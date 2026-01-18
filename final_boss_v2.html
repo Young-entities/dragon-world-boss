@@ -74,6 +74,24 @@
             }
         }
 
+        /* NEW WRAPPER FOR 100VH LAYOUT */
+        .main-screen-height {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+        }
+
+        .monster-stage {
+            flex: 1;
+            /* Pushes bottom UI down */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* --- TOP UI (STICKY) --- */
         .top-ui-wrapper {
             z-index: 20;
@@ -731,83 +749,88 @@
         <div class="magma-pulse"></div>
         <div class="bg-embers"></div>
 
-        <!-- Top UI (Sticky) -->
-        <div class="top-ui-wrapper">
-            <div class="top-row">
-                <div class="level-badge">
-                    <div class="level-number">
-                        <div class="level-star">⭐</div><span class="level-value" id="levelText">42</span>
-                    </div>
-                    <div class="xp-bar-wrapper">XP: <span id="xpText"></span>
-                        <div class="xp-bar">
-                            <div class="xp-fill" id="xpBar"></div>
+        <!-- Main Screen Wrapper (100vh) -->
+        <div class="main-screen-height">
+            <!-- Top UI (Sticky) -->
+            <div class="top-ui-wrapper">
+                <div class="top-row">
+                    <div class="level-badge">
+                        <div class="level-number">
+                            <div class="level-star">⭐</div><span class="level-value" id="levelText">42</span>
+                        </div>
+                        <div class="xp-bar-wrapper">XP: <span id="xpText"></span>
+                            <div class="xp-bar">
+                                <div class="xp-fill" id="xpBar"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="money-display">
-                    <div class="money-amount" id="moneyText">0G</div>
-                    <div class="money-sub">Next Check: 15:00</div>
-                </div>
-            </div>
-            <div class="resource-row">
-                <div class="resource-item">❤️
-                    <div class="resource-bar">
-                        <div class="resource-fill stamina" id="hpBar" style="width:100%"></div>
+                    <div class="money-display">
+                        <div class="money-amount" id="moneyText">0G</div>
+                        <div class="money-sub">Next Check: 15:00</div>
                     </div>
-                    <span class="resource-text"><span id="hpText">100/100</span><span id="hpTimer"
-                            class="resource-timer"></span></span>
                 </div>
-                <div class="resource-item">⚡
-                    <div class="resource-bar">
-                        <div class="resource-fill stamina" id="staminaBar" style="width:100%"></div>
+                <div class="resource-row">
+                    <div class="resource-item">❤️
+                        <div class="resource-bar">
+                            <div class="resource-fill stamina" id="hpBar" style="width:100%"></div>
+                        </div>
+                        <span class="resource-text"><span id="hpText">100/100</span><span id="hpTimer"
+                                class="resource-timer"></span></span>
                     </div>
-                    <span class="resource-text"><span id="staminaText">50/50</span><span id="staminaTimer"
-                            class="resource-timer"></span></span>
+                    <div class="resource-item">⚡
+                        <div class="resource-bar">
+                            <div class="resource-fill stamina" id="staminaBar" style="width:100%"></div>
+                        </div>
+                        <span class="resource-text"><span id="staminaText">50/50</span><span id="staminaTimer"
+                                class="resource-timer"></span></span>
+                    </div>
+                    <div class="resource-item">💎 <span class="resource-text" id="gemsText">5,717</span></div>
                 </div>
-                <div class="resource-item">💎 <span class="resource-text" id="gemsText">5,717</span></div>
-            </div>
-            <div class="overdrive-wrapper">
-                <div class="od-bar-frame">
-                    <div class="od-bar-fill" id="odFill"></div>
-                    <div class="od-text-overlay">OVERDRIVE</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dragon Area -->
-        <div class="dragon-stage">
-            <img src="fire_dragon_transparent.png" class="dragon-img" id="dragon">
-            <div class="damage-floater" id="damageText">999</div>
-        </div>
-
-        <!-- Bottom UI -->
-        <div class="bottom-ui">
-            <!-- Boss HP -->
-            <div class="boss-hp-wrapper">
-                <div class="boss-meta">
-                    <span class="boss-name-text" id="bossName">🔥 Dark Overlord</span>
-                    <span style="color:#aaa; font-family:monospace;">05:59:40</span>
-                </div>
-                <div class="boss-bar-frame">
-                    <div class="boss-bar-fill" id="bossFill"></div>
-                    <div class="boss-hp-text" id="phaseMsg"></div>
+                <div class="overdrive-wrapper">
+                    <div class="od-bar-frame">
+                        <div class="od-bar-fill" id="odFill"></div>
+                        <div class="od-text-overlay">OVERDRIVE</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Attack Buttons -->
-            <div class="btn-row">
-                <button class="btn normal" onclick="attack('normal')">
-                    <span class="btn-title">ATTACK x1</span><span class="btn-cost">⚡ 1 Stamina</span>
-                    <div class="btn-fx"></div>
-                </button>
-                <button class="btn united" onclick="attack('united')">
-                    <span class="btn-title">ATTACK x5</span><span class="btn-cost">⚡ 5 Stamina</span>
-                    <div class="btn-fx"></div>
-                </button>
-                <button class="btn special" onclick="attack('special')">
-                    <span class="btn-title">ATTACK x50</span><span class="btn-cost">💎 10 Gems</span>
-                    <div class="btn-fx"></div>
-                </button>
+            <!-- Dragon Area -->
+            <div class="dragon-stage">
+                <img src="fire_dragon_transparent.png" class="dragon-img" id="dragon">
+                <div class="damage-floater" id="damageText">999</div>
+            </div>
+
+            <!-- Bottom UI -->
+            <div class="bottom-ui">
+                <!-- Boss HP -->
+                <div class="boss-hp-wrapper">
+                    <div class="boss-meta">
+                        <span class="boss-name-text" id="bossName">🔥 Dark Overlord</span>
+                        <span style="color:#aaa; font-family:monospace;">05:59:40</span>
+                    </div>
+                    <div class="boss-bar-frame">
+                        <div class="boss-bar-fill" id="bossFill"></div>
+                        <div class="boss-hp-text" id="phaseMsg"></div>
+                    </div>
+                </div>
+
+                <!-- Attack Buttons -->
+                <div class="btn-row">
+                    <button class="btn normal" onclick="attack('normal')">
+                        <span class="btn-title">ATTACK x1</span><span class="btn-cost">⚡ 1 Stamina</span>
+                        <div class="btn-fx"></div>
+                    </button>
+                    <button class="btn united" onclick="attack('united')">
+                        <span class="btn-title">ATTACK x5</span><span class="btn-cost">⚡ 5 Stamina</span>
+                        <div class="btn-fx"></div>
+                    </button>
+                    <button class="btn special" onclick="attack('special')">
+                        <span class="btn-title">ATTACK x50</span><span class="btn-cost">💎 10 Gems</span>
+                        <div class="btn-fx"></div>
+                    </button>
+                </div>
+
+                <!-- End of Main Screen Wrapper -->
             </div>
 
             <!-- Battle Status Panel (Screenshot Style) -->
