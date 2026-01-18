@@ -282,8 +282,8 @@
         /* --- DRAGON AREA --- */
         .dragon-stage {
             flex: 1;
-            /* Pushes content down */
-            min-height: 50vh;
+            min-height: 0;
+            /* Allow shrinking */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -293,7 +293,9 @@
 
         .dragon-img {
             max-width: 90%;
-            max-height: 80%;
+            max-height: 65vh;
+            /* Prevent image from pushing buttons */
+            object-fit: contain;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
             animation: breathe 3s ease-in-out infinite;
             transition: filter 1s;
