@@ -8,8 +8,207 @@
     <style>
         * {
             box-sizing: border-box;
-            user-select: none;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- MONSTER TAB STYLES --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            height: 55px;
+            background: #111;
+            display: flex;
+            align-items: stretch;
+            padding: 0;
+            margin: 0;
+            border-top: 1px solid #333;
+            z-index: 9999;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
+            /* Ensure padding/border doesn't increase width */
+        }
+
+        .nav-btn {
+            flex: 0 0 25%;
+            /* Strictly 25% width */
+            max-width: 25%;
+            height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            color: #777;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nav-btn.active {
+            color: #ffcc00;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* Stage 2 Element Icon */
+        .stage2-element {
+            display: none;
+            /* Hidden by default */
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #440000;
+            border: 1px solid #ff4400;
+            color: #ffaa00;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 20;
+            white-space: nowrap;
+        }
+
+        .stage2-element.active {
+            display: block;
+        }
+
+        /* Monster Overlay */
+        #view-monster {
+            position: fixed;
+            top: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            height: calc(100vh - 170px);
+            background: #000;
+            z-index: 900;
+            display: none;
+            flex-direction: column;
+            border: 1px solid #333;
+        }
+
+        .sub-nav-tabs {
+            display: flex;
+            background: #111;
+            border-bottom: 1px solid #333;
+        }
+
+        .sub-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            color: #666;
+            font-weight: bold;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .sub-tab.active {
+            color: #fff;
+            border-bottom: 2px solid #ffcc00;
+            background: #222;
+        }
+
+        .mon-tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: none;
+        }
+
+        .mon-tab-content.active {
+            display: block;
+        }
+
+        /* Monster List Styles */
+        .mon-row {
+            display: flex;
+            align-items: center;
+            background: #1a1a1a;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .mon-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .mon-info {
+            flex: 1;
+        }
+
+        .mon-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .mon-stats {
+            color: #888;
+            font-size: 10px;
+        }
+
+        .mon-act {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-act {
+            padding: 4px 8px;
+            font-size: 10px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-buy {
+            background: #258;
+            color: #fff;
+        }
+
+        .btn-sell {
+            background: #522;
+            color: #fff;
+        }
+
+        /* Grid Styles */
+        .mon-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 10px;
+        }
+
+        .mon-grid-item {
+            background: #1a1a1a;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 8px;
+            border: 1px solid #333;
         }
 
         /* --- SCROLLABLE LAYOUT --- */
@@ -34,7 +233,8 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            overflow-x: hidden;
+            padding-bottom: 150px;
+            /* ENORMOUS PADDING to ensure scroll clearance */
         }
 
         .boss-bg-layer {
@@ -293,13 +493,23 @@
 
         .dragon-img {
             max-width: 90%;
-            max-height: 50vh;
-            /* Scaled down for safe fit */
+            max-height: 45vh;
+            /* Optimized for View */
             object-fit: contain;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
             animation: breathe 3s ease-in-out infinite;
             transition: filter 1s;
-            /* Smooth phase transition */
+        }
+
+        .tab-content {
+            background: #111822;
+            /* Dark list background */
+            min-height: 200px;
+            max-height: 300px;
+            /* Bigger as requested */
+            overflow-y: auto;
+            padding: 0;
+            margin-bottom: 20px;
         }
 
         /* Visual for Phase 2 */
@@ -410,7 +620,12 @@
             display: flex;
             gap: 8px;
             height: 55px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            /* STANDARD FLOW */
+            z-index: 20;
+            padding: 0 10px;
+            pointer-events: auto;
         }
 
         .btn {
@@ -489,8 +704,13 @@
             border-top: 2px solid #506070;
             color: #fff;
             margin-bottom: 20px;
+            margin-top: 60px;
+            /* AGGRESSIVE GAP to prevent overlap */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             border-radius: 3px;
+            position: relative;
+            /* Ensure stacking context */
+            z-index: 5;
         }
 
         .status-header {
@@ -562,10 +782,13 @@
         .tab-content {
             background: #111822;
             /* Dark list background */
-            min-height: 250px;
-            max-height: 400px;
+            min-height: 150px;
+            /* More compact */
+            max-height: 300px;
             overflow-y: auto;
             padding: 0;
+            margin-bottom: 20px;
+            /* Ensure space below */
         }
 
         /* --- SIDE BY SIDE COLUMNS FOR REWARD (RESTORED) --- */
@@ -802,21 +1025,36 @@
                 <div class="damage-floater" id="damageText">999</div>
             </div>
 
-            <!-- Bottom UI -->
+            <!-- Bottom UI Wrapper (RESTORED) -->
             <div class="bottom-ui">
-                <!-- Boss HP -->
-                <div class="boss-hp-wrapper">
-                    <div class="boss-meta">
-                        <span class="boss-name-text" id="bossName">🔥 Dark Overlord</span>
-                        <span style="color:#aaa; font-family:monospace;">05:59:40</span>
+                <!-- Boss Info (Name & Element) -->
+                <div class="boss-info"
+                    style="text-align:center; margin-bottom:5px; margin-top: 10px; position: relative; z-index: 20;">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <div class="boss-name" id="bossName"
+                            style="font-size:18px; font-weight:bold; color:#ff4400; text-shadow:0 1px 2px #000;">Dark
+                            Overlord
+                        </div>
+                        <!-- Element Icon (Visible Always) -->
+                        <div id="stage2Icon"
+                            style="display:block; font-size:12px; color:#ffaa00; font-weight:bold; border:1px solid #ff4400; padding:2px 8px; border-radius:4px; background:#440000;">
+                            🔥 Fire Element
+                        </div>
                     </div>
+                    <!-- Phase Message -->
+                    <div class="phase-msg" id="phaseMsg"
+                        style="font-size:11px; color:#ffcc00; margin-top:2px; height:14px;"></div>
+                </div>
+
+                <!-- Boss HP Bar -->
+                <div class="boss-hp-wrapper">
                     <div class="boss-bar-frame">
                         <div class="boss-bar-fill" id="bossFill"></div>
-                        <div class="boss-hp-text" id="phaseMsg"></div>
+                        <!-- REMOVED HP TEXT AS REQUESTED -->
                     </div>
                 </div>
 
-                <!-- Attack Buttons -->
+                <!-- Buttons (Restored Flow) -->
                 <div class="btn-row">
                     <button class="btn normal" onclick="attack('normal')">
                         <span class="btn-title">ATTACK x1</span><span class="btn-cost">⚡ 1 Stamina</span>
@@ -832,8 +1070,17 @@
                     </button>
                 </div>
 
-                <!-- End of Main Screen Wrapper -->
-            </div>
+                <!-- Forced Spacer -->
+                <div style="height: 50px; width: 100%;"></div>
+            </div> <!-- CLOSE .bottom-ui -->
+
+            <!-- Battle Status Panel (Inside Main Wrapper now?) -->
+            <!-- actually, battle status was SUPPOSED to be separate from the fixed UI stack in my head, 
+                 but visually it makes sense to flow together. 
+                 Wait, the Screenshot shows NO Battle Status panel visible at all!
+                 The user just wants the MAIN GAME LOOP visible.
+                 But I can't just delete it. I 'll keep it below.
+            -->
 
             <!-- Battle Status Panel (Screenshot Style) -->
             <div class="battle-status">
@@ -849,26 +1096,109 @@
 
                 <!-- 2. Tabs -->
                 <div class="status-tabs">
-                    <div class="tab" onclick="switchTab('damage', this)">Damage</div>
+                    <div class="tab active" onclick="switchTab('damage', this)">Damage</div>
                     <div class="tab" onclick="switchTab('attacks', this)">Attacks</div>
-                    <div class="tab" onclick="switchTab('chat', this)">Chat</div>
-                    <div class="tab active" onclick="switchTab('reward', this)">Reward</div>
+                    <div class="tab" onclick="switchTab('reward', this)">Reward</div>
                 </div>
 
-                <!-- 3. Content List (Bottom) -->
-                <div id="tabContent" class="tab-content">
-                    <!-- Default loaded by JS -->
+                <!-- 3. Content List -->
+                <div class="tab-content" id="tabContent">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Spacer to prevent bottom nav from blocking content -->
+            <div style="height: 80px; width: 100%; flex-shrink: 0;"></div>
+            <!-- Spacer to prevent bottom nav from blocking content -->
+            <div style="height: 120px; width: 100%; flex-shrink: 0; clear:both;"></div>
+        </div>
+
+        <!-- === MONSTER VIEW OVERLAY === -->
+        <div id="view-monster">
+            <div class="sub-nav-tabs">
+                <div class="sub-tab active" onclick="monsterTab('monster', this)">Monster</div>
+                <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
+                <div class="sub-tab" onclick="monsterTab('collectibles', this)">Collectibles</div>
+            </div>
+
+            <!-- Monster Tab -->
+            <div id="mt-monster" class="mon-tab-content active">
+                <div style="color:#ffcc00; font-size:12px; margin-bottom:10px; text-align:center;">Manage your army
+                </div>
+                <div class="mon-row">
+                    <div class="mon-icon">🐉</div>
+                    <div class="mon-info">
+                        <div class="mon-name">Fire Dragon</div>
+                        <div class="mon-stats">ATK: 5000 | DEF: 2000</div>
+                    </div>
+                    <div class="mon-act">
+                        <button class="btn-act btn-buy">UPGR</button>
+                    </div>
+                </div>
+                <div class="mon-row">
+                    <div class="mon-icon">👹</div>
+                    <div class="mon-info">
+                        <div class="mon-name">Ogre</div>
+                        <div class="mon-stats">ATK: 1500 | DEF: 3000</div>
+                    </div>
+                    <div class="mon-act">
+                        <button class="btn-act btn-buy">UPGR</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pets Tab -->
+            <div id="mt-pets" class="mon-tab-content">
+                <div style="color:#44ff44; font-size:12px; margin-bottom:10px; text-align:center;">Active Companions
+                </div>
+                <div class="mon-grid">
+                    <div class="mon-grid-item">🐺</div>
+                    <div class="mon-grid-item">🦅</div>
+                    <div class="mon-grid-item">🐢</div>
+                </div>
+            </div>
+
+            <!-- Collectibles Tab -->
+            <div id="mt-collectibles" class="mon-tab-content">
+                <div style="color:#cc44ff; font-size:12px; margin-bottom:10px; text-align:center;">Artifacts & Trophies
+                </div>
+                <div class="mon-grid">
+                    <div class="mon-grid-item">👑</div>
+                    <div class="mon-grid-item">💍</div>
+                    <div class="mon-grid-item">🗡️</div>
+                    <div class="mon-grid-item" style="opacity:0.3">🛡️</div>
+                    <div class="mon-grid-item" style="opacity:0.3">🔮</div>
                 </div>
             </div>
         </div>
 
-        <!-- Level Up Overlay -->
-        <div class="level-up-overlay" id="luOverlay">
-            <div class="lu-content">
-                <div class="lu-title">LEVEL UP!</div>
-                <div class="lu-sub" id="luText">Level 43</div>
-            </div>
+        <!-- === BOTTOM NAVIGATION === -->
+        <div class="bottom-nav">
+            <button class="nav-btn" onclick="toggleView('battle')">
+                <span class="nav-icon">⚔️</span>
+                <span>Battle</span>
+            </button>
+            <button class="nav-btn" onclick="toggleView('monster')">
+                <span class="nav-icon">👹</span>
+                <span>Monster</span>
+            </button>
+            <button class="nav-btn">
+                <span class="nav-icon">🎒</span>
+                <span>Equip</span>
+            </button>
+            <button class="nav-btn">
+                <span class="nav-icon">💰</span>
+                <span>Shop</span>
+            </button>
         </div>
+    </div>
+    <!-- Level Up Overlay -->
+    <div class="level-up-overlay" id="luOverlay">
+        <div class="lu-content">
+            <div class="lu-title">LEVEL UP!</div>
+            <div class="lu-sub" id="luText">Level 43</div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -881,34 +1211,47 @@
             gems: 5717, level: 42, xp: 4200, xpToLevel: 50000, money: 416531953,
             overdrive: 0, maxOverdrive: 100,
             totalDamage: 0, totalAttacks: 0,
-            activeTab: 'reward'
+            activeTab: 'damage'
         };
 
         // DOM elements
         const el = {
             bossFill: document.getElementById('bossFill'),
-            phaseMsg: document.getElementById('phaseMsg'),
             bossName: document.getElementById('bossName'),
+            phaseMsg: document.getElementById('phaseMsg'),
+            stage2Icon: document.getElementById('stage2Icon'),
+
             hpFill: document.getElementById('hpBar'), hpText: document.getElementById('hpText'), hpTimer: document.getElementById('hpTimer'),
             staminaFill: document.getElementById('staminaBar'), staminaText: document.getElementById('staminaText'), staminaTimer: document.getElementById('staminaTimer'),
-            gemsText: document.getElementById('gemsText'), dragon: document.getElementById('dragon'), damageText: document.getElementById('damageText'),
-            levelText: document.getElementById('levelText'), xpText: document.getElementById('xpText'), xpBar: document.getElementById('xpBar'), moneyText: document.getElementById('moneyText'),
+
+            gemsText: document.getElementById('gemsText'), moneyText: document.getElementById('moneyText'),
+            levelText: document.getElementById('levelText'), xpText: document.getElementById('xpText'), xpBar: document.getElementById('xpBar'),
+
             odFill: document.getElementById('odFill'),
+
             totalDamage: document.getElementById('totalDamage'), totalAttacks: document.getElementById('totalAttacks'),
             dmgRank: document.getElementById('dmgRank'), atkRank: document.getElementById('atkRank'),
-            tabContent: document.getElementById('tabContent'), tabs: document.querySelectorAll('.tab'),
-            luOverlay: document.getElementById('luOverlay'), luText: document.getElementById('luText')
+
+            dragon: document.getElementById('dragon'),
+            damageText: document.getElementById('damageText'),
+
+            luOverlay: document.getElementById('luOverlay'), luText: document.getElementById('luText'),
+
+            // FIXED: Added missing tabContent reference
+            tabContent: document.getElementById('tabContent')
         };
 
         // --- TAB & UI LOGIC ---
         function switchTab(tabName, tabElement) {
-            el.tabs.forEach(t => t.classList.remove('active'));
-            tabElement.classList.add('active');
             state.activeTab = tabName;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tabElement.classList.add('active');
             renderTabContent();
         }
 
         function renderTabContent() {
+            if (!el.tabContent) return; // Safety check
+
             const tab = state.activeTab;
             let html = '';
 
@@ -969,12 +1312,24 @@
         function updateUI() {
             el.bossFill.style.width = (state.bossHp / state.maxBossHp * 100) + '%';
 
-            // Phase Msg logic in updated UI
+            // Removed Boss HP Text numbers as requested
+
+            // Phase Logic Update
             if (state.bossHp > 0) {
-                if (state.phase === 2) el.phaseMsg.textContent = "⚠ MAGMA ARMOR";
-                else el.phaseMsg.textContent = ""; // Hide HP text
+                if (state.phase === 2) {
+                    el.phaseMsg.textContent = "⚠ MAGMA ARMOR ACTIVATED";
+                    // Icon is always visible now
+                    el.bossName.textContent = "Dark Overlord (Armored)";
+                    el.bossName.style.color = "#ff4400"; // Always Red
+                } else {
+                    el.phaseMsg.textContent = "";
+                    // Icon is always visible now
+                    el.bossName.textContent = "Dark Overlord";
+                    el.bossName.style.color = "#ff4400"; // Always Red
+                }
             } else {
                 el.phaseMsg.textContent = "BOSS DEFEATED";
+                el.stage2Icon.style.display = 'none';
             }
 
             el.hpFill.style.width = (state.hp / state.maxHp * 100) + '%';
@@ -1012,28 +1367,65 @@
             if (type === 'united') { costSt = 5; dmg = 80000; atks = 5; }
             if (type === 'special') { costSt = 0; costGm = 10; dmg = 500000; atks = 50; }
 
+            // --- RESOURCE CHECK (No Popups) ---
             if (type !== 'special') {
-                if (state.stamina < costSt) return alert("No Stamina");
+                if (state.stamina < costSt) {
+                    showDamage("NO STAMINA!", false, '#888');
+                    return;
+                }
                 state.stamina -= costSt;
             } else {
-                if (state.gems < costGm) return alert("No Gems");
+                if (state.gems < costGm) {
+                    showDamage("NO GEMS!", false, '#888');
+                    return;
+                }
                 state.gems -= costGm;
             }
 
             // Stats Update
             state.totalAttacks += atks;
 
-            // --- OVERDRIVE & REWARDS ---
+            // --- PHASE LOGIC ---
+            checkPhase();
+
+            // Damage Roll
+            let roll = dmg * (0.9 + Math.random() * 0.2);
+
+            // Unit Composition (Simulated)
+            let waterPct = 0.0; // User said monster with elemental strength
+            let normalPct = 1.0;
+
+            // Logic: Elemental Strength does +60%
+            // Logic: Stage 2 Neutral does -60% (40% damage)
+
+            let finalDmg = roll;
+
+            // Stage 2 Logic: Neutral Damage reduced by 60%
+            if (state.phase === 2) {
+                finalDmg = finalDmg * 0.4;
+            }
+
+            finalDmg = Math.floor(finalDmg);
+
+            // Overdrive Logic
             let odGain = 0;
             if (type === 'normal') odGain = 0.8;
             else if (type === 'united') odGain = 4.0;
             else if (type === 'special') odGain = 10.0;
 
             let isOD = (state.overdrive + odGain >= state.maxOverdrive);
-            let mult = isOD ? 2 : 1; // Double Rewards on Overdrive!
-            state.overdrive += odGain;
+            if (isOD) {
+                state.overdrive = 0;
+                finalDmg *= 5; // Critical Hit Multiplier
+            } else {
+                state.overdrive += odGain;
+            }
 
-            // Fixed: 10 XP per attack
+            state.bossHp = Math.max(0, state.bossHp - finalDmg);
+            state.totalDamage += finalDmg;
+
+            // Reward Calc
+            let mult = isOD ? 2 : 1;
             let xpVal = 10 * atks * mult;
             let moneyVal = (15000 + Math.floor(Math.random() * 10000)) * atks * mult;
 
@@ -1044,71 +1436,44 @@
             spawnUIFloater(el.xpText, "+" + xpVal.toLocaleString() + " XP", isOD ? "#fff" : "#fd4");
             spawnUIFloater(el.moneyText, "+" + moneyVal.toLocaleString() + " G", "#4f4");
 
-            // Floaters removed as requested
+            // --- CRITICAL HIT COLORS ---
+            let dmgColor = '#ffcc00'; // Default Gold
+
+            if (state.phase === 2) {
+                // STAGE 2 (Fire Boss) -> Weak to Water (Blue)
+                // Normal: Blue, Crit: Cyan
+                dmgColor = isOD ? '#00ffff' : '#00ccff';
+            } else {
+                // STAGE 1 (Neutral)
+                // Normal: Gold, Crit: Red
+                dmgColor = isOD ? '#ff4400' : '#ffcc00';
+            }
+
+            showDamage(finalDmg.toLocaleString(), isOD, dmgColor);
+
+            // Visual Effects
+            const btnEl = document.querySelector(`.btn.${type} .btn-fx`);
+            if (btnEl) {
+                btnEl.style.animation = 'none';
+                btnEl.offsetHeight;
+                btnEl.style.animation = 'btnFlash 0.3s';
+            }
+
+            el.moneyText.classList.remove('pop');
+            void el.moneyText.offsetWidth;
+            el.moneyText.classList.add('pop');
 
             // Level Up Check
             if (state.xp >= state.xpToLevel) {
                 state.level++;
                 state.xp = state.xp - state.xpToLevel;
                 state.xpToLevel = Math.floor(state.xpToLevel * 1.1);
-
-                // Full Restore
                 state.hp = state.maxHp;
                 state.stamina = state.maxStamina;
-
                 triggerLevelUp(state.level);
             }
 
-            // Overdrive calculation moved up for Reward Bonus logic
-
-            // --- PHASE LOGIC ---
-            checkPhase();
-
-            // ENGINE DAMAGE FORMULA
-            let roll = dmg * (0.9 + Math.random() * 0.2);
-
-            // Unit Composition (Engine Ready)
-            let waterPct = 0.0; // Currently 0
-            let normalPct = 1.0;
-
-            // 1. Elemental Strength (+60% ALWAYS)
-            let waterDmg = (roll * waterPct) * 1.6;
-            let normalDmg = (roll * normalPct);
-
-            // 2. Phase 2: Magma Armor (Nerfs Neutral Only)
-            if (state.phase === 2) {
-                normalDmg = normalDmg * 0.4; // -60% Neutral
-            }
-
-            roll = waterDmg + normalDmg;
-
-            let finalDmg = Math.floor(roll);
-            let isCrit = false;
-
-            if (state.overdrive >= state.maxOverdrive) {
-                state.overdrive = 0;
-                let bonus = finalDmg * 5;
-                state.bossHp = Math.max(0, state.bossHp - bonus);
-                state.totalDamage += bonus;
-                showDamage("CRIT " + bonus.toLocaleString() + "!", true);
-            } else {
-                state.bossHp = Math.max(0, state.bossHp - finalDmg);
-                state.totalDamage += finalDmg;
-                let col = (state.phase === 2) ? '#ccc' : '#fc0';
-                showDamage(finalDmg.toLocaleString(), false, col);
-            }
-
             animateDragon();
-
-            // Button FX
-            const btn = document.querySelector(`.btn.${type} .btn-fx`);
-            if (btn) { btn.style.animation = 'none'; btn.offsetHeight; btn.style.animation = 'btnFlash 0.3s'; }
-
-            // Money Pop Up Top
-            el.moneyText.classList.remove('pop');
-            void el.moneyText.offsetWidth; // Force Reflow
-            el.moneyText.classList.add('pop');
-
             updateUI();
         }
 
@@ -1124,7 +1489,14 @@
 
         function showDamage(text, isCrit, colorOverride) {
             el.damageText.textContent = text;
-            el.damageText.style.color = isCrit ? '#ff4400' : (colorOverride || '#ffcc00');
+            // FIXED LOGIC: If colorOverride is provided (from attack function), USE IT. 
+            // Otherwise default to Red for Crit, Gold for Normal.
+            if (colorOverride) {
+                el.damageText.style.color = colorOverride;
+            } else {
+                el.damageText.style.color = isCrit ? '#ff4400' : '#ffcc00';
+            }
+
             el.damageText.style.fontSize = isCrit ? '50px' : '40px';
             el.damageText.style.animation = 'none';
             el.damageText.offsetHeight;
