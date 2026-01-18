@@ -12,31 +12,50 @@
         }
 
         /* --- MONSTER TAB STYLES --- */
+        /* REMOVED .unified-sticky-header - using direct children now */
+
+        /* STICKY HEADER GROUP REMOVED */
+
+        /* --- MONSTER TAB STYLES --- */
         .bottom-nav {
             position: fixed;
+            /* FIXED TO BOTTOM SCREEN */
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+            top: auto;
+            left: 0;
+            right: auto;
+            margin: 0;
+            /* JS will handle alignment */
             width: 100%;
             max-width: 480px;
-            height: 55px;
-            background: #111;
+            height: 50px;
+            background: rgba(20, 20, 25, 1);
             display: flex;
-            align-items: stretch;
+            align-items: center;
+            justify-content: center;
             padding: 0;
-            margin: 0;
             border-top: 1px solid #333;
+            border-bottom: 0;
             z-index: 9999;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.8);
             box-sizing: border-box;
-            /* Ensure padding/border doesn't increase width */
+            margin-bottom: 0;
+        }
+
+        /* Status Info */
+        .sticky-status-info {
+            position: relative;
+            /* Reset to relative inside wrapper */
+            padding-top: 0;
+            background: #000;
+            z-index: 1001;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #333;
         }
 
         .nav-btn {
-            flex: 0 0 25%;
-            /* Strictly 25% width */
-            max-width: 25%;
-            height: 50px;
+            flex: 1;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -44,7 +63,8 @@
             background: transparent;
             border: none;
             outline: none;
-            padding: 0;
+            padding-top: 4px;
+            /* Reduced padding */
             margin: 0;
             cursor: pointer;
             color: #777;
@@ -54,13 +74,18 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+
+
         .nav-btn.active {
             color: #ffcc00;
         }
 
         .nav-icon {
-            font-size: 20px;
-            margin-bottom: 2px;
+            font-size: 22px;
+            margin-bottom: 4px;
+            display: block;
+            text-align: center;
+            line-height: 1;
         }
 
         /* Stage 2 Element Icon */
@@ -211,758 +236,769 @@
             border: 1px solid #333;
         }
 
-        /* --- SCROLLABLE LAYOUT --- */
+        /* --- SCROLLABLE ARCHITECTURE (Standard) --- */
         body {
-            margin: 0;
-            padding: 0;
             background: #000;
             height: 100vh;
             width: 100vw;
             overflow-y: auto;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        /* --- GAME CONTAINER --- */
         #game-container {
             width: 100%;
             max-width: 480px;
             min-height: 100vh;
             margin: 0 auto;
             position: relative;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            padding-bottom: 150px;
-            /* ENORMOUS PADDING to ensure scroll clearance */
-        }
 
-        .boss-bg-layer {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            filter: brightness(0.8) contrast(1.1);
-        }
-
-        .magma-pulse,
-        .bg-embers {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        .magma-pulse {
-            z-index: 1;
-        }
-
-        .bg-embers {
-            z-index: 2;
-            background-image:
-                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
-                radial-gradient(2px 2px at 150px 150px, #ffcc00, transparent);
-            background-size: 300px 300px;
-            animation: floatUp 3s linear infinite;
-        }
-
-        @keyframes floatUp {
-            from {
-                transform: translateY(0);
+            #game-container {
+                width: 100%;
+                max-width: 480px;
+                min-height: 100vh;
+                margin: 0 auto;
+                position: relative;
+                background: #000;
+                display: block;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+                padding-bottom: 60px;
+                /* SPACE FOR FIXED NAV */
+                overflow: visible;
             }
 
-            to {
-                transform: translateY(-300px);
+            /* Status Info relative again */
+            .sticky-status-info {
+                position: relative;
+                z-index: 10;
             }
-        }
 
-        /* NEW WRAPPER FOR 100VH LAYOUT */
-        .main-screen-height {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            z-index: 10;
-        }
-
-        .monster-stage {
-            flex: 1;
-            /* Pushes bottom UI down */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* --- TOP UI (STICKY) --- */
-        .top-ui-wrapper {
-            z-index: 20;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.8) 100%);
-            padding-bottom: 10px;
-            position: sticky;
-            top: 0;
-            width: 100%;
-            border-bottom: 1px solid #333;
-        }
-
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 10px 5px 10px;
-        }
-
-        .level-badge {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .level-number {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .level-star {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, #ffd700 0%, #ff8800 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            border: 2px solid #ffee88;
-        }
-
-        .level-value {
-            color: #fff;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .xp-bar-wrapper {
-            margin-top: 3px;
-            font-size: 10px;
-            color: #aaa;
-        }
-
-        .xp-bar {
-            width: 100px;
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .xp-fill {
-            height: 100%;
-            background: #44dd44;
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .money-display {
-            text-align: right;
-        }
-
-        .money-amount {
-            color: #44ff44;
-            font-weight: bold;
-            font-size: 18px;
-            display: inline-block;
-            transition: transform 0.1s;
-        }
-
-        .money-amount.pop {
-            transform: scale(1.2);
-            /* Just a small pulse, no color change */
-            /* color: #fff; REMOVED */
-            /* text-shadow: REMOVED */
-        }
-
-        .money-sub {
-            font-size: 10px;
-            color: #888;
-        }
-
-        .resource-row {
-            display: flex;
-            justify-content: space-around;
-            padding: 5px 10px;
-            gap: 8px;
-        }
-
-        .resource-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px 10px;
-            border-radius: 15px;
-            border: 1px solid #333;
-        }
-
-        .resource-bar {
-            width: 50px;
-            height: 6px;
-            background: #222;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .resource-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
-
-        .resource-fill.stamina {
-            background: linear-gradient(90deg, #ffaa00, #ff8800);
-        }
-
-        .resource-fill.gems {
-            background: linear-gradient(90deg, #00aaff, #0088dd);
-        }
-
-        .resource-text {
-            font-size: 11px;
-            color: #ddd;
-            font-weight: bold;
-        }
-
-        .resource-timer {
-            font-size: 11px;
-            color: #44ff44;
-            margin-left: 4px;
-            font-weight: normal;
-        }
-
-        /* OVERDRIVE */
-        .overdrive-wrapper {
-            width: 96%;
-            margin: 6px auto 0;
-            padding: 0 10px;
-        }
-
-        .od-bar-frame {
-            height: 12px;
-            background: #111;
-            border: 1px solid #440000;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .od-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(180deg, #cc0000, #990000);
-            transition: width 0.3s;
-        }
-
-        .od-bar-fill.full {
-            animation: odPulse 0.5s infinite alternate;
-        }
-
-        .od-text-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            font-weight: bold;
-            color: #fff;
-            letter-spacing: 2px;
-        }
-
-        @keyframes odPulse {
-            to {
-                opacity: 0.7;
+            .boss-bg-layer {
+                position: absolute;
+                inset: 0;
+                z-index: 0;
+                filter: brightness(0.8) contrast(1.1);
             }
-        }
 
-        /* --- DRAGON AREA --- */
-        .dragon-stage {
-            flex: 1;
-            min-height: 0;
-            /* Allow shrinking */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 10;
-        }
-
-        .dragon-img {
-            max-width: 90%;
-            max-height: 45vh;
-            /* Optimized for View */
-            object-fit: contain;
-            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
-            animation: breathe 3s ease-in-out infinite;
-            transition: filter 1s;
-        }
-
-        .tab-content {
-            background: #111822;
-            /* Dark list background */
-            min-height: 200px;
-            max-height: 300px;
-            /* Bigger as requested */
-            overflow-y: auto;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        /* Visual for Phase 2 */
-        .filter-phase2 {
-            filter: drop-shadow(0 0 20px #ff2222) brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(3) !important;
-        }
-
-        @keyframes breathe {
-            50% {
-                transform: scale(1.02) translateY(-5px);
+            .magma-pulse,
+            .bg-embers {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
             }
-        }
 
-        .damage-floater {
-            position: absolute;
-            color: #ffcc00;
-            font-weight: bold;
-            font-size: 40px;
-            text-shadow: 0 0 10px #ff0000;
-            opacity: 0;
-            pointer-events: none;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-        }
+            .magma-pulse {
+                z-index: 1;
+            }
 
-        @keyframes damagePop {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
+            .bg-embers {
+                z-index: 2;
+                background-image:
+                    radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                    radial-gradient(2px 2px at 150px 150px, #ffcc00, transparent);
+                background-size: 300px 300px;
+                animation: floatUp 3s linear infinite;
+            }
+
+            @keyframes floatUp {
+                from {
+                    transform: translateY(0);
+                }
+
+                to {
+                    transform: translateY(-300px);
+                }
+            }
+
+            /* NEW WRAPPER FOR 100VH LAYOUT */
+            .main-screen-height {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                position: relative;
+                z-index: 10;
+            }
+
+            .monster-stage {
+                flex: 1;
+                /* Pushes bottom UI down */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* --- TOP UI (STICKY) --- */
+            .top-ui-wrapper {
+                z-index: 20;
+                background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.8) 100%);
+                padding-bottom: 10px;
+                position: sticky;
+                top: 0;
+                width: 100%;
+                border-bottom: 1px solid #333;
+            }
+
+            .top-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 10px 5px 10px;
+            }
+
+            .level-badge {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .level-number {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .level-star {
+                width: 28px;
+                height: 28px;
+                background: linear-gradient(135deg, #ffd700 0%, #ff8800 100%);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                border: 2px solid #ffee88;
+            }
+
+            .level-value {
+                color: #fff;
+                font-weight: bold;
+                font-size: 20px;
+            }
+
+            .xp-bar-wrapper {
+                margin-top: 3px;
+                font-size: 10px;
+                color: #aaa;
+            }
+
+            .xp-bar {
+                width: 100px;
+                height: 4px;
+                background: #333;
+                border-radius: 2px;
+                overflow: hidden;
+            }
+
+            .xp-fill {
+                height: 100%;
+                background: #44dd44;
+                width: 0%;
+                transition: width 0.3s;
+            }
+
+            .money-display {
+                text-align: right;
+            }
+
+            .money-amount {
+                color: #44ff44;
+                font-weight: bold;
+                font-size: 18px;
+                display: inline-block;
+                transition: transform 0.1s;
+            }
+
+            .money-amount.pop {
+                transform: scale(1.2);
+                /* Just a small pulse, no color change */
+                /* color: #fff; REMOVED */
+                /* text-shadow: REMOVED */
+            }
+
+            .money-sub {
+                font-size: 10px;
+                color: #888;
+            }
+
+            .resource-row {
+                display: flex;
+                justify-content: space-around;
+                padding: 5px 10px;
+                gap: 8px;
+            }
+
+            .resource-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 4px 10px;
+                border-radius: 15px;
+                border: 1px solid #333;
+            }
+
+            .resource-bar {
+                width: 50px;
+                height: 6px;
+                background: #222;
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .resource-fill {
+                height: 100%;
+                border-radius: 3px;
+                transition: width 0.3s;
+            }
+
+            .resource-fill.stamina {
+                background: linear-gradient(90deg, #ffaa00, #ff8800);
+            }
+
+            .resource-fill.gems {
+                background: linear-gradient(90deg, #00aaff, #0088dd);
+            }
+
+            .resource-text {
+                font-size: 11px;
+                color: #ddd;
+                font-weight: bold;
+            }
+
+            .resource-timer {
+                font-size: 11px;
+                color: #44ff44;
+                margin-left: 4px;
+                font-weight: normal;
+            }
+
+            /* OVERDRIVE */
+            .overdrive-wrapper {
+                width: 96%;
+                margin: 6px auto 0;
+                padding: 0 10px;
+            }
+
+            .od-bar-frame {
+                height: 12px;
+                background: #111;
+                border: 1px solid #440000;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .od-bar-fill {
+                height: 100%;
+                width: 0%;
+                background: linear-gradient(180deg, #cc0000, #990000);
+                transition: width 0.3s;
+            }
+
+            .od-bar-fill.full {
+                animation: odPulse 0.5s infinite alternate;
+            }
+
+            .od-text-overlay {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 8px;
+                font-weight: bold;
+                color: #fff;
+                letter-spacing: 2px;
+            }
+
+            @keyframes odPulse {
+                to {
+                    opacity: 0.7;
+                }
+            }
+
+            /* --- DRAGON AREA --- */
+            .dragon-stage {
+                flex: 1;
+                min-height: 0;
+                /* Allow shrinking */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                z-index: 10;
+            }
+
+            .dragon-img {
+                max-width: 90%;
+                max-height: 45vh;
+                /* Optimized for View */
+                object-fit: contain;
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
+                animation: breathe 3s ease-in-out infinite;
+                transition: filter 1s;
+            }
+
+            .tab-content {
+                background: #111822;
+                /* Dark list background */
+                min-height: 200px;
+                max-height: 300px;
+                /* Bigger as requested */
+                overflow-y: auto;
+                padding: 0;
+                margin-bottom: 20px;
+            }
+
+            /* Visual for Phase 2 */
+            .filter-phase2 {
+                filter: drop-shadow(0 0 20px #ff2222) brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(3) !important;
+            }
+
+            @keyframes breathe {
+                50% {
+                    transform: scale(1.02) translateY(-5px);
+                }
+            }
+
+            .damage-floater {
+                position: absolute;
+                color: #ffcc00;
+                font-weight: bold;
+                font-size: 40px;
+                text-shadow: 0 0 10px #ff0000;
                 opacity: 0;
+                pointer-events: none;
+                top: 40%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 100;
             }
 
-            20% {
-                transform: translate(-50%, -80%) scale(1.2);
-                opacity: 1;
+            @keyframes damagePop {
+                0% {
+                    transform: translate(-50%, -50%) scale(0.5);
+                    opacity: 0;
+                }
+
+                20% {
+                    transform: translate(-50%, -80%) scale(1.2);
+                    opacity: 1;
+                }
+
+                100% {
+                    transform: translate(-50%, -150%) scale(1);
+                    opacity: 0;
+                }
             }
 
-            100% {
-                transform: translate(-50%, -150%) scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* --- BOTTOM UI GROUP --- */
-        .bottom-ui {
-            z-index: 20;
-            padding: 10px;
-            background: linear-gradient(0deg, #111 20%, transparent 100%);
-        }
-
-        /* Boss HP */
-        .boss-hp-wrapper {
-            width: 96%;
-            margin: 0 auto 15px auto;
-        }
-
-        .boss-meta {
-            display: flex;
-            justify-content: space-between;
-            color: #b8b8b8;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .boss-name-text {
-            font-size: 14px;
-            color: #fff;
-            text-shadow: 0 1px 2px #000;
-        }
-
-        .boss-bar-frame {
-            height: 20px;
-            background: #220;
-            border: 1px solid #550;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .boss-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff0000, #ff5500);
-            width: 100%;
-            transition: width 0.2s;
-        }
-
-        .boss-bar-fill.phase2 {
-            background: linear-gradient(90deg, #aa0000, #550000);
-        }
-
-        .boss-hp-text {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            line-height: 20px;
-            text-align: center;
-            font-size: 11px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 3px #000;
-        }
-
-        /* Buttons */
-        .btn-row {
-            display: flex;
-            gap: 8px;
-            height: 55px;
-            margin-bottom: 20px;
-            position: relative;
-            /* STANDARD FLOW */
-            z-index: 20;
-            padding: 0 10px;
-            pointer-events: auto;
-        }
-
-        .btn {
-            flex: 1;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        .btn.normal {
-            background: linear-gradient(180deg, #4477ee, #2255cc);
-            border-bottom: 2px solid #113388;
-        }
-
-        .btn.united {
-            background: linear-gradient(180deg, #55cc55, #229922);
-            border-bottom: 2px solid #116611;
-        }
-
-        .btn.special {
-            background: linear-gradient(180deg, #ff5555, #cc2222);
-            border-bottom: 2px solid #881111;
-        }
-
-        .btn-title {
-            font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 2px;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        .btn-cost {
-            font-size: 11px;
-            opacity: 0.9;
-            font-weight: bold;
-        }
-
-        .btn-fx {
-            position: absolute;
-            inset: 0;
-            background: #fff;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        @keyframes btnFlash {
-            0% {
-                opacity: 0.5;
+            /* --- BOTTOM UI GROUP --- */
+            .bottom-ui {
+                z-index: 20;
+                padding: 10px;
+                background: linear-gradient(0deg, #111 20%, transparent 100%);
             }
 
-            100% {
-                opacity: 0;
+            /* Boss HP */
+            .boss-hp-wrapper {
+                width: 96%;
+                margin: 0 auto 15px auto;
             }
-        }
 
-        /* --- BATTLE STATUS SECTION (MATCHING SCREENSHOT) --- */
-        .battle-status {
-            background: #1a2533;
-            border: 1px solid #334455;
-            border-top: 2px solid #506070;
-            color: #fff;
-            margin-bottom: 20px;
-            margin-top: 60px;
-            /* AGGRESSIVE GAP to prevent overlap */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            border-radius: 3px;
-            position: relative;
-            /* Ensure stacking context */
-            z-index: 5;
-        }
+            .boss-meta {
+                display: flex;
+                justify-content: space-between;
+                color: #b8b8b8;
+                font-size: 13px;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
 
-        .status-header {
-            background: linear-gradient(#2a3b4c, #1a2533);
-            padding: 6px 10px;
-            font-size: 11px;
-            color: #ddd;
-            font-weight: bold;
-            border-bottom: 1px solid #000;
-        }
+            .boss-name-text {
+                font-size: 14px;
+                color: #fff;
+                text-shadow: 0 1px 2px #000;
+            }
 
-        .status-summary {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 8px 10px;
-            border-bottom: 1px solid #334455;
-        }
+            .boss-bar-frame {
+                height: 20px;
+                background: #220;
+                border: 1px solid #550;
+                border-radius: 4px;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            }
 
-        .summary-row {
-            font-size: 12px;
-            margin-bottom: 4px;
-            color: #ccc;
-        }
+            .boss-bar-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #ff0000, #ff5500);
+                width: 100%;
+                transition: width 0.2s;
+            }
 
-        .summary-row:last-child {
-            margin-bottom: 0;
-        }
+            .boss-bar-fill.phase2 {
+                background: linear-gradient(90deg, #aa0000, #550000);
+            }
 
-        .summary-row b {
-            color: #fff;
-            font-size: 13px;
-        }
+            .boss-hp-text {
+                position: absolute;
+                width: 100%;
+                top: 0;
+                line-height: 20px;
+                text-align: center;
+                font-size: 11px;
+                font-weight: bold;
+                color: #fff;
+                text-shadow: 0 0 3px #000;
+            }
 
-        .rank-text {
-            color: #ffcc00;
-            margin-left: 5px;
-            font-size: 11px;
-        }
+            /* Buttons */
+            .btn-row {
+                display: flex;
+                gap: 8px;
+                height: 55px;
+                margin-bottom: 0;
+                /* Closed gap completely */
+                position: relative;
+                /* STANDARD FLOW */
+                z-index: 20;
+                padding: 0 10px;
+                pointer-events: auto;
+            }
 
-        .status-tabs {
-            display: flex;
-            background: #0d1219;
-            border-bottom: 1px solid #000;
-        }
+            .btn {
+                flex: 1;
+                border: none;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+                transition: transform 0.1s, box-shadow 0.1s;
+            }
 
-        .tab {
-            flex: 1;
-            background: linear-gradient(#223344, #15202b);
-            border-right: 1px solid #000;
-            text-align: center;
-            padding: 10px 0;
-            font-size: 12px;
-            font-weight: bold;
-            color: #8899aa;
-            cursor: pointer;
-        }
+            .btn:active {
+                transform: translateY(2px);
+                box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+            }
 
-        .tab:last-child {
-            border-right: none;
-        }
+            .btn.normal {
+                background: linear-gradient(180deg, #4477ee, #2255cc);
+                border-bottom: 2px solid #113388;
+            }
 
-        .tab.active {
-            background: #0077cc;
-            /* Active Blue */
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-            box-shadow: inset 0 -2px 0 #44aaff;
-        }
+            .btn.united {
+                background: linear-gradient(180deg, #55cc55, #229922);
+                border-bottom: 2px solid #116611;
+            }
 
-        .tab-content {
-            background: #111822;
-            /* Dark list background */
-            min-height: 150px;
-            /* More compact */
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 0;
-            margin-bottom: 20px;
-            /* Ensure space below */
-        }
+            .btn.special {
+                background: linear-gradient(180deg, #ff5555, #cc2222);
+                border-bottom: 2px solid #881111;
+            }
 
-        /* --- SIDE BY SIDE COLUMNS FOR REWARD (RESTORED) --- */
-        .reward-columns {
-            display: flex;
-            width: 100%;
-        }
+            .btn-title {
+                font-size: 15px;
+                font-weight: 800;
+                margin-bottom: 2px;
+                letter-spacing: 0.5px;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            }
 
-        .reward-col {
-            flex: 1;
-            border-right: 1px solid #333;
-        }
+            .btn-cost {
+                font-size: 11px;
+                opacity: 0.9;
+                font-weight: bold;
+            }
 
-        .reward-col:last-child {
-            border: none;
-        }
-
-        .reward-header {
-            text-align: center;
-            padding: 6px 4px;
-            background: rgba(0, 255, 0, 0.1);
-            color: #44ff44;
-            font-size: 10px;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            white-space: nowrap;
-        }
-
-        .reward-row,
-        .leaderboard-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 7px 8px;
-            /* Slightly more padding */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 11px;
-            color: #ccc;
-        }
-
-        .reward-row:nth-child(even),
-        .leaderboard-row:nth-child(even) {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .reward-rank {
-            color: #99aacc;
-            font-weight: bold;
-            width: 45px;
-        }
-
-        .reward-items {
-            flex: 1;
-            text-align: left;
-            color: #fff;
-            word-break: break-word;
-        }
-
-        .item-god {
-            color: #ffd700;
-            font-weight: bold;
-        }
-
-        .item-ult {
-            color: #aaaaff;
-            font-weight: bold;
-        }
-
-        .item-chaos {
-            color: #f8f;
-            font-weight: bold;
-        }
-
-        .item-anc {
-            color: #ffaa00;
-            font-weight: bold;
-        }
-
-        /* Leaderboard styling */
-        .lb-rank {
-            width: 30px;
-            color: #ffcc00;
-        }
-
-        .lb-name {
-            flex: 1;
-        }
-
-        .lb-val {
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .my-row {
-            background: rgba(255, 204, 0, 0.15) !important;
-            border-left: 3px solid #fc0;
-        }
-
-        .info-msg {
-            padding: 20px;
-            text-align: center;
-            color: #667788;
-            font-size: 12px;
-        }
-
-        /* --- LEVEL UP OVERLAY --- */
-        .level-up-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .level-up-overlay.active {
-            opacity: 1;
-            animation: flashBg 0.5s;
-        }
-
-        .lu-content {
-            text-align: center;
-            transform: scale(0.5);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .level-up-overlay.active .lu-content {
-            transform: scale(1);
-        }
-
-        .lu-title {
-            font-size: 50px;
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 20px #ff8800, 0 0 40px #ff0000;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-            animation: bounceIn 0.6s 0.2s backwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .lu-sub {
-            font-size: 24px;
-            color: #fff;
-            font-weight: bold;
-            text-shadow: 0 2px 4px #000;
-        }
-
-        @keyframes flashBg {
-            0% {
+            .btn-fx {
+                position: absolute;
+                inset: 0;
                 background: #fff;
+                opacity: 0;
+                pointer-events: none;
             }
 
-            100% {
+            @keyframes btnFlash {
+                0% {
+                    opacity: 0.5;
+                }
+
+                100% {
+                    opacity: 0;
+                }
+            }
+
+            /* --- BATTLE STATUS SECTION (MATCHING SCREENSHOT) --- */
+            .battle-status {
+                background: #1a2533;
+                border: 1px solid #334455;
+                border-top: 2px solid #506070;
+                color: #fff;
+                margin-bottom: 20px;
+                margin-top: 0;
+                /* Closed gap completely */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+                border-radius: 3px;
+                position: relative;
+                /* Ensure stacking context */
+                z-index: 5;
+            }
+
+            .status-header {
+                background: linear-gradient(#2a3b4c, #1a2533);
+                padding: 6px 10px;
+                font-size: 11px;
+                color: #ddd;
+                font-weight: bold;
+                border-bottom: 1px solid #000;
+            }
+
+            .status-summary {
+                background: rgba(0, 0, 0, 0.2);
+                padding: 8px 10px;
+                border-bottom: 1px solid #334455;
+            }
+
+            .summary-row {
+                font-size: 12px;
+                margin-bottom: 4px;
+                color: #ccc;
+            }
+
+            .summary-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .summary-row b {
+                color: #fff;
+                font-size: 13px;
+            }
+
+            .rank-text {
+                color: #ffcc00;
+                margin-left: 5px;
+                font-size: 11px;
+            }
+
+            .status-tabs {
+                display: flex;
+                background: #0d1219;
+                border-bottom: 1px solid #000;
+            }
+
+            .tab {
+                flex: 1;
+                background: linear-gradient(#223344, #15202b);
+                border-right: 1px solid #000;
+                text-align: center;
+                padding: 10px 0;
+                font-size: 12px;
+                font-weight: bold;
+                color: #8899aa;
+                cursor: pointer;
+            }
+
+            .tab:last-child {
+                border-right: none;
+            }
+
+            .tab.active {
+                background: #0077cc;
+                /* Active Blue */
+                color: #fff;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+                box-shadow: inset 0 -2px 0 #44aaff;
+            }
+
+            .tab-content {
+                background: #111822;
+                /* Dark list background */
+                /* Removed fixed height for window scrolling */
+                min-height: 150px;
+                padding: 0;
+                margin-bottom: 20px;
+                /* Ensure space below */
+            }
+
+            /* --- SIDE BY SIDE COLUMNS FOR REWARD (RESTORED) --- */
+            .reward-columns {
+                display: flex;
+                width: 100%;
+            }
+
+            .reward-col {
+                flex: 1;
+                border-right: 1px solid #333;
+            }
+
+            .reward-col:last-child {
+                border: none;
+            }
+
+            .reward-header {
+                text-align: center;
+                padding: 6px 4px;
+                background: rgba(0, 255, 0, 0.1);
+                color: #44ff44;
+                font-size: 10px;
+                font-weight: bold;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                white-space: nowrap;
+            }
+
+            .reward-row,
+            .leaderboard-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 7px 8px;
+                /* Slightly more padding */
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                font-size: 11px;
+                color: #ccc;
+            }
+
+            .reward-row:nth-child(even),
+            .leaderboard-row:nth-child(even) {
+                background: rgba(255, 255, 255, 0.02);
+            }
+
+            .reward-rank {
+                color: #99aacc;
+                font-weight: bold;
+                width: 45px;
+            }
+
+            .reward-items {
+                flex: 1;
+                text-align: left;
+                color: #fff;
+                word-break: break-word;
+            }
+
+            .item-god {
+                color: #ffd700;
+                font-weight: bold;
+            }
+
+            .item-ult {
+                color: #aaaaff;
+                font-weight: bold;
+            }
+
+            .item-chaos {
+                color: #f8f;
+                font-weight: bold;
+            }
+
+            .item-anc {
+                color: #ffaa00;
+                font-weight: bold;
+            }
+
+            /* Leaderboard styling */
+            .lb-rank {
+                width: 30px;
+                color: #ffcc00;
+            }
+
+            .lb-name {
+                flex: 1;
+            }
+
+            .lb-val {
+                font-weight: bold;
+                color: #fff;
+            }
+
+            .my-row {
+                background: rgba(255, 204, 0, 0.15) !important;
+                border-left: 3px solid #fc0;
+            }
+
+            .info-msg {
+                padding: 20px;
+                text-align: center;
+                color: #667788;
+                font-size: 12px;
+            }
+
+            /* --- LEVEL UP OVERLAY --- */
+            .level-up-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
                 background: rgba(0, 0, 0, 0.85);
+                z-index: 2000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s;
             }
-        }
 
-        @keyframes bounceIn {
-            0% {
-                transform: scale(0);
+            .level-up-overlay.active {
+                opacity: 1;
+                animation: flashBg 0.5s;
             }
 
-            100% {
+            .lu-content {
+                text-align: center;
+                transform: scale(0.5);
+                transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            .level-up-overlay.active .lu-content {
                 transform: scale(1);
             }
-        }
+
+            .lu-title {
+                font-size: 50px;
+                font-weight: 900;
+                color: #ffd700;
+                text-shadow: 0 0 20px #ff8800, 0 0 40px #ff0000;
+                margin-bottom: 20px;
+                letter-spacing: 2px;
+                animation: bounceIn 0.6s 0.2s backwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            .lu-sub {
+                font-size: 24px;
+                color: #fff;
+                font-weight: bold;
+                text-shadow: 0 2px 4px #000;
+            }
+
+            @keyframes flashBg {
+                0% {
+                    background: #fff;
+                }
+
+                100% {
+                    background: rgba(0, 0, 0, 0.85);
+                }
+            }
+
+            @keyframes bounceIn {
+                0% {
+                    transform: scale(0);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
     </style>
 </head>
 
@@ -1070,23 +1106,34 @@
                     </button>
                 </div>
 
-                <!-- Forced Spacer -->
-                <div style="height: 50px; width: 100%;"></div>
+                <!-- Forced Spacer REMOVED -->
             </div> <!-- CLOSE .bottom-ui -->
 
-            <!-- Battle Status Panel (Inside Main Wrapper now?) -->
-            <!-- actually, battle status was SUPPOSED to be separate from the fixed UI stack in my head, 
-                 but visually it makes sense to flow together. 
-                 Wait, the Screenshot shows NO Battle Status panel visible at all!
-                 The user just wants the MAIN GAME LOOP visible.
-                 But I can't just delete it. I 'll keep it below.
-            -->
+            <!-- STICKY GROUP REMOVED -->
+            <!-- === 1. BOTTOM NAVIGATION (Sticky) === -->
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="toggleView('battle')">
+                    <span class="nav-icon">⚔️</span>
+                    <span>Battle</span>
+                </button>
+                <button class="nav-btn" onclick="toggleView('monster')">
+                    <span class="nav-icon">👹</span>
+                    <span>Monster</span>
+                </button>
+                <button class="nav-btn">
+                    <span class="nav-icon">🎒</span>
+                    <span>Equip</span>
+                </button>
+                <button class="nav-btn">
+                    <span class="nav-icon">💰</span>
+                    <span>Shop</span>
+                </button>
+            </div>
 
-            <!-- Battle Status Panel (Screenshot Style) -->
-            <div class="battle-status">
+            <!-- Status Panel Header (Relative with Padding) -->
+            <div class="sticky-status-info">
                 <div class="status-header">Boss Battle Status (Participants: 6,586)</div>
-
-                <!-- 1. Summary Section (Top) -->
                 <div class="status-summary">
                     <div class="summary-row">Damage Inflicted : <b id="totalDamage">0</b> <span class="rank-text">[Rank
                             : <span id="dmgRank">999+</span>]</span></div>
@@ -1100,97 +1147,92 @@
                     <div class="tab" onclick="switchTab('attacks', this)">Attacks</div>
                     <div class="tab" onclick="switchTab('reward', this)">Reward</div>
                 </div>
+            </div> <!-- Close status info -->
+            <!-- GROUP CLOSED -->
+            <!-- === 2. STATUS PANEL HEADER === -->
 
-                <!-- 3. Content List -->
+            <!-- 3. Content List (SCROLLABLE OUTSIDE HEADER) -->
+            <div class="battle-status-content">
                 <div class="tab-content" id="tabContent">
                     <!-- Populated by JS -->
                 </div>
             </div>
 
-            <!-- Spacer to prevent bottom nav from blocking content -->
-            <div style="height: 80px; width: 100%; flex-shrink: 0;"></div>
-            <!-- Spacer to prevent bottom nav from blocking content -->
-            <div style="height: 120px; width: 100%; flex-shrink: 0; clear:both;"></div>
+
         </div>
 
-        <!-- === MONSTER VIEW OVERLAY === -->
-        <div id="view-monster">
-            <div class="sub-nav-tabs">
-                <div class="sub-tab active" onclick="monsterTab('monster', this)">Monster</div>
-                <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
-                <div class="sub-tab" onclick="monsterTab('collectibles', this)">Collectibles</div>
-            </div>
+        <!-- Spacer to prevent bottom nav from blocking content -->
+        <!-- === BOTTOM NAVIGATION (MOVED HERE) === -->
 
-            <!-- Monster Tab -->
-            <div id="mt-monster" class="mon-tab-content active">
-                <div style="color:#ffcc00; font-size:12px; margin-bottom:10px; text-align:center;">Manage your army
-                </div>
-                <div class="mon-row">
-                    <div class="mon-icon">🐉</div>
-                    <div class="mon-info">
-                        <div class="mon-name">Fire Dragon</div>
-                        <div class="mon-stats">ATK: 5000 | DEF: 2000</div>
-                    </div>
-                    <div class="mon-act">
-                        <button class="btn-act btn-buy">UPGR</button>
-                    </div>
-                </div>
-                <div class="mon-row">
-                    <div class="mon-icon">👹</div>
-                    <div class="mon-info">
-                        <div class="mon-name">Ogre</div>
-                        <div class="mon-stats">ATK: 1500 | DEF: 3000</div>
-                    </div>
-                    <div class="mon-act">
-                        <button class="btn-act btn-buy">UPGR</button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Pets Tab -->
-            <div id="mt-pets" class="mon-tab-content">
-                <div style="color:#44ff44; font-size:12px; margin-bottom:10px; text-align:center;">Active Companions
+        <!-- === BOTTOM NAVIGATION (RESTORED HERE) === -->
+
+
+        <!-- Safety Spacer for scrolling -->
+        <div style="height: 20px; width: 100%; flex-shrink: 0;"></div>
+    </div>
+
+    <!-- === MONSTER VIEW OVERLAY === -->
+    <div id="view-monster">
+        <div class="sub-nav-tabs">
+            <div class="sub-tab active" onclick="monsterTab('monster', this)">Monster</div>
+            <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
+            <div class="sub-tab" onclick="monsterTab('collectibles', this)">Collectibles</div>
+        </div>
+
+        <!-- Monster Tab -->
+        <div id="mt-monster" class="mon-tab-content active">
+            <div style="color:#ffcc00; font-size:12px; margin-bottom:10px; text-align:center;">Manage your army
+            </div>
+            <div class="mon-row">
+                <div class="mon-icon">🐉</div>
+                <div class="mon-info">
+                    <div class="mon-name">Fire Dragon</div>
+                    <div class="mon-stats">ATK: 5000 | DEF: 2000</div>
                 </div>
-                <div class="mon-grid">
-                    <div class="mon-grid-item">🐺</div>
-                    <div class="mon-grid-item">🦅</div>
-                    <div class="mon-grid-item">🐢</div>
+                <div class="mon-act">
+                    <button class="btn-act btn-buy">UPGR</button>
                 </div>
             </div>
-
-            <!-- Collectibles Tab -->
-            <div id="mt-collectibles" class="mon-tab-content">
-                <div style="color:#cc44ff; font-size:12px; margin-bottom:10px; text-align:center;">Artifacts & Trophies
+            <div class="mon-row">
+                <div class="mon-icon">👹</div>
+                <div class="mon-info">
+                    <div class="mon-name">Ogre</div>
+                    <div class="mon-stats">ATK: 1500 | DEF: 3000</div>
                 </div>
-                <div class="mon-grid">
-                    <div class="mon-grid-item">👑</div>
-                    <div class="mon-grid-item">💍</div>
-                    <div class="mon-grid-item">🗡️</div>
-                    <div class="mon-grid-item" style="opacity:0.3">🛡️</div>
-                    <div class="mon-grid-item" style="opacity:0.3">🔮</div>
+                <div class="mon-act">
+                    <button class="btn-act btn-buy">UPGR</button>
                 </div>
             </div>
         </div>
 
-        <!-- === BOTTOM NAVIGATION === -->
-        <div class="bottom-nav">
-            <button class="nav-btn" onclick="toggleView('battle')">
-                <span class="nav-icon">⚔️</span>
-                <span>Battle</span>
-            </button>
-            <button class="nav-btn" onclick="toggleView('monster')">
-                <span class="nav-icon">👹</span>
-                <span>Monster</span>
-            </button>
-            <button class="nav-btn">
-                <span class="nav-icon">🎒</span>
-                <span>Equip</span>
-            </button>
-            <button class="nav-btn">
-                <span class="nav-icon">💰</span>
-                <span>Shop</span>
-            </button>
+        <!-- Pets Tab -->
+        <div id="mt-pets" class="mon-tab-content">
+            <div style="color:#44ff44; font-size:12px; margin-bottom:10px; text-align:center;">Active Companions
+            </div>
+            <div class="mon-grid">
+                <div class="mon-grid-item">🐺</div>
+                <div class="mon-grid-item">🦅</div>
+                <div class="mon-grid-item">🐢</div>
+            </div>
         </div>
+
+        <!-- Collectibles Tab -->
+        <div id="mt-collectibles" class="mon-tab-content">
+            <div style="color:#cc44ff; font-size:12px; margin-bottom:10px; text-align:center;">Artifacts & Trophies
+            </div>
+            <div class="mon-grid">
+                <div class="mon-grid-item">👑</div>
+                <div class="mon-grid-item">💍</div>
+                <div class="mon-grid-item">🗡️</div>
+                <div class="mon-grid-item" style="opacity:0.3">🛡️</div>
+                <div class="mon-grid-item" style="opacity:0.3">🔮</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === BOTTOM NAVIGATION === -->
+
     </div>
     <!-- Level Up Overlay -->
     <div class="level-up-overlay" id="luOverlay">
@@ -1580,6 +1622,93 @@
 
         renderTabContent();
         updateUI();
+    </script>
+
+    <script>
+        (function () {
+            // SIMPLE STICKY NAV - DISABLED (Using Native CSS)
+            return;
+            var nav = document.querySelector('.bottom-nav');
+            var container = document.getElementById('game-container');
+
+            if (nav) {
+                var navHeight = nav.offsetHeight;
+
+                // Create placeholder that stays in document flow
+                var placeholder = document.createElement('div');
+                placeholder.style.height = navHeight + 'px';
+                placeholder.style.display = 'none';
+                nav.parentNode.insertBefore(placeholder, nav);
+
+                var isFixed = false;
+
+                function checkSticky() {
+                    // Check where the placeholder is relative to viewport
+                    // If placeholder is hidden, check nav's position
+                    var checkElement = isFixed ? placeholder : nav;
+                    var rect = checkElement.getBoundingClientRect();
+
+                    // If the element has scrolled to or past the top of the viewport
+                    if (rect.top <= 0 && !isFixed) {
+                        // STICK IT
+                        isFixed = true;
+                        nav.style.position = 'fixed';
+                        nav.style.top = '0';
+                        nav.style.zIndex = '9999';
+
+                        if (container) {
+                            var containerRect = container.getBoundingClientRect();
+                            nav.style.width = containerRect.width + 'px';
+                            nav.style.left = containerRect.left + 'px';
+                        }
+
+                        placeholder.style.display = 'block';
+                    }
+                    // If we should unstick (placeholder is below top of viewport)
+                    else if (isFixed && placeholder.getBoundingClientRect().top > 0) {
+                        // UNSTICK IT
+                        isFixed = false;
+                        nav.style.position = '';
+                        nav.style.top = '';
+                        nav.style.left = '';
+                        nav.style.width = '';
+                        nav.style.zIndex = '';
+                        placeholder.style.display = 'none';
+                    }
+
+                    // Keep aligned while fixed
+                    if (isFixed && container) {
+                        var containerRect = container.getBoundingClientRect();
+                        nav.style.left = containerRect.left + 'px';
+                        nav.style.width = containerRect.width + 'px';
+                    }
+                }
+
+                window.addEventListener('scroll', checkSticky);
+                window.addEventListener('resize', checkSticky);
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            // FORCE BOTTOM NAV ALIGNMENT
+            function alignBottomNav() {
+                var nav = document.querySelector('.bottom-nav');
+                var container = document.getElementById('game-container');
+                if (nav && container) {
+                    var rect = container.getBoundingClientRect();
+                    nav.style.left = rect.left + 'px';
+                    nav.style.width = rect.width + 'px';
+                    nav.style.bottom = '0px'; // Ensure bottom
+                }
+            }
+            window.addEventListener('scroll', alignBottomNav);
+            window.addEventListener('resize', alignBottomNav);
+            window.addEventListener('load', alignBottomNav);
+            // Run loop to catch layout shifts
+            setInterval(alignBottomNav, 100);
+            alignBottomNav();
+        })();
     </script>
 </body>
 
