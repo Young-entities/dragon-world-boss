@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Monster Warlord</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Roboto:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        #game {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===== TOP HEADER BAR ===== */
+        #top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
+            padding: 10px 15px 20px;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .level-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            color: #000;
+            border: 2px solid #fff;
+        }
+
+        .exp-bar {
+            width: 60px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .exp-fill {
+            height: 100%;
+            width: 45%;
+            background: linear-gradient(90deg, #00cc66, #00ff88);
+        }
+
+        .currency {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .currency-icon {
+            font-size: 16px;
+        }
+
+        .currency-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        .stat-icon {
+            font-size: 12px;
+        }
+
+        .stat-bar {
+            width: 50px;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-bar .fill {
+            height: 100%;
+        }
+
+        .stat-bar .fill.health {
+            background: linear-gradient(90deg, #cc2244, #ff4466);
+        }
+
+        .stat-bar .fill.energy {
+            background: linear-gradient(90deg, #2244cc, #4466ff);
+        }
+
+        .stat-bar .fill.stamina {
+            background: linear-gradient(90deg, #cc8822, #ffaa44);
+        }
+
+        /* ===== HP BAR SECTION (Removed from here) ===== */
+        /*
+        #hp-section {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            z-index: 90;
+            padding: 0 15px;
+        }
+
+        .hp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .back-btn {
+            background: linear-gradient(180deg, #444, #222);
+            border: 1px solid #666;
+            padding: 5px 15px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .hp-label {
+            color: #ff4466;
+            font-weight: 700;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(255, 68, 102, 0.8);
+        }
+
+        .timer {
+            color: #ffcc00;
+            font-size: 16px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 200, 0, 0.8);
+        }
+
+        .boss-hp-bar {
+            height: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #ff4466;
+        }
+
+        .boss-hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #cc2244 0%, #ff4466 50%, #ff6688 100%);
+            transition: width 0.5s ease;
+        }
+        */
+
+        /* ===== BATTLEFIELD ===== */
+        #battlefield {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    #0a1628 0%,
+                    #152238 30%,
+                    #1a2a44 60%,
+                    #0f1a2a 100%);
+        }
+
+        /* Spooky forest background elements */
+        .bg-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 35%;
+        }
+
+        .tree-trunk {
+            width: 30px;
+            background: #1a1520;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .tree-branches {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .branch {
+            position: absolute;
+            height: 8px;
+            background: #1a1520;
+            border-radius: 0 10px 10px 0;
+            transform-origin: left center;
+        }
+
+        /* Fog/mist effect */
+        .fog {
+            position: absolute;
+            width: 200%;
+            height: 100px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(100, 150, 200, 0.1) 25%,
+                    rgba(100, 150, 200, 0.15) 50%,
+                    rgba(100, 150, 200, 0.1) 75%,
+                    transparent 100%);
+            animation: fogDrift 20s linear infinite;
+        }
+
+        .fog.f1 {
+            bottom: 30%;
+            animation-duration: 25s;
+        }
+
+        .fog.f2 {
+            bottom: 35%;
+            animation-duration: 30s;
+            animation-delay: -10s;
+            opacity: 0.7;
+        }
+
+        @keyframes fogDrift {
+            from {
+                transform: translateX(-50%);
+            }
+
+            to {
+                transform: translateX(0%);
+            }
+        }
+
+        /* Moon glow */
+        .moon-glow {
+            position: absolute;
+            top: 15%;
+            right: 20%;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(150, 180, 220, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: moonPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes moonPulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            /* ROBUST CSS VOLCANO BACKGROUND */
+            background:
+                /* Ash particles */
+                radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px) 0 0 / 50px 50px,
+                /* Dark Vignette */
+                radial-gradient(circle at center, transparent 40%, #000 120%),
+                /* Mountains Silhouette */
+                linear-gradient(170deg, transparent 40%, #1a0500 40%, #000 90%),
+                /* Magma Glow from bottom */
+                linear-gradient(0deg, #ff3300 0%, #880000 30%, #220000 60%, #050510 100%);
+            background-size: cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Ambient Fire Glow Overlay */
+        .game-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at bottom, rgba(255, 100, 0, 0.2) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Fix: Removed misplaced CSS properties */
+        /*
+        right: 0;
+        height: 35%;
+        background: linear-gradient(180deg,
+            #151525 0%,
+            #0a0a15 50%,
+            #050508 100%);
+        }
+        */
+
+        /* Top Status Bar */
+        .top-bar {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            /* Gradient removed for cleaner look */
+        }
+
+        /* Boss HP Styling now inline/simplified */
+
+
+        .boss-info {
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+
+        .hp-track {
+            height: 12px;
+            background: #330000;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .fill.boss {
+            background: linear-gradient(90deg, #ff0000, #ff6600);
+            width: 100%;
+            height: 100%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        /* ===== CHARACTER ===== */
+        #character-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            margin-bottom: 20px;
+            /* Give room for UI */
+            background: transparent !important;
+        }
+
+        .character {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: characterIdle 3s ease-in-out infinite;
+        }
+
+        @keyframes characterIdle {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            20% {
+                transform: translateY(-3px) scale(1.005);
+            }
+
+            40% {
+                transform: translateY(-8px) scale(1.01);
+            }
+
+            60% {
+                transform: translateY(-5px) scale(1.008);
+            }
+
+            80% {
+                transform: translateY(-2px) scale(1.002);
+            }
+        }
+
+        /* Adjusted Character Fit */
+        .character img {
+            width: auto;
+            height: auto;
+            max-width: 90%;
+            max-height: 70%;
+            /* Reduced from 85% to 70% to clear the top bar */
+            margin-top: 40px;
+            /* Push down away from HP bar */
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(255, 100, 0, 0.4));
+        }
+
+        #character-area {
+            background: transparent !important;
+        }
+
+        /* Character glow/aura */
+        .character-aura {
+            position: absolute;
+            inset: -30px;
+            background: radial-gradient(ellipse at center bottom,
+                    rgba(255, 100, 50, 0.3) 0%,
+                    transparent 60%);
+            animation: auraPulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes auraPulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        /* Damage number floating */
+        .floating-damage {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            font-weight: 900;
+            color: #ffcc00;
+            text-shadow:
+                0 0 10px #ff6600,
+                2px 2px 0 #000,
+                -2px -2px 0 #000;
+            animation: damageFloat 2s ease-out infinite;
+        }
+
+        @keyframes damageFloat {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+
+            10% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            90% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px);
+            }
+        }
+
+        /* +1 XP indicator */
+        .xp-gain {
+            position: absolute;
+            bottom: 10%;
+            right: 10%;
+            color: #88ff88;
+            font-size: 14px;
+            font-weight: 700;
+            text-shadow: 0 0 5px #00ff00;
+            animation: xpPop 1.5s ease-out infinite;
+        }
+
+        @keyframes xpPop {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: translateY(10px) scale(0.8);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translateY(0) scale(1.1);
+            }
+
+            80% {
+                opacity: 1;
+                transform: translateY(-5px) scale(1);
+            }
+        }
+
+        /* ===== BOTTOM ACTION PANEL ===== */
+        #action-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .attack-buttons {
+            display: flex;
+            padding: 10px 15px;
+            gap: 8px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.95));
+        }
+
+        .attack-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            transition: all 0.2s;
+        }
+
+        .attack-btn.normal {
+            background: linear-gradient(180deg, #3366aa 0%, #224488 100%);
+            border: 2px solid #4488cc;
+        }
+
+        .attack-btn.united {
+            background: linear-gradient(180deg, #44aa44 0%, #228822 100%);
+            border: 2px solid #66cc66;
+        }
+
+        .attack-btn.special {
+            background: linear-gradient(180deg, #aa4444 0%, #882222 100%);
+            border: 2px solid #cc6666;
+        }
+
+        .attack-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.2);
+        }
+
+        .attack-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .btn-cost {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 12px;
+            color: #ffcc00;
+        }
+
+        /* Monster icons row */
+        .monster-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .monster-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(180deg, #333, #222);
+            border: 2px solid #555;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .monster-icon.selected {
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
+        }
+
+        /* Bottom nav */
+        .bottom-nav {
+            display: flex;
+            background: #111;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 10px 5px;
+            text-align: center;
+            color: #888;
+            font-size: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+        }
+
+        .nav-item.active {
+            color: #ffcc00;
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Effects */
+        #effects {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        .hit-flash {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.3);
+            opacity: 0;
+        }
+
+        .hit-flash.active {
+            animation: flashHit 0.15s ease-out;
+        }
+
+        @keyframes flashHit {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <!-- Battlefield Background -->
+        <div id="battlefield">
+            <div class="moon-glow"></div>
+
+            <div class="bg-layer">
+                <div class="fog f1"></div>
+                <div class="fog f2"></div>
+            </div>
+
+            <div class="ground"></div>
+        </div>
+
+        <!-- Top Bar -->
+        <div id="top-bar">
+            <div class="top-row">
+                <div class="level-badge">
+                    <div class="level-icon">11</div>
+                    <div class="exp-bar">
+                        <div class="exp-fill"></div>
+                    </div>
+                </div>
+                <div class="currency">
+                    <span class="currency-icon">💎</span>
+                    <span class="currency-value">5,717</span>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span>150/150</span>
+                    <div class="stat-bar">
+                        <div class="fill health" style="width:100%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⚡</span>
+                    <span>1/35</span>
+                    <div class="stat-bar">
+                        <div class="fill energy" style="width:3%"></div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🔥</span>
+                    <span>11/11</span>
+                    <div class="stat-bar">
+                        <div class="fill stamina" style="width:100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HP Section -->
+        <div id="hp-section">
+            <div class="hp-header">
+                <button class="back-btn">← BACK</button>
+                <span class="hp-label">HP</span>
+                <span class="timer">05:59:40</span>
+            </div>
+            <div class="boss-hp-bar">
+                <div class="boss-hp-fill" id="bossHp" style="width:75%"></div>
+            </div>
+        </div>
+
+        <!-- Character -->
+        <div id="character-area">
+            <div class="character">
+                <div class="character-aura"></div>
+                <img src="fire_dragon_transparent.png" alt="Fire Dragon">
+                <div class="floating-damage">781</div>
+                <div class="xp-gain">+1 XP</div>
+            </div>
+        </div>
+
+        <!-- Boss HP Bar (Visible & Positioned) -->
+        <div class="boss-hp-container"
+            style="display:flex; flex-direction:column; width:94%; margin:0 auto 10px auto; z-index:100; position:relative;">
+            <div class="boss-info"
+                style="justify-content:space-between; display:flex; color:#ddd; font-size:12px; margin-bottom:4px; font-weight:bold; text-transform:uppercase;">
+                <span>Dark Overlord</span>
+                <span id="bossTimer">05:59:40</span>
+            </div>
+            <!-- The Bar Track -->
+            <div class="hp-track"
+                style="height:16px; background:#220000; border:1px solid #550000; border-radius:4px; overflow:hidden; position:relative; box-shadow:0 0 10px rgba(0,0,0,0.5);">
+                <!-- The Red Fill -->
+                <div class="fill boss" id="bossHp"
+                    style="width:100%; background:linear-gradient(90deg, #ff0000, #ff4400); height:100%;"></div>
+            </div>
+        </div>
+
+        <!-- Action Panel -->
+        <div id="action-panel">
+            <div class="attack-buttons">
+                <button class="attack-btn normal" onclick="attack('normal')">
+                    <span class="btn-label">Normal Attack</span>
+                    <span class="btn-cost">⚡ X1</span>
+                </button>
+                <button class="attack-btn united" onclick="attack('united')">
+                    <span class="btn-label">United Attack</span>
+                    <span class="btn-cost">⚡ X5</span>
+                </button>
+                <button class="attack-btn special" onclick="attack('special')">
+                    <span class="btn-label">Special Attack</span>
+                    <span class="btn-cost">💎 X100</span>
+                </button>
+            </div>
+
+            <div class="monster-row">
+                <div class="monster-icon selected">🐉</div>
+                <div class="monster-icon">🦁</div>
+                <div class="monster-icon">🐺</div>
+                <div class="monster-icon">🦅</div>
+                <div class="monster-icon">🐍</div>
+                <div class="monster-icon">+</div>
+            </div>
+
+            <div class="bottom-nav">
+                <button class="nav-item"><span class="nav-icon">🏠</span>Home</button>
+                <button class="nav-item"><span class="nav-icon">📰</span>News</button>
+                <button class="nav-item"><span class="nav-icon">⚔️</span>Quest</button>
+                <button class="nav-item active"><span class="nav-icon">💀</span>Battle</button>
+                <button class="nav-item"><span class="nav-icon">👹</span>Monster</button>
+                <button class="nav-item"><span class="nav-icon">🎒</span>Equip</button>
+                <button class="nav-item"><span class="nav-icon">🛒</span>Shop</button>
+            </div>
+        </div>
+
+        <!-- Effects Layer -->
+        <div id="effects">
+            <div class="hit-flash" id="hitFlash"></div>
+        </div>
+    </div>
+
+    <div id="victory-screen"
+        style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.8); z-index:500; align-items:center; justify-content:center; flex-direction:column;">
+        <h1 style="color:#ffcc00; font-size:40px; text-shadow:0 0 20px #ff6600; margin-bottom:20px;">VICTORY</h1>
+        <div style="font-size:14px; color:#aaa; margin-bottom:30px;">You defeated the Dark Overlord!</div>
+        <div style="display:flex; gap:20px;">
+            <div style="text-align:center;">
+                <div style="font-size:24px;">💎</div>
+                <div style="color:#fff; font-weight:bold;">+5</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:24px;">🪙</div>
+                <div style="color:#fff; font-weight:bold;">+2500</div>
+            </div>
+        </div>
+        <button onclick="location.reload()"
+            style="margin-top:40px; padding:10px 30px; background:#44aa44; border:none; color:white; font-weight:bold; border-radius:5px; cursor:pointer;">BATTLE
+            AGAIN</button>
+    </div>
+
+    <script>
+        // Game State
+        const state = {
+            bossHp: 50000,
+            bossMaxHp: 50000,
+            gems: 5717,
+            stamina: 50, /* Increased default stamina so you can test more */
+            maxStamina: 50,
+            isAnimating: false
+        };
+
+        // Elements
+        const el = {
+            bossHpBar: document.getElementById('bossHp'),
+            character: document.querySelector('.character img'),
+            damageText: document.querySelector('.floating-damage'),
+            hitFlash: document.getElementById('hitFlash'),
+            victory: document.getElementById('victory-screen'),
+
+            // Resource UI Elements
+            gemText: document.querySelector('.currency-value'),
+            staminaText: document.querySelector('.stat-item:nth-child(3) span'), // 11/11 text
+            staminaBar: document.querySelector('.fill.stamina')
+        };
+
+        function attack(type) {
+            if (state.isAnimating) return;
+
+            // Resource Checks
+            if (type === 'normal') {
+                if (state.stamina < 1) {
+                    alert("Not enough Stamina! (Need 1)");
+                    return;
+                }
+                state.stamina -= 1;
+            } else if (type === 'united') {
+                // United now uses Stamina (5)
+                if (state.stamina < 5) {
+                    alert("Not enough Stamina! (Need 5)");
+                    return;
+                }
+                state.stamina -= 5;
+            } else if (type === 'special') {
+                // Special uses Gems (10)
+                if (state.gems < 10) {
+                    alert("Not enough Gems! (Need 10)");
+                    return;
+                }
+                state.gems -= 10;
+            }
+
+            // Consume Resources & Update UI
+            updateResources();
+            state.isAnimating = true;
+
+            // Calculate Damage
+            let damage = 0;
+            let shakeIntensity = 5;
+            switch (type) {
+                case 'normal':
+                    damage = Math.floor(1500 + Math.random() * 500);
+                    shakeIntensity = 5;
+                    break;
+                case 'united':
+                    damage = Math.floor(8000 + Math.random() * 2000); /* Buffed damage for cost */
+                    shakeIntensity = 12;
+                    break;
+                case 'special':
+                    damage = Math.floor(50000 + Math.random() * 10000); /* Huge damage for 100 gems */
+                    shakeIntensity = 25;
+                    break;
+            }
+
+            // Crit chance
+            if (Math.random() > 0.8) {
+                damage *= 2;
+                shakeIntensity += 5;
+            }
+
+            // Visual Effects
+            showDamage(damage);
+            shakeScreen(shakeIntensity);
+
+            // Animate Hero (Attack Pulse)
+            el.character.style.transform = 'scale(1.1) translateY(-5px)';
+            el.character.style.filter = 'brightness(1.5) drop-shadow(0 0 15px orange)';
+
+            setTimeout(() => {
+                el.character.style.transform = '';
+                el.character.style.filter = '';
+                state.isAnimating = false;
+            }, 150);
+
+            // Update Boss State
+            state.bossHp = Math.max(0, state.bossHp - damage);
+            updateBossUI();
+
+            // Check Victory
+            if (state.bossHp <= 0) {
+                setTimeout(() => {
+                    el.victory.style.display = 'flex';
+                }, 800);
+            }
+        }
+
+        function updateResources() {
+            // Update Gems Display
+            el.gemText.textContent = state.gems.toLocaleString();
+
+            // Update Stamina Display
+            el.staminaText.textContent = `${state.stamina}/${state.maxStamina}`;
+            const staminaPct = (state.stamina / state.maxStamina) * 100;
+            el.staminaBar.style.width = staminaPct + '%';
+        }
+
+        function updateBossUI() {
+            const bossPct = (state.bossHp / state.bossMaxHp) * 100;
+            el.bossHpBar.style.width = bossPct + '%';
+        }
+
+        function showDamage(amount) {
+            el.damageText.style.animation = 'none';
+            el.damageText.offsetHeight; /* trigger reflow */
+            el.damageText.style.animation = 'damageFloat 1s ease-out';
+            el.damageText.textContent = amount.toLocaleString();
+            el.damageText.style.color = '#ffcc00';
+        }
+
+        function shakeScreen(intensity) {
+            const x = (Math.random() - 0.5) * intensity;
+            const y = (Math.random() - 0.5) * intensity;
+            document.body.style.transform = `translate(${x}px, ${y}px)`;
+            setTimeout(() => {
+                document.body.style.transform = 'translate(0,0)';
+            }, 100);
+        }
+    </script>
+    <!-- SVG Filter Definition for Transparency -->
+    <svg style="height: 0; width: 0; position: absolute; pointer-events: none;">
+        <defs>
+            <filter id="remove-white" color-interpolation-filters="sRGB">
+                <feColorMatrix type="matrix" values="1 0 0 0 0
+                                                     0 1 0 0 0
+                                                     0 0 1 0 0
+                                                     -1 -1 -1 1 0" result="transparency" />
+                <feComposite in="SourceGraphic" in2="transparency" operator="in" />
+            </filter>
+        </defs>
+    </svg>
+</body>
+
+</html>

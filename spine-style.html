@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brave Frontier - 2.5D Animated Battle</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a15;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        #game {
+            width: 900px;
+            height: 650px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #1a0a2e 0%, #2d1b4e 40%, #3d2b5e 70%, #1a0a2e 100%);
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(100, 50, 200, 0.5);
+        }
+
+        /* Animated Background */
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: glowPulse 4s ease-in-out infinite;
+        }
+
+        .bg-glow.g1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(100, 50, 200, 0.4);
+            left: 10%;
+            top: 10%;
+        }
+
+        .bg-glow.g2 {
+            width: 250px;
+            height: 250px;
+            background: rgba(50, 100, 200, 0.3);
+            right: 15%;
+            top: 20%;
+            animation-delay: 1s;
+        }
+
+        .bg-glow.g3 {
+            width: 200px;
+            height: 200px;
+            background: rgba(200, 50, 150, 0.2);
+            left: 40%;
+            bottom: 30%;
+            animation-delay: 2s;
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        /* Ground with perspective */
+        #ground {
+            position: absolute;
+            bottom: 150px;
+            left: -50%;
+            width: 200%;
+            height: 300px;
+            background: linear-gradient(180deg, rgba(60, 40, 100, 0.6) 0%, rgba(30, 20, 60, 0.8) 100%);
+            transform: perspective(800px) rotateX(70deg);
+            transform-origin: center top;
+        }
+
+        #ground::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(100, 70, 160, 0.2) 80px, rgba(100, 70, 160, 0.2) 82px),
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(100, 70, 160, 0.15) 40px, rgba(100, 70, 160, 0.15) 42px);
+            animation: gridMove 3s linear infinite;
+        }
+
+        @keyframes gridMove {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 82px 42px;
+            }
+        }
+
+        /* ============ 2.5D CHARACTER SYSTEM ============ */
+        .character-container {
+            position: absolute;
+            bottom: 200px;
+        }
+
+        .hero-container {
+            left: 100px;
+        }
+
+        .enemy-container {
+            right: 100px;
+        }
+
+        /* Character made of layers/parts */
+        .character {
+            position: relative;
+            width: 180px;
+            height: 220px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        /* Each body part is a separate animated layer */
+        .char-part {
+            position: absolute;
+            transform-origin: center bottom;
+            image-rendering: pixelated;
+        }
+
+        /* === HERO PARTS === */
+        .hero-shadow {
+            width: 120px;
+            height: 30px;
+            background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+            bottom: -20px;
+            left: 30px;
+            animation: shadowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes shadowPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
+        }
+
+        /* Legs */
+        .hero-legs {
+            width: 60px;
+            height: 70px;
+            background: linear-gradient(180deg, #2a2a4a 0%, #1a1a2a 100%);
+            bottom: 0;
+            left: 60px;
+            border-radius: 5px 5px 10px 10px;
+            animation: legsIdle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes legsIdle {
+
+            0%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            50% {
+                transform: scaleY(0.98);
+            }
+        }
+
+        /* Body/Torso */
+        .hero-body {
+            width: 80px;
+            height: 90px;
+            background: linear-gradient(180deg, #4a4a7a 0%, #3a3a5a 50%, #2a2a4a 100%);
+            bottom: 60px;
+            left: 50px;
+            border-radius: 10px 10px 5px 5px;
+            animation: bodyBreathe 2s ease-in-out infinite;
+            box-shadow: inset 5px 0 15px rgba(100, 150, 255, 0.3);
+        }
+
+        @keyframes bodyBreathe {
+
+            0%,
+            100% {
+                transform: scaleX(1) scaleY(1);
+            }
+
+            50% {
+                transform: scaleX(1.02) scaleY(1.03);
+            }
+        }
+
+        /* Armor details */
+        .hero-body::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 50px;
+            background: linear-gradient(180deg, #6666aa 0%, #4444aa 100%);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(100, 100, 255, 0.5);
+        }
+
+        /* Cape - flows independently */
+        .hero-cape {
+            width: 100px;
+            height: 120px;
+            background: linear-gradient(180deg, #cc3344 0%, #aa2233 50%, #881122 100%);
+            bottom: 50px;
+            left: 20px;
+            border-radius: 10px 50px 30px 50px;
+            transform-origin: top center;
+            animation: capeFlow 2.5s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes capeFlow {
+
+            0%,
+            100% {
+                transform: rotate(-5deg) skewX(0deg);
+            }
+
+            25% {
+                transform: rotate(-8deg) skewX(-5deg);
+            }
+
+            50% {
+                transform: rotate(-3deg) skewX(5deg);
+            }
+
+            75% {
+                transform: rotate(-10deg) skewX(-3deg);
+            }
+        }
+
+        /* Left Arm */
+        .hero-arm-left {
+            width: 25px;
+            height: 70px;
+            background: linear-gradient(90deg, #3a3a5a 0%, #4a4a7a 50%, #3a3a5a 100%);
+            bottom: 80px;
+            left: 25px;
+            border-radius: 10px;
+            transform-origin: top center;
+            animation: armLeftSwing 2s ease-in-out infinite;
+        }
+
+        @keyframes armLeftSwing {
+
+            0%,
+            100% {
+                transform: rotate(10deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        /* Right Arm with Sword */
+        .hero-arm-right {
+            width: 25px;
+            height: 70px;
+            background: linear-gradient(90deg, #4a4a7a 0%, #5a5a8a 50%, #4a4a7a 100%);
+            bottom: 80px;
+            right: 25px;
+            border-radius: 10px;
+            transform-origin: top center;
+            animation: armRightSwing 2s ease-in-out infinite;
+        }
+
+        @keyframes armRightSwing {
+
+            0%,
+            100% {
+                transform: rotate(-15deg);
+            }
+
+            50% {
+                transform: rotate(-20deg);
+            }
+        }
+
+        /* Sword */
+        .hero-sword {
+            width: 15px;
+            height: 120px;
+            background: linear-gradient(180deg, #aaccff 0%, #88aaff 30%, #6688dd 70%, #445588 100%);
+            bottom: 90px;
+            right: 0px;
+            border-radius: 3px 3px 2px 2px;
+            transform-origin: bottom center;
+            animation: swordSwing 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(100, 150, 255, 0.8), 0 0 40px rgba(100, 150, 255, 0.4);
+        }
+
+        @keyframes swordSwing {
+
+            0%,
+            100% {
+                transform: rotate(-30deg);
+            }
+
+            25% {
+                transform: rotate(-35deg);
+            }
+
+            50% {
+                transform: rotate(-25deg);
+            }
+
+            75% {
+                transform: rotate(-40deg);
+            }
+        }
+
+        /* Sword glow effect */
+        .hero-sword::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 20px;
+            background: linear-gradient(180deg, #ffffff 0%, #88ccff 100%);
+            border-radius: 50% 50% 30% 30%;
+            box-shadow: 0 0 15px #88ccff;
+        }
+
+        /* Sword energy trail */
+        .hero-sword::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(100, 200, 255, 0.3), transparent);
+            transform: translateX(-50%);
+            animation: swordTrail 0.5s ease-in-out infinite;
+        }
+
+        @keyframes swordTrail {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Head */
+        .hero-head {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(180deg, #ffe4c4 0%, #ddc4a4 100%);
+            bottom: 145px;
+            left: 62px;
+            border-radius: 50%;
+            animation: headBob 2s ease-in-out infinite;
+        }
+
+        @keyframes headBob {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-3px) rotate(2deg);
+            }
+        }
+
+        /* Hair */
+        .hero-hair {
+            width: 70px;
+            height: 50px;
+            background: linear-gradient(180deg, #2244aa 0%, #1133aa 50%, #0022aa 100%);
+            bottom: 165px;
+            left: 55px;
+            border-radius: 50% 50% 30% 30%;
+            animation: hairFlow 2s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes hairFlow {
+
+            0%,
+            100% {
+                transform: skewX(0deg);
+            }
+
+            25% {
+                transform: skewX(3deg);
+            }
+
+            75% {
+                transform: skewX(-3deg);
+            }
+        }
+
+        /* Hair flowing strands */
+        .hero-hair::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -15px;
+            width: 25px;
+            height: 60px;
+            background: linear-gradient(180deg, #2244aa 0%, #1133aa 100%);
+            border-radius: 0 30px 50px 10px;
+            transform-origin: top left;
+            animation: hairStrand 1.5s ease-in-out infinite;
+        }
+
+        @keyframes hairStrand {
+
+            0%,
+            100% {
+                transform: rotate(10deg);
+            }
+
+            50% {
+                transform: rotate(20deg);
+            }
+        }
+
+        /* Eyes */
+        .hero-eyes {
+            position: absolute;
+            bottom: 160px;
+            left: 70px;
+            width: 35px;
+            height: 15px;
+        }
+
+        .hero-eye {
+            width: 12px;
+            height: 12px;
+            background: #222;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+        }
+
+        .hero-eye.left {
+            left: 0;
+        }
+
+        .hero-eye.right {
+            right: 0;
+        }
+
+        .hero-eye::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+        }
+
+        /* Aura effect */
+        .hero-aura {
+            position: absolute;
+            width: 200px;
+            height: 250px;
+            bottom: -20px;
+            left: -10px;
+            background: radial-gradient(ellipse, rgba(50, 100, 255, 0.3) 0%, transparent 70%);
+            animation: auraPulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes auraPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* Energy particles around hero */
+        .hero-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #88ccff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #88ccff;
+        }
+
+        .hero-particle:nth-child(1) {
+            animation: particleFloat 3s ease-in-out infinite;
+            left: 20px;
+            bottom: 50px;
+        }
+
+        .hero-particle:nth-child(2) {
+            animation: particleFloat 2.5s ease-in-out infinite 0.5s;
+            left: 150px;
+            bottom: 80px;
+        }
+
+        .hero-particle:nth-child(3) {
+            animation: particleFloat 2.8s ease-in-out infinite 1s;
+            left: 80px;
+            bottom: 200px;
+        }
+
+        @keyframes particleFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: translateY(-30px) scale(1.5);
+                opacity: 1;
+            }
+        }
+
+        /* ============ ENEMY (Dragon-like) ============ */
+        .enemy .character {
+            transform: scaleX(-1);
+        }
+
+        .enemy-shadow {
+            width: 150px;
+            height: 40px;
+            background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 0%, transparent 70%);
+            bottom: -25px;
+            left: 15px;
+            animation: shadowPulse 2.5s ease-in-out infinite;
+        }
+
+        .enemy-body {
+            width: 120px;
+            height: 130px;
+            background: linear-gradient(180deg, #553366 0%, #442255 50%, #331144 100%);
+            bottom: 10px;
+            left: 30px;
+            border-radius: 30px 30px 20px 20px;
+            animation: enemyBreathe 2.5s ease-in-out infinite;
+            box-shadow: inset -10px 0 20px rgba(255, 100, 50, 0.3);
+        }
+
+        @keyframes enemyBreathe {
+
+            0%,
+            100% {
+                transform: scaleX(1) scaleY(1);
+            }
+
+            50% {
+                transform: scaleX(1.05) scaleY(1.08);
+            }
+        }
+
+        /* Wings */
+        .enemy-wing {
+            width: 80px;
+            height: 100px;
+            background: linear-gradient(45deg, #442255 0%, #553366 50%, #664477 100%);
+            position: absolute;
+            border-radius: 80% 20% 50% 10%;
+            transform-origin: bottom right;
+        }
+
+        .enemy-wing.left {
+            bottom: 100px;
+            left: -30px;
+            animation: wingFlap 1.5s ease-in-out infinite;
+        }
+
+        .enemy-wing.right {
+            bottom: 100px;
+            right: -30px;
+            transform: scaleX(-1);
+            animation: wingFlap 1.5s ease-in-out infinite 0.1s;
+        }
+
+        @keyframes wingFlap {
+
+            0%,
+            100% {
+                transform: rotate(-10deg) scaleY(1);
+            }
+
+            50% {
+                transform: rotate(15deg) scaleY(0.9);
+            }
+        }
+
+        /* Dragon head */
+        .enemy-head {
+            width: 70px;
+            height: 60px;
+            background: linear-gradient(180deg, #664477 0%, #553366 100%);
+            bottom: 130px;
+            left: 55px;
+            border-radius: 50% 50% 30% 30%;
+            animation: enemyHeadBob 2s ease-in-out infinite;
+        }
+
+        @keyframes enemyHeadBob {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(5deg);
+            }
+        }
+
+        /* Dragon horns */
+        .enemy-horn {
+            width: 15px;
+            height: 40px;
+            background: linear-gradient(180deg, #ffaa00 0%, #ff6600 100%);
+            position: absolute;
+            border-radius: 50% 50% 20% 20%;
+        }
+
+        .enemy-horn.left {
+            bottom: 175px;
+            left: 55px;
+            transform: rotate(-20deg);
+            animation: hornGlow 2s ease-in-out infinite;
+        }
+
+        .enemy-horn.right {
+            bottom: 175px;
+            left: 110px;
+            transform: rotate(20deg);
+            animation: hornGlow 2s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes hornGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px #ff6600;
+            }
+
+            50% {
+                box-shadow: 0 0 25px #ffaa00, 0 0 40px #ff6600;
+            }
+        }
+
+        /* Enemy eyes glowing */
+        .enemy-eyes {
+            position: absolute;
+            bottom: 155px;
+            left: 70px;
+        }
+
+        .enemy-eye {
+            width: 15px;
+            height: 12px;
+            background: #ff3300;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 15px #ff0000;
+            animation: eyeGlow 1s ease-in-out infinite;
+        }
+
+        .enemy-eye.left {
+            left: 0;
+        }
+
+        .enemy-eye.right {
+            left: 25px;
+        }
+
+        @keyframes eyeGlow {
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 15px #ff0000;
+            }
+
+            50% {
+                opacity: 0.7;
+                box-shadow: 0 0 30px #ff0000, 0 0 50px #ff6600;
+            }
+        }
+
+        /* Tail */
+        .enemy-tail {
+            width: 20px;
+            height: 80px;
+            background: linear-gradient(180deg, #553366 0%, #442255 100%);
+            bottom: 10px;
+            left: 0px;
+            border-radius: 30px;
+            transform-origin: top center;
+            animation: tailSwing 2s ease-in-out infinite;
+        }
+
+        @keyframes tailSwing {
+
+            0%,
+            100% {
+                transform: rotate(-20deg);
+            }
+
+            50% {
+                transform: rotate(-40deg);
+            }
+        }
+
+        /* Fire aura */
+        .enemy-aura {
+            position: absolute;
+            width: 220px;
+            height: 280px;
+            bottom: -30px;
+            left: -20px;
+            background: radial-gradient(ellipse, rgba(255, 100, 0, 0.4) 0%, transparent 70%);
+            animation: fireAura 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fireAura {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 0.8;
+            }
+        }
+
+        /* UI */
+        #ui {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 140px;
+            background: linear-gradient(180deg, rgba(20, 10, 40, 0.9), rgba(10, 5, 25, 0.95));
+            border-top: 2px solid rgba(100, 50, 200, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .name-bars {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 0 50px;
+        }
+
+        .unit-info {
+            text-align: center;
+        }
+
+        .unit-name {
+            color: #fff;
+            font-size: 14px;
+            text-shadow: 0 0 10px rgba(100, 150, 255, 0.8);
+            margin-bottom: 5px;
+        }
+
+        .enemy .unit-name {
+            text-shadow: 0 0 10px rgba(255, 100, 50, 0.8);
+        }
+
+        .hp-bar {
+            width: 200px;
+            height: 18px;
+            background: #111;
+            border: 2px solid #4488ff;
+            border-radius: 9px;
+            overflow: hidden;
+        }
+
+        .enemy .hp-bar {
+            border-color: #ff6644;
+        }
+
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00cc44, #00ff66);
+            transition: width 0.5s ease;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(180deg, #4a3a8a, #2a1a5a);
+            border: 2px solid #8866cc;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(100, 50, 200, 0.5);
+        }
+
+        /* Attack state */
+        .character.attacking .hero-arm-right,
+        .character.attacking .hero-sword {
+            animation: attackSwing 0.4s ease-out !important;
+        }
+
+        @keyframes attackSwing {
+            0% {
+                transform: rotate(-30deg);
+            }
+
+            30% {
+                transform: rotate(-80deg);
+            }
+
+            60% {
+                transform: rotate(30deg);
+            }
+
+            100% {
+                transform: rotate(-30deg);
+            }
+        }
+
+        .character.attacking .hero-body {
+            animation: attackLunge 0.5s ease-out !important;
+        }
+
+        @keyframes attackLunge {
+            0% {
+                transform: translateX(0);
+            }
+
+            40% {
+                transform: translateX(150px) scaleX(1.1);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <!-- Background Effects -->
+        <div class="bg-glow g1"></div>
+        <div class="bg-glow g2"></div>
+        <div class="bg-glow g3"></div>
+        <div id="ground"></div>
+
+        <!-- Hero -->
+        <div class="character-container hero-container">
+            <div class="character" id="heroChar">
+                <div class="hero-aura"></div>
+                <div class="hero-shadow char-part"></div>
+                <div class="hero-cape char-part"></div>
+                <div class="hero-legs char-part"></div>
+                <div class="hero-body char-part"></div>
+                <div class="hero-arm-left char-part"></div>
+                <div class="hero-arm-right char-part"></div>
+                <div class="hero-sword char-part"></div>
+                <div class="hero-head char-part"></div>
+                <div class="hero-hair char-part"></div>
+                <div class="hero-eyes">
+                    <div class="hero-eye left"></div>
+                    <div class="hero-eye right"></div>
+                </div>
+                <div class="hero-particle"></div>
+                <div class="hero-particle"></div>
+                <div class="hero-particle"></div>
+            </div>
+        </div>
+
+        <!-- Enemy -->
+        <div class="character-container enemy-container enemy">
+            <div class="character">
+                <div class="enemy-aura"></div>
+                <div class="enemy-shadow char-part"></div>
+                <div class="enemy-tail char-part"></div>
+                <div class="enemy-body char-part"></div>
+                <div class="enemy-wing left char-part"></div>
+                <div class="enemy-wing right char-part"></div>
+                <div class="enemy-head char-part"></div>
+                <div class="enemy-horn left char-part"></div>
+                <div class="enemy-horn right char-part"></div>
+                <div class="enemy-eyes">
+                    <div class="enemy-eye left"></div>
+                    <div class="enemy-eye right"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UI -->
+        <div id="ui">
+            <div class="name-bars">
+                <div class="unit-info">
+                    <div class="unit-name">AZURE KNIGHT</div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="unit-info enemy">
+                    <div class="unit-name">SHADOW DRAGON</div>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="enemyHp" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn" onclick="attack()">⚔️ ATTACK</button>
+                <button class="btn" onclick="skill()">✨ SKILL</button>
+                <button class="btn" onclick="burst()">💥 BURST</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let hp = 100;
+        const heroChar = document.getElementById('heroChar');
+        const enemyHp = document.getElementById('enemyHp');
+
+        function attack() {
+            heroChar.classList.add('attacking');
+            setTimeout(() => {
+                heroChar.classList.remove('attacking');
+                hp = Math.max(0, hp - 10);
+                enemyHp.style.width = hp + '%';
+            }, 500);
+        }
+
+        function skill() {
+            heroChar.classList.add('attacking');
+            setTimeout(() => {
+                heroChar.classList.remove('attacking');
+                hp = Math.max(0, hp - 25);
+                enemyHp.style.width = hp + '%';
+            }, 500);
+        }
+
+        function burst() {
+            heroChar.classList.add('attacking');
+            setTimeout(() => {
+                heroChar.classList.remove('attacking');
+                hp = Math.max(0, hp - 50);
+                enemyHp.style.width = hp + '%';
+            }, 500);
+        }
+    </script>
+</body>
+
+</html>
