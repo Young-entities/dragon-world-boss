@@ -2055,7 +2055,7 @@
                 // Sync duplicated Top UI elements
                 if (document.getElementById('m_levelText')) {
                     document.getElementById('m_levelText').textContent = state.level;
-                    document.getElementById('m_xpText').textContent = state.xp.toLocaleString();
+                    document.getElementById('m_xpText').textContent = `${state.xp.toLocaleString()}/${state.xpToLevel.toLocaleString()}`;
                     document.getElementById('m_xpBar').style.width = (state.xp / state.xpToLevel * 100) + '%';
 
                     document.getElementById('m_moneyText').textContent = state.money.toLocaleString() + 'G';
@@ -2085,33 +2085,170 @@
 
         <!-- FUSIONS TAB (Renamed from Fusion) -->
         <div id="mt-fusions" class="mon-tab-content active">
-            <!-- Fusion Deck Area -->
-            <div class="fusion-deck">
-                <div class="fusion-gap">
-                    <div class="fusion-slot"></div>
-                    <div class="fusion-plus">+</div>
-                    <div class="fusion-slot"></div>
+            <!-- New Fusion Deck Area -->
+            <div class="fusion-deck unique-style">
+                <div class="fusion-chamber">
+                    <div class="hex-slot"></div>
+                    <div class="fusion-icon">⚛️</div>
+                    <div class="hex-slot"></div>
                 </div>
                 <!-- Action Buttons -->
                 <div class="fusion-actions">
-                    <button class="btn-combine">Combine</button>
-                    <button class="btn-combine omega">Omega<br>Combine</button>
+                    <button class="btn-fuse">FUSE</button>
+                    <button class="btn-fuse mass">MASS<br>FUSE</button>
                 </div>
-                <div class="help-icon">?</div>
             </div>
 
-            <!-- Rank List -->
-            <div class="rank-list-container">
-                <div class="rank-bar" style="color:#00ffff; border-left: 4px solid #00ffff;">Immortal</div>
-                <div class="rank-bar" style="color:#00ff00; border-left: 4px solid #00ff00;">Divine</div>
-                <div class="rank-bar" style="color:#ffcc00; border-left: 4px solid #ffcc00;">Eternal</div>
-                <div class="rank-bar" style="color:#ff8800; border-left: 4px solid #ff8800;">Mystic</div>
-                <div class="rank-bar" style="color:#ffff88; border-left: 4px solid #ffff88;">Infinite</div>
-                <div class="rank-bar" style="color:#cc88ff; border-left: 4px solid #cc88ff;">Outer</div>
-                <div class="rank-bar" style="color:#ff4444; border-left: 4px solid #ff4444;">Elder</div>
-                <div class="rank-bar" style="color:#ffcc88; border-left: 4px solid #ffcc88;">Supreme</div>
-                <div class="rank-bar" style="color:#ffff00; border-left: 4px solid #ffff00;">Ultra God</div>
+            <!-- New Rank List (TIER NAMES - CUSTOMIZE HERE) -->
+            <div class="rank-list-unique">
+                <div class="rank-card tier-10">Primordial (Max) <span class="count">0</span></div>
+                <div class="rank-card tier-9">Ancient <span class="count">0</span></div>
+                <div class="rank-card tier-8">Chaos <span class="count">0</span></div>
+                <div class="rank-card tier-7">God <span class="count">0</span></div>
+                <div class="rank-card tier-6">Divine <span class="count">0</span></div>
+                <div class="rank-card tier-5">Mythic <span class="count">0</span></div>
+                <div class="rank-card tier-4">Legendary <span class="count">0</span></div>
+                <div class="rank-card tier-3">Epic <span class="count">0</span></div>
+                <div class="rank-card tier-2">Rare <span class="count">0</span></div>
+                <div class="rank-card tier-1">Minion <span class="count">1</span></div>
             </div>
+
+            <style>
+                .fusion-deck.unique-style {
+                    background: #101520;
+                    padding: 20px;
+                    border-bottom: 2px solid #2a3b4c;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .fusion-chamber {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                .hex-slot {
+                    width: 50px;
+                    height: 55px;
+                    background: #222;
+                    border: 2px solid #444;
+                    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+                    position: relative;
+                }
+
+                .fusion-icon {
+                    font-size: 20px;
+                    color: #44ff44;
+                    animation: spin 4s linear infinite;
+                }
+
+                @keyframes spin {
+                    100% {
+                        transform: rotate(360deg);
+                    }
+                }
+
+                .btn-fuse {
+                    background: #222;
+                    border: 1px solid #44ff44;
+                    color: #44ff44;
+                    padding: 8px 15px;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    margin-left: 10px;
+                }
+
+                .btn-fuse.mass {
+                    border-color: #ffaa00;
+                    color: #ffaa00;
+                    font-size: 10px;
+                }
+
+                .rank-list-unique {
+                    padding: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+
+                .rank-card {
+                    padding: 12px 20px;
+                    background: linear-gradient(90deg, #1a1f2a, #252b36);
+                    border-left: 4px solid #555;
+                    color: #eee;
+                    font-weight: bold;
+                    display: flex;
+                    justify-content: space-between;
+                    border-radius: 0 8px 8px 0;
+                    transition: all 0.2s;
+                }
+
+                .rank-card:hover {
+                    margin-left: 5px;
+                    background: #2a3040;
+                }
+
+                /* Tiers Colors */
+                .tier-1 {
+                    border-color: #888;
+                }
+
+                .tier-2 {
+                    border-color: #44ff44;
+                    box-shadow: -2px 0 10px rgba(68, 255, 68, 0.1);
+                }
+
+                .tier-3 {
+                    border-color: #00aaff;
+                    box-shadow: -2px 0 10px rgba(0, 170, 255, 0.1);
+                }
+
+                .tier-4 {
+                    border-color: #aa00ff;
+                }
+
+                .tier-5 {
+                    border-color: #ffaa00;
+                }
+
+                .tier-6 {
+                    border-color: #ff0000;
+                    box-shadow: -2px 0 15px rgba(255, 0, 0, 0.2);
+                }
+
+                .tier-7 {
+                    border-color: #00ffff;
+                    box-shadow: -2px 0 15px rgba(0, 255, 255, 0.3);
+                }
+
+                .tier-8 {
+                    border-color: #ffd700;
+                    background: linear-gradient(90deg, #2a2a29, #444422);
+                }
+
+                .tier-9 {
+                    border-color: #ff00ff;
+                    background: linear-gradient(90deg, #2a1a2a, #442244);
+                }
+
+                .tier-10 {
+                    border-color: #fff;
+                    background: linear-gradient(90deg, #333, #555);
+                    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+                    color: #fff;
+                    text-shadow: 0 0 5px #fff;
+                }
+
+                .count {
+                    background: rgba(0, 0, 0, 0.5);
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-size: 11px;
+                }
+            </style>
         </div>
 
         <!-- Pets Tab -->
