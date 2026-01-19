@@ -51,6 +51,8 @@
             z-index: 1001;
             padding-bottom: 5px;
             border-bottom: 1px solid #333;
+            transform: translateY(5px);
+            /* Push down into nav to close gap */
         }
 
         .nav-btn {
@@ -334,7 +336,8 @@
                 z-index: 20;
                 background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.8) 100%);
                 padding-bottom: 10px;
-                position: sticky;
+                position: relative;
+                /* WAS STICKY */
                 top: 0;
                 width: 100%;
                 border-bottom: 1px solid #333;
@@ -1023,7 +1026,7 @@
     <div id="game-container">
         <!-- Background -->
         <div class="boss-bg-layer"
-            style="background: url('volcano_bg.png') no-repeat center center; background-size: cover;"></div>
+            style="background: url('volcano_ground.png') no-repeat center bottom; background-size: cover;"></div>
         <div class="magma-pulse"></div>
         <div class="bg-embers"></div>
 
@@ -1740,7 +1743,50 @@
                 opacity: 0;
             }
         }
-    </style>
-</body>
 
-</html>
+        /* --- FIRE & BREATH ANIMATIONS --- */
+        .dragon-img {
+            animation: deepBreathe 4s ease-in-out infinite !important;
+        }
+
+        @keyframes deepBreathe {
+
+            0%,
+            100% {
+                transform: scale(1) translateY(0);
+                filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8)) brightness(1);
+            }
+
+            50% {
+                transform: scale(1.04) translateY(-10px);
+                filter: drop-shadow(0 15px 40px rgba(255, 50, 0, 0.3)) brightness(1.15);
+            }
+        }
+
+        .bg-embers {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                radial-gradient(circle, #ffcc00 2px, transparent 2.5px),
+                radial-gradient(circle, #ff4400 1.5px, transparent 2px),
+                radial-gradient(circle, #ff0000 1px, transparent 1.5px);
+            background-size: 300px 300px, 250px 250px, 200px 200px;
+            background-position: 0 0, 40px 70px, 120px 140px;
+            animation: risingEmbers 8s linear infinite;
+            opacity: 0.8;
+            z-index: 5;
+            mix-blend-mode: screen;
+        }
+
+        @keyframes risingEmbers {
+            from {
+                background-position: 0 0, 40px 70px, 120px 140px;
+            }
+
+            to {
+                background-position: 0 -300px, 40px -130px, 120px -60px;
+            }
+        }
+
+        </body></html>
