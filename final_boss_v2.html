@@ -999,6 +999,23 @@
                     transform: scale(1);
                 }
             }
+
+            @keyframes damagePopVisible {
+                0% {
+                    transform: translate(-50%, -50%) scale(0.5);
+                    opacity: 0;
+                }
+
+                20% {
+                    transform: translate(-50%, -80%) scale(1.2);
+                    opacity: 1;
+                }
+
+                100% {
+                    transform: translate(-50%, -150%) scale(1);
+                    opacity: 0;
+                }
+            }
     </style>
 </head>
 
@@ -1065,17 +1082,12 @@
             <div class="bottom-ui">
                 <!-- Boss Info (Name & Element) -->
                 <div class="boss-info"
-                    style="text-align:center; margin-bottom:5px; margin-top: 10px; position: relative; z-index: 20;">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+                    style="text-align:center; padding-left: 0px; margin-bottom:0px; margin-top: 5px; position: relative; z-index: 20;">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <span id="stage2Icon" style="font-size:16px;">🔥</span>
                         <div class="boss-name" id="bossName"
                             style="font-size:18px; font-weight:bold; color:#ff4400; text-shadow:0 1px 2px #000;">Dark
-                            Overlord
-                        </div>
-                        <!-- Element Icon (Visible Always) -->
-                        <div id="stage2Icon"
-                            style="display:block; font-size:12px; color:#ffaa00; font-weight:bold; border:1px solid #ff4400; padding:2px 8px; border-radius:4px; background:#440000;">
-                            🔥 Fire Element
-                        </div>
+                            Overlord</div>
                     </div>
                     <!-- Phase Message -->
                     <div class="phase-msg" id="phaseMsg"
@@ -1542,7 +1554,7 @@
             el.damageText.style.fontSize = isCrit ? '50px' : '40px';
             el.damageText.style.animation = 'none';
             el.damageText.offsetHeight;
-            el.damageText.style.animation = 'damagePop 0.8s ease-out';
+            el.damageText.style.animation = 'damagePopVisible 0.8s ease-out';
         }
 
         function spawnFloater(val, type) {
@@ -1710,6 +1722,25 @@
             alignBottomNav();
         })();
     </script>
+    <!-- FORCE ANIMATION FIX -->
+    <style>
+        @keyframes damagePopVisible {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+
+            20% {
+                transform: translate(-50%, -80%) scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -150%) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
 </body>
 
 </html>
