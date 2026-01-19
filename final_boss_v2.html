@@ -51,8 +51,7 @@
             z-index: 1001;
             padding-bottom: 5px;
             border-bottom: 1px solid #333;
-            transform: translateY(5px);
-            /* Push down into nav to close gap */
+            margin-top: 20px;
         }
 
         .nav-btn {
@@ -335,6 +334,7 @@
             .top-ui-wrapper {
                 z-index: 20;
                 background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.8) 100%);
+                padding-top: 15px;
                 padding-bottom: 10px;
                 position: relative;
                 /* WAS STICKY */
@@ -597,7 +597,7 @@
             /* --- BOTTOM UI GROUP --- */
             .bottom-ui {
                 z-index: 20;
-                padding: 10px;
+                padding: 10px 10px 15px 10px;
                 background: linear-gradient(0deg, #111 20%, transparent 100%);
             }
 
@@ -1077,6 +1077,8 @@
 
             <!-- Dragon Area -->
             <div class="dragon-stage">
+                <!-- Animated Lava Platform -->
+                <div class="lava-platform"></div>
                 <img src="fire_dragon_transparent.png" class="dragon-img" id="dragon">
                 <div class="damage-floater" id="damageText">999</div>
             </div>
@@ -1085,7 +1087,7 @@
             <div class="bottom-ui">
                 <!-- Boss Info (Name & Element) -->
                 <div class="boss-info"
-                    style="text-align:center; padding-left: 0px; margin-bottom:0px; margin-top: 5px; position: relative; z-index: 20;">
+                    style="text-align:center; padding-left: 0px; margin-bottom:-2px; margin-top: 0px; position: relative; z-index: 20;">
                     <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
                         <span id="stage2Icon" style="font-size:16px;">🔥</span>
                         <div class="boss-name" id="bossName"
@@ -1094,7 +1096,7 @@
                     </div>
                     <!-- Phase Message -->
                     <div class="phase-msg" id="phaseMsg"
-                        style="font-size:11px; color:#ffcc00; margin-top:2px; height:14px;"></div>
+                        style="font-size:11px; color:#ffcc00; margin-top:0px; height:0px;"></div>
                 </div>
 
                 <!-- Boss HP Bar -->
@@ -1789,4 +1791,61 @@
             }
         }
 
-        </body></html>
+        < !-- ANIMATED LAVA PLATFORM --><style>.lava-platform {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 80px;
+            background:
+                radial-gradient(ellipse 100% 50% at 50% 100%, rgba(255, 68, 0, 0.4) 0%, transparent 70%),
+                radial-gradient(ellipse 80% 40% at 50% 100%, rgba(255, 136, 0, 0.3) 0%, transparent 60%),
+                radial-gradient(ellipse 120% 60% at 50% 100%, rgba(100, 30, 0, 0.8) 0%, transparent 80%);
+            border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+            z-index: 5;
+            animation: lavaPulse 3s ease-in-out infinite;
+            filter: blur(2px);
+            pointer-events: none;
+        }
+
+        @keyframes lavaPulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+                box-shadow:
+                    0 0 30px rgba(255, 68, 0, 0.5),
+                    0 0 60px rgba(255, 136, 0, 0.3),
+                    inset 0 -10px 30px rgba(255, 68, 0, 0.4);
+            }
+
+            50% {
+                opacity: 1;
+                box-shadow:
+                    0 0 50px rgba(255, 68, 0, 0.8),
+                    0 0 100px rgba(255, 136, 0, 0.5),
+                    inset 0 -15px 50px rgba(255, 100, 0, 0.6);
+            }
+        }
+    </style>
+    <!-- SPACING TWEAKS -->
+    <style>
+        .boss-info {
+            margin-top: 10px !important;
+        }
+
+        .dragon-img {
+            position: relative;
+            top: 20px;
+            /* Push dragon down slightly */
+        }
+
+        .boss-bg-layer {
+            background-position: center 90% !important;
+            /* Push background up */
+        }
+    </style>
+</body>
+
+</html>
