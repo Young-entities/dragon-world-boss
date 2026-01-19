@@ -2101,10 +2101,13 @@
 
             <!-- New Rank List (TIER NAMES - CUSTOMIZE HERE) -->
             <div class="rank-list-unique">
-                <div class="rank-card tier-10">Primordial (Max) <span class="count">0</span></div>
-                <div class="rank-card tier-9">Ancient <span class="count">0</span></div>
-                <div class="rank-card tier-8">God <span class="count">0</span></div>
-                <div class="rank-card tier-7">Demi God <span class="count">0</span></div>
+                <div class="rank-card tier-13">Primordial <span class="count">0</span></div>
+                <div class="rank-card tier-12">Eternal <span class="count">0</span></div>
+                <div class="rank-card tier-11">Chaos <span class="count">0</span></div>
+                <div class="rank-card tier-10">Deity <span class="count">0</span></div>
+                <div class="rank-card tier-9">God <span class="count">0</span></div>
+                <div class="rank-card tier-8">Demi God <span class="count">0</span></div>
+                <div class="rank-card tier-7">Titan <span class="count">0</span></div>
                 <div class="rank-card tier-6">Mythic <span class="count">0</span></div>
                 <div class="rank-card tier-5">Myth <span class="count">0</span></div>
                 <div class="rank-card tier-4">Legendary <span class="count">0</span></div>
@@ -2172,6 +2175,12 @@
                     display: flex;
                     flex-direction: column;
                     gap: 8px;
+                    flex: 1;
+                    /* PUSH SCROLL */
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    padding-bottom: 80px;
+                    /* Space for Nav */
                 }
 
                 .rank-card {
@@ -2191,55 +2200,63 @@
                     background: #2a3040;
                 }
 
-                /* Tiers Colors */
+                /* Tiers Colors (Border Only) */
                 .tier-1 {
                     border-color: #888;
                 }
 
                 .tier-2 {
                     border-color: #44ff44;
-                    box-shadow: -2px 0 10px rgba(68, 255, 68, 0.1);
                 }
 
                 .tier-3 {
-                    border-color: #00aaff;
-                    box-shadow: -2px 0 10px rgba(0, 170, 255, 0.1);
-                }
-
-                .tier-4 {
                     border-color: #aa00ff;
                 }
 
+                .tier-4 {
+                    border-color: #ffff00;
+                }
+
                 .tier-5 {
-                    border-color: #ffaa00;
+                    border-color: #ff8800;
                 }
 
                 .tier-6 {
                     border-color: #ff0000;
-                    box-shadow: -2px 0 15px rgba(255, 0, 0, 0.2);
                 }
 
                 .tier-7 {
                     border-color: #00ffff;
-                    box-shadow: -2px 0 15px rgba(0, 255, 255, 0.3);
                 }
 
                 .tier-8 {
-                    border-color: #ffd700;
-                    background: linear-gradient(90deg, #2a2a29, #444422);
+                    border-color: #0088ff;
                 }
 
                 .tier-9 {
-                    border-color: #ff00ff;
-                    background: linear-gradient(90deg, #2a1a2a, #442244);
+                    border-color: #0000ff;
                 }
 
                 .tier-10 {
-                    border-color: #fff;
-                    background: linear-gradient(90deg, #333, #555);
-                    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-                    color: #fff;
-                    text-shadow: 0 0 5px #fff;
+                    border-color: #ff00ff;
+                }
+
+                .tier-11 {
+                    border-color: #990000;
+                }
+
+                .tier-12 {
+                    border-color: #ffffff;
+                }
+
+                /* Primordial Only (Glow, No Full BG) */
+                .tier-13 {
+                    border-color: #ffd700;
+                    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+                    /* The Glow */
+                    color: #ffd700;
+                    /* Gold Text */
+                    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
                 }
 
                 .count {
