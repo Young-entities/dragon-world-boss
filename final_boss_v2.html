@@ -413,9 +413,6 @@
 
             .money-amount.pop {
                 transform: scale(1.2);
-                /* Just a small pulse, no color change */
-                /* color: #fff; REMOVED */
-                /* text-shadow: REMOVED */
             }
 
             .money-sub {
@@ -1050,23 +1047,30 @@
                         <div class="money-sub">Next Check: 15:00</div>
                     </div>
                 </div>
-                <div class="resource-row">
-                    <div class="resource-item">❤️
+
+                <!-- Resource Pills (Keeping the Design User Liked) -->
+                <div class="resource-row pill-design">
+                    <div class="resource-item pill">
+                        ❤️
                         <div class="resource-bar">
                             <div class="resource-fill stamina" id="hpBar" style="width:100%"></div>
                         </div>
                         <span class="resource-text"><span id="hpText">100/100</span><span id="hpTimer"
                                 class="resource-timer"></span></span>
                     </div>
-                    <div class="resource-item">⚡
+                    <div class="resource-item pill">
+                        ⚡
                         <div class="resource-bar">
                             <div class="resource-fill stamina" id="staminaBar" style="width:100%"></div>
                         </div>
                         <span class="resource-text"><span id="staminaText">50/50</span><span id="staminaTimer"
                                 class="resource-timer"></span></span>
                     </div>
-                    <div class="resource-item">💎 <span class="resource-text" id="gemsText">5,717</span></div>
+                    <div class="resource-item pill">
+                        💎 <span class="resource-text" id="gemsText">5,717</span>
+                    </div>
                 </div>
+
                 <div class="overdrive-wrapper">
                     <div class="od-bar-frame">
                         <div class="od-bar-fill" id="odFill"></div>
@@ -1077,8 +1081,8 @@
 
             <!-- Dragon Area -->
             <div class="dragon-stage">
-                <!-- Animated Lava Platform -->
-                <div class="lava-platform"></div>
+                <!-- Animated Lava Platform (Commented out as 'Mist') -->
+                <!-- <div class="lava-platform"></div> -->
                 <img src="fire_dragon_transparent.png" class="dragon-img" id="dragon">
                 <div class="damage-floater" id="damageText">999</div>
             </div>
@@ -1179,78 +1183,9 @@
         </div>
 
         <!-- Spacer to prevent bottom nav from blocking content -->
-        <!-- === BOTTOM NAVIGATION (MOVED HERE) === -->
-
-
-        <!-- === BOTTOM NAVIGATION (RESTORED HERE) === -->
-
-
-        <!-- Safety Spacer for scrolling -->
         <div style="height: 20px; width: 100%; flex-shrink: 0;"></div>
     </div>
 
-    <!-- === MONSTER VIEW OVERLAY === -->
-    <div id="view-monster">
-        <div class="sub-nav-tabs">
-            <div class="sub-tab active" onclick="monsterTab('monster', this)">Monster</div>
-            <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
-            <div class="sub-tab" onclick="monsterTab('collectibles', this)">Collectibles</div>
-        </div>
-
-        <!-- Monster Tab -->
-        <div id="mt-monster" class="mon-tab-content active">
-            <div style="color:#ffcc00; font-size:12px; margin-bottom:10px; text-align:center;">Manage your army
-            </div>
-            <div class="mon-row">
-                <div class="mon-icon">🐉</div>
-                <div class="mon-info">
-                    <div class="mon-name">Fire Dragon</div>
-                    <div class="mon-stats">ATK: 5000 | DEF: 2000</div>
-                </div>
-                <div class="mon-act">
-                    <button class="btn-act btn-buy">UPGR</button>
-                </div>
-            </div>
-            <div class="mon-row">
-                <div class="mon-icon">👹</div>
-                <div class="mon-info">
-                    <div class="mon-name">Ogre</div>
-                    <div class="mon-stats">ATK: 1500 | DEF: 3000</div>
-                </div>
-                <div class="mon-act">
-                    <button class="btn-act btn-buy">UPGR</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pets Tab -->
-        <div id="mt-pets" class="mon-tab-content">
-            <div style="color:#44ff44; font-size:12px; margin-bottom:10px; text-align:center;">Active Companions
-            </div>
-            <div class="mon-grid">
-                <div class="mon-grid-item">🐺</div>
-                <div class="mon-grid-item">🦅</div>
-                <div class="mon-grid-item">🐢</div>
-            </div>
-        </div>
-
-        <!-- Collectibles Tab -->
-        <div id="mt-collectibles" class="mon-tab-content">
-            <div style="color:#cc44ff; font-size:12px; margin-bottom:10px; text-align:center;">Artifacts & Trophies
-            </div>
-            <div class="mon-grid">
-                <div class="mon-grid-item">👑</div>
-                <div class="mon-grid-item">💍</div>
-                <div class="mon-grid-item">🗡️</div>
-                <div class="mon-grid-item" style="opacity:0.3">🛡️</div>
-                <div class="mon-grid-item" style="opacity:0.3">🔮</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- === BOTTOM NAVIGATION === -->
-
-    </div>
     <!-- Level Up Overlay -->
     <div class="level-up-overlay" id="luOverlay">
         <div class="lu-content">
@@ -1378,7 +1313,7 @@
                 if (state.phase === 2) {
                     el.phaseMsg.textContent = "⚠ MAGMA ARMOR ACTIVATED";
                     // Icon is always visible now
-                    el.bossName.textContent = "Dark Overlord (Armored)";
+                    el.bossName.textContent = "Dark Overlord";
                     el.bossName.style.color = "#ff4400"; // Always Red
                 } else {
                     el.phaseMsg.textContent = "";
@@ -1521,6 +1456,7 @@
             el.moneyText.classList.remove('pop');
             void el.moneyText.offsetWidth;
             el.moneyText.classList.add('pop');
+            setTimeout(() => el.moneyText.classList.remove('pop'), 150);
 
             // Level Up Check
             if (state.xp >= state.xpToLevel) {
@@ -1790,8 +1726,10 @@
                 background-position: 0 -300px, 40px -130px, 120px -60px;
             }
         }
-
-        < !-- ANIMATED LAVA PLATFORM --><style>.lava-platform {
+    </style>
+    <!-- ANIMATED LAVA PLATFORM -->
+    <style>
+        .lava-platform {
             position: absolute;
             bottom: 0;
             left: 50%;
@@ -1844,6 +1782,552 @@
         .boss-bg-layer {
             background-position: center 90% !important;
             /* Push background up */
+        }
+    </style>
+    <!-- FUSION UI CSS -->
+    <style>
+        .fusion-deck {
+            background: linear-gradient(180deg, #1f2f3f 0%, #0f151f 100%);
+            padding: 15px;
+            border-bottom: 1px solid #334455;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .fusion-gap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .fusion-slot {
+            width: 60px;
+            height: 80px;
+            background: #0a0e14;
+            border: 2px solid #2a3a4a;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .fusion-plus {
+            font-size: 40px;
+            color: #8899aa;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .fusion-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-combine {
+            background: linear-gradient(180deg, #556677 0%, #334455 100%);
+            border: 1px solid #667788;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-combine.omega {
+            background: linear-gradient(180deg, #556677 0%, #2a3a4a 100%);
+            font-size: 10px;
+            padding: 4px 10px;
+            opacity: 0.8;
+        }
+
+        .help-icon {
+            position: absolute;
+            top: 10px;
+            right: 120px;
+            width: 20px;
+            height: 20px;
+            background: #eb4;
+            color: #000;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .rank-list-container {
+            padding: 10px;
+            overflow-y: auto;
+            flex: 1;
+            background: #050510;
+        }
+
+        .rank-bar {
+            background: linear-gradient(90deg, #111 0%, #222 50%, #111 100%);
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            border: 1px solid #333;
+            border-left-width: 4px;
+            /* Color defined inline */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 1);
+        }
+    </style>
+    <!-- MONSTER VIEW FULL SCREEN STYLE (CENTERED) -->
+    <style>
+        #view-monster {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            background: #050b14;
+            /* Solid Dark Background */
+            z-index: 9000;
+            /* Above game, Below Bottom Nav */
+            display: none;
+            /* Hidden by default */
+            flex-direction: column;
+            padding-bottom: 50px;
+            /* Space for bottom nav */
+            box-sizing: border-box;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+        }
+    </style>
+    <!-- MONSTER UI LOGIC -->
+    <script>
+        function toggleView(viewId) {
+            const el = document.getElementById('view-' + viewId);
+            if (el) {
+                const isOpen = el.style.display === 'flex';
+                el.style.display = isOpen ? 'none' : 'flex';
+
+                // Toggle body class for conditional styling
+                if (!isOpen) {
+                    document.body.classList.add('view-open');
+                } else {
+                    document.body.classList.remove('view-open');
+                }
+
+                // Hide main scroll if open
+                document.body.style.overflow = isOpen ? 'auto' : 'hidden';
+            }
+        }
+
+        function monsterTab(tabName, clickedEl) {
+            // 1. Remove active from all tabs
+            document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+            // 2. Add active to clicked
+            clickedEl.classList.add('active');
+
+            // 3. Hide all tab contents
+            document.querySelectorAll('.mon-tab-content').forEach(c => {
+                c.style.display = 'none';
+                c.classList.remove('active');
+            });
+
+            // 4. Show new tab content
+            const target = document.getElementById('mt-' + tabName);
+            if (target) {
+                target.style.display = 'block'; // Or flex if needed layout
+                target.classList.add('active');
+            }
+        }
+    </script>
+    <!-- === MONSTER VIEW OVERLAY (Relocated) === -->
+    <div id="view-monster">
+        <!-- DUPLICATED TOP UI (For Overlay - Matches Pill Design) -->
+        <div class="top-ui-wrapper"
+            style="position: relative; background: transparent; border-bottom: 1px solid #333; z-index: 5;">
+            <div class="top-row">
+                <div class="level-badge">
+                    <div class="level-number">
+                        <div class="level-star">⭐</div><span class="level-value" id="m_levelText">42</span>
+                    </div>
+                    <div class="xp-bar-wrapper">XP: <span id="m_xpText"></span>
+                        <div class="xp-bar">
+                            <div class="xp-fill" id="m_xpBar"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="money-display">
+                    <div class="money-amount" id="m_moneyText">0G</div>
+                    <div class="money-sub" style="color: #888;">Next Check: 15:00</div>
+                </div>
+            </div>
+
+            <style>
+                #view-monster .top-ui-wrapper {
+                    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%) !important;
+                }
+
+                #view-monster .money-amount {
+                    color: #44ff44 !important;
+                }
+
+                #view-monster .money-sub {
+                    font-size: 10px !important;
+                    line-height: 1.1;
+                }
+            </style>
+
+            <div class="resource-row pill-design">
+                <div class="resource-item pill">
+                    ❤️
+                    <div class="resource-bar">
+                        <div class="resource-fill stamina" id="m_hpBar" style="width:100%"></div>
+                    </div>
+                    <span class="resource-text"><span id="m_hpText">100/100</span><span id="m_hpTimer"
+                            class="resource-timer"></span></span>
+                </div>
+                <div class="resource-item pill">
+                    ⚡
+                    <div class="resource-bar">
+                        <div class="resource-fill stamina" id="m_staminaBar" style="width:100%"></div>
+                    </div>
+                    <span class="resource-text"><span id="m_staminaText">50/50</span><span id="m_staminaTimer"
+                            class="resource-timer"></span></span>
+                </div>
+                <div class="resource-item pill">
+                    💎 <span class="resource-text" id="m_gemsText">5,717</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sub-nav-tabs"
+            style="overflow-x: auto; white-space: nowrap; justify-content: flex-start; padding-left: 10px;">
+            <div class="sub-tab" onclick="monsterTab('monster', this)">Monster</div>
+            <div class="sub-tab active" onclick="monsterTab('fusions', this)">Fusion</div>
+            <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
+            <div class="sub-tab" onclick="monsterTab('summon', this)">Summon</div>
+            <div class="sub-tab" onclick="monsterTab('collections', this)">Collections</div>
+        </div>
+
+        <!-- PILL CSS & SYNC LOGIC -->
+        <style>
+            .resource-row.pill-design {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                padding-bottom: 10px;
+            }
+
+            .resource-item.pill {
+                display: flex;
+                align-items: center;
+                background: #000;
+                border: 1px solid #333;
+                border-radius: 50px;
+                padding: 4px 12px;
+                min-width: 110px;
+                justify-content: space-between;
+            }
+
+            .resource-item.pill .resource-bar {
+                width: 60px;
+                height: 6px;
+                background: #222;
+                border-radius: 3px;
+                overflow: hidden;
+                margin: 0 5px;
+                display: inline-block;
+            }
+        </style>
+        <script>
+            // Sync Monster UI
+            const originalUpdateUI = window.updateUI;
+            window.updateUI = function () {
+                if (originalUpdateUI) originalUpdateUI();
+
+                // Sync duplicated Top UI elements
+                if (document.getElementById('m_levelText')) {
+                    document.getElementById('m_levelText').textContent = state.level;
+                    document.getElementById('m_xpText').textContent = state.xp.toLocaleString();
+                    document.getElementById('m_xpBar').style.width = (state.xp / state.xpToLevel * 100) + '%';
+
+                    document.getElementById('m_moneyText').textContent = state.money.toLocaleString() + 'G';
+                    document.getElementById('m_gemsText').textContent = state.gems.toLocaleString();
+
+                    document.getElementById('m_hpText').textContent = `${state.hp}/${state.maxHp}`;
+                    document.getElementById('m_hpBar').style.width = (state.hp / state.maxHp * 100) + '%';
+                    document.getElementById('m_hpTimer').textContent = state.hp < state.maxHp ? formatTime(state.hpSeconds) : '';
+
+                    document.getElementById('m_staminaText').textContent = `${state.stamina}/${state.maxStamina}`;
+                    document.getElementById('m_staminaBar').style.width = (state.stamina / state.maxStamina * 100) + '%';
+                    document.getElementById('m_staminaTimer').textContent = state.stamina < state.maxStamina ? formatTime(state.staminaSeconds) : '';
+                }
+            };
+        </script>
+
+        <!-- Monster List Tab (Placeholder) -->
+        <div id="mt-monster" class="mon-tab-content">
+            <div class="mon-row">
+                <div class="mon-icon">🐉</div>
+                <div class="mon-info">
+                    <div class="mon-name">Fire Dragon</div>
+                    <div class="mon-stats">Lv. 40</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FUSIONS TAB (Renamed from Fusion) -->
+        <div id="mt-fusions" class="mon-tab-content active">
+            <!-- Fusion Deck Area -->
+            <div class="fusion-deck">
+                <div class="fusion-gap">
+                    <div class="fusion-slot"></div>
+                    <div class="fusion-plus">+</div>
+                    <div class="fusion-slot"></div>
+                </div>
+                <!-- Action Buttons -->
+                <div class="fusion-actions">
+                    <button class="btn-combine">Combine</button>
+                    <button class="btn-combine omega">Omega<br>Combine</button>
+                </div>
+                <div class="help-icon">?</div>
+            </div>
+
+            <!-- Rank List -->
+            <div class="rank-list-container">
+                <div class="rank-bar" style="color:#00ffff; border-left: 4px solid #00ffff;">Immortal</div>
+                <div class="rank-bar" style="color:#00ff00; border-left: 4px solid #00ff00;">Divine</div>
+                <div class="rank-bar" style="color:#ffcc00; border-left: 4px solid #ffcc00;">Eternal</div>
+                <div class="rank-bar" style="color:#ff8800; border-left: 4px solid #ff8800;">Mystic</div>
+                <div class="rank-bar" style="color:#ffff88; border-left: 4px solid #ffff88;">Infinite</div>
+                <div class="rank-bar" style="color:#cc88ff; border-left: 4px solid #cc88ff;">Outer</div>
+                <div class="rank-bar" style="color:#ff4444; border-left: 4px solid #ff4444;">Elder</div>
+                <div class="rank-bar" style="color:#ffcc88; border-left: 4px solid #ffcc88;">Supreme</div>
+                <div class="rank-bar" style="color:#ffff00; border-left: 4px solid #ffff00;">Ultra God</div>
+            </div>
+        </div>
+
+        <!-- Pets Tab -->
+        <div id="mt-pets" class="mon-tab-content">
+            <div style="padding:20px; text-align:center; color:#888;">Pets Coming Soon</div>
+        </div>
+
+        <!-- Summon Tab -->
+        <div id="mt-summon" class="mon-tab-content">
+            <div style="padding:20px; text-align:center; color:#888;">Summon Gate Locked</div>
+        </div>
+
+        <!-- Collections Tab -->
+        <div id="mt-collections" class="mon-tab-content">
+            <div style="padding:20px; text-align:center; color:#888;">Collections Empty</div>
+        </div>
+        <!-- BOTTOM NAV (Inside Monster View) -->
+        <div class="bottom-nav"
+            style="position: absolute; bottom: 0; width: 100%; z-index: 10; border-top: 1px solid #333; background: #141419;">
+            <button class="nav-btn" onclick="toggleView('battle')">
+                <span class="nav-icon">⚔️</span>
+                <span>Battle</span>
+            </button>
+            <button class="nav-btn" style="color: #ffcc00;">
+                <span class="nav-icon">👹</span>
+                <span>Monster</span>
+            </button>
+            <button class="nav-btn">
+                <span class="nav-icon">🎒</span>
+                <span>Equip</span>
+            </button>
+            <button class="nav-btn">
+                <span class="nav-icon">💰</span>
+                <span>Shop</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SYNC SCRIPT REMOVED (Redundant with Global Header) -->
+    <script>
+        // No sync needed, Header is global.
+    </script>
+    <!-- MONSTER VIEW FIXES -->
+    <style>
+        /* Fix Top UI Layout in Overlay */
+        #view-monster .top-ui-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            background: transparent;
+        }
+
+        #view-monster .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #view-monster .resource-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 15px 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #view-monster .resource-item {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #fff;
+            gap: 6px;
+        }
+
+        /* Ensure specific items are flex too */
+        /* Ensure specific items are flex too */
+        #view-monster .level-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Fix Money Display to Column (stacked like Main Screen) */
+        #view-monster .money-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        #view-monster .level-number {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: gold;
+            font-weight: bold;
+        }
+
+        #view-monster .xp-bar-wrapper {
+            font-size: 10px;
+            color: #aaa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #view-monster .xp-bar {
+            width: 60px;
+            height: 4px;
+            background: #333;
+            margin-top: 2px;
+        }
+
+        #view-monster .xp-fill {
+            height: 100%;
+            background: #00ff00;
+        }
+
+        /* Enforce Green Timer */
+        #view-monster .resource-timer {
+            color: #44ff44 !important;
+        }
+
+        /* Money color override removed to match Global Green */
+
+        /* Fix Fusion Tab Layout */
+        #mt-fusions.active {
+            display: flex !important;
+            /* Override block */
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Ensure Deck doesn't shrink and List expands */
+        .fusion-deck {
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .rank-list-container {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding-bottom: 60px;
+            /* Nav space */
+        }
+
+        /* HIDE BATTLE SCENE WHEN VIEW IS OPEN */
+        body.view-open .main-screen-height {
+            display: none !important;
+        }
+
+        /* --- PREMIUM UI UPGRADE --- */
+
+        /* 1. Deep Background */
+        #view-monster {
+            background: radial-gradient(circle at center top, #1f2f3f 0%, #05080c 100%);
+        }
+
+        /* 2. Top Header (Original Style) */
+        #view-monster .top-ui-wrapper {
+            background: rgba(0, 0, 0, 0.5) !important;
+            /* Slight dim like battle? */
+            border-bottom: none !important;
+            box-shadow: none !important;
+            padding-bottom: 0;
+        }
+
+        /* Re-apply Original Resource Bar Styles specifically for Overlay with PILL DESIGN */
+        #view-monster .resource-row {
+            display: flex;
+            justify-content: center;
+            /* Center the pills */
+            gap: 15px;
+            padding-bottom: 10px;
+        }
+
+        /* 3. Sleek Tabs (No Scrollbar) */
+        #view-monster .sub-nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        #view-monster .sub-nav-tabs {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            /* Firefox/IE */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #view-monster .sub-tab {
+            padding: 15px 20px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #667788;
+            background: transparent !important;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        #view-monster .sub-tab.active {
+            color: #fff;
+            border-bottom: 3px solid #00ffff;
+            /* Cyan Glow */
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 255, 0.05) 100%) !important;
         }
     </style>
 </body>
