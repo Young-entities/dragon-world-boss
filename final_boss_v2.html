@@ -2087,15 +2087,25 @@
         <div id="mt-fusions" class="mon-tab-content active">
             <!-- New Fusion Deck Area -->
             <div class="fusion-deck unique-style">
-                <div class="fusion-chamber">
-                    <div class="hex-slot"></div>
-                    <div class="fusion-icon">⚛️</div>
-                    <div class="hex-slot"></div>
+                <div class="fusion-chamber"
+                    style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                    <!-- Slot 1 (Empty Default) -->
+                    <div id="fusion-slot-1" class="fusion-slot"
+                        style="width: 70px; height: 70px; background: #222; border: 2px solid #555; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: none; transition: all 0.3s ease;">
+                        <span style="font-size: 30px; opacity: 0.3;">❓</span>
+                    </div>
+                    <!-- Spinning Core -->
+                    <div class="fusion-plus" style="font-size: 30px; animation: fusionSpin 2s linear infinite;">⚛️</div>
+                    <!-- Slot 2 (Empty Default) -->
+                    <div id="fusion-slot-2" class="fusion-slot"
+                        style="width: 70px; height: 70px; background: #222; border: 2px solid #555; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: none; transition: all 0.3s ease;">
+                        <span style="font-size: 30px; opacity: 0.3;">❓</span>
+                    </div>
                 </div>
                 <!-- Action Buttons -->
                 <div class="fusion-actions">
                     <button class="btn-fuse">FUSE</button>
-                    <button class="btn-fuse mass">MASS<br>FUSE</button>
+                    <button class="btn-fuse mass">INSTANT<br>FUSE</button>
                 </div>
             </div>
 
@@ -2103,7 +2113,78 @@
             <div class="rank-list-unique">
                 <div class="rank-card tier-13">Primordial <span class="count">0</span></div>
                 <div class="rank-card tier-12">Eternal <span class="count">0</span></div>
-                <div class="rank-card tier-11">Chaos <span class="count">0</span></div>
+                <div class="rank-card tier-11"
+                    onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';"
+                    style="cursor: pointer;">
+                    Chaos <span class="count">1</span>
+                </div>
+                <!-- Chaos Monster List (Expandable Grid) -->
+                <div class="rank-monsters"
+                    style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #990000; margin-bottom: 5px;">
+                    <!-- World Boss Item -->
+                    <!-- Updated Monster Item with Image -->
+                    <div class="monster-item" onclick="addToFusionSlot('assets/chaos_dragon_full.png', '#990000', true)"
+                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
+                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+
+                        <!-- Square Icon (Rounded) - Full Art - Plain (No Glow/Line) -->
+                        <div class="mob-icon-square"
+                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
+                            <!-- Full Image (No Zoom) -->
+                            <img src="assets/chaos_dragon_full.png"
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
+                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
+                            Dark Overlord</div>
+                    </div>
+                </div>
+
+                <script>
+                    let fusionSlot1Filled = false;
+                    let fusionSlot2Filled = false;
+
+                    function addToFusionSlot(content, color, isImage) {
+                        const slot1 = document.getElementById('fusion-slot-1');
+                        const slot2 = document.getElementById('fusion-slot-2');
+
+                        const innerHTML = isImage
+                            ? `<img src="${content}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">`
+                            : `<span style="font-size: 30px;">${content}</span>`;
+
+                        if (!fusionSlot1Filled) {
+                            slot1.innerHTML = innerHTML;
+                            slot1.style.borderColor = 'transparent';
+                            slot1.style.boxShadow = `0 0 15px ${color}`;
+                            slot1.style.opacity = '1';
+                            fusionSlot1Filled = true;
+                        } else if (!fusionSlot2Filled) {
+                            slot2.innerHTML = innerHTML;
+                            slot2.style.borderColor = 'transparent';
+                            slot2.style.boxShadow = `0 0 15px ${color}`;
+                            slot2.style.opacity = '1';
+                            fusionSlot2Filled = true;
+                        } else {
+                            // Reset (Both Full -> Clear)
+                            slot1.innerHTML = '<span style="font-size: 30px; opacity: 0.3;">❓</span>';
+                            slot1.style.borderColor = '#555'; /* Reset to Grey */
+                            slot1.style.boxShadow = 'none';   /* No Glow */
+
+                            slot2.innerHTML = '<span style="font-size: 30px; opacity: 0.3;">❓</span>';
+                            slot2.style.borderColor = '#555';
+                            slot2.style.boxShadow = 'none';
+
+                            fusionSlot1Filled = false;
+                            fusionSlot2Filled = false;
+
+                            // Re-Add Current Selection to Slot 1
+                            slot1.innerHTML = innerHTML;
+                            slot1.style.borderColor = 'transparent';
+                            slot1.style.boxShadow = `0 0 15px ${color}`;
+                            fusionSlot1Filled = true;
+                        }
+                    }
+                </script>
                 <div class="rank-card tier-10">Deity <span class="count">0</span></div>
                 <div class="rank-card tier-9">God <span class="count">0</span></div>
                 <div class="rank-card tier-8">Demi God <span class="count">0</span></div>
@@ -2483,6 +2564,103 @@
             text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
             background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 255, 0.05) 100%) !important;
         }
+
+        /* --- FUSION ANIMATIONS --- */
+
+        @keyframes pulseSlot {
+            0% {
+                box-shadow: 0 0 10px rgba(153, 0, 0, 0.3);
+                border-color: #990000;
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+                border-color: #ff0000;
+            }
+
+            100% {
+                box-shadow: 0 0 10px rgba(153, 0, 0, 0.3);
+                border-color: #990000;
+            }
+        }
+
+        .fusion-slot.tier-11 {
+            animation: pulseSlot 3s infinite ease-in-out;
+        }
+
+        @keyframes fusionSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes plusPulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+        }
+
+        .fusion-plus {
+            animation: plusPulse 2s infinite;
+        }
+
+        /* Staggered Rank Entry */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .rank-card {
+            animation: slideInRight 0.4s ease-out backwards;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .rank-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        /* Stagger Delays */
+        .tier-13 {
+            animation-delay: 0.05s;
+        }
+
+        .tier-12 {
+            animation-delay: 0.1s;
+        }
+
+        .tier-11 {
+            animation-delay: 0.15s;
+        }
+
+        .tier-10 {
+            animation-delay: 0.2s;
+        }
+
+        /* Add more if needed, keeps UI snappy */
     </style>
 </body>
 
