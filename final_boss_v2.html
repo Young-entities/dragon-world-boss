@@ -295,14 +295,15 @@
             /* Space for Fixed Nav */
         }
 
-        margin: 0 auto;
-        position: relative;
-        background: #000;
-        display: block;
-        box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-        padding-bottom: 60px;
-        /* SPACE FOR FIXED NAV */
-        overflow: visible;
+        #game-container {
+            margin: 0 auto;
+            position: relative;
+            background: #000;
+            display: block;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            padding-bottom: 80px;
+            /* SPACE FOR FIXED NAV */
+            overflow: visible;
         }
 
         /* Status Info relative again */
@@ -711,87 +712,99 @@
             text-shadow: 0 0 3px #000;
         }
 
-        /* Buttons */
+        /* Button Row */
         .btn-row {
             display: flex;
             gap: 8px;
-            height: 55px;
-            margin-bottom: 0;
-            /* Closed gap completely */
-            position: relative;
-            /* STANDARD FLOW */
-            z-index: 20;
             padding: 0 10px;
-            pointer-events: auto;
+            width: 100%;
+            box-sizing: border-box;
+            justify-content: space-between;
         }
 
         .btn {
             flex: 1;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
+            height: 60px;
+            border-radius: 15px;
+            /* Rounder */
+            border: 5px solid;
+            /* Colored per button */
+            color: #fff;
+            font-family: inherit;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.1s, box-shadow 0.1s;
+            transition: transform 0.1s, filter 0.1s;
+            text-transform: uppercase;
+            /* 3D Bevel & Shadow */
+            box-shadow:
+                inset 0 3px 6px rgba(255, 255, 255, 0.4),
+                /* Top Highlight */
+                inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+                /* Bottom Shadow */
+                0 6px 0 rgba(0, 0, 0, 0.4);
+            /* Drop Shadow Block */
+            text-shadow: 0 2px 2px rgba(0, 0, 0, 0.8);
         }
 
         .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        .btn.normal {
-            background: linear-gradient(180deg, #4477ee, #2255cc);
-            border-bottom: 2px solid #113388;
-        }
-
-        .btn.united {
-            background: linear-gradient(180deg, #55cc55, #229922);
-            border-bottom: 2px solid #116611;
-        }
-
-        .btn.special {
-            background: linear-gradient(180deg, #ff5555, #cc2222);
-            border-bottom: 2px solid #881111;
+            transform: translateY(3px);
+            box-shadow:
+                inset 0 3px 6px rgba(255, 255, 255, 0.4),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.3),
+                0 3px 0 rgba(0, 0, 0, 0.4);
         }
 
         .btn-title {
-            font-size: 15px;
-            font-weight: 800;
+            font-size: 16px;
+            font-weight: 900;
             margin-bottom: 2px;
             letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .btn-cost {
             font-size: 11px;
-            opacity: 0.9;
+            opacity: 1;
             font-weight: bold;
         }
 
-        .btn-fx {
-            position: absolute;
-            inset: 0;
-            background: #fff;
-            opacity: 0;
-            pointer-events: none;
+        /* 1. Normal Attack (Blue) */
+        .btn.normal {
+            background: linear-gradient(180deg, #4488ff 0%, #0044aa 100%);
+            border-color: #002266;
+            /* Dark Blue Frame */
+            /* Border Bevel simulation via shadow? No, solid border is cleaner for stone look. */
+            border-color: #2b75cc;
+            /* Lighter Frame */
+            box-shadow:
+                inset 0 0 10px #2e8eff,
+                0 6px 0 #002255,
+                0 0 10px rgba(46, 142, 255, 0.5);
+            /* Outer Glow */
         }
 
-        @keyframes btnFlash {
-            0% {
-                opacity: 0.5;
-            }
+        /* 2. United Attack (Green) */
+        .btn.united {
+            background: linear-gradient(180deg, #55ee55 0%, #009900 100%);
+            border-color: #2bba2b;
+            box-shadow:
+                inset 0 0 10px #44ff44,
+                0 6px 0 #004400,
+                0 0 10px rgba(68, 255, 68, 0.5);
+        }
 
-            100% {
-                opacity: 0;
-            }
+        /* 3. Special Attack (Red) */
+        .btn.special {
+            background: linear-gradient(180deg, #ff5555 0%, #aa0000 100%);
+            border-color: #cc2222;
+            box-shadow:
+                inset 0 0 10px #ff4444,
+                0 6px 0 #440000,
+                0 0 10px rgba(255, 68, 68, 0.5);
         }
 
         /* --- BATTLE STATUS SECTION (MATCHING SCREENSHOT) --- */
@@ -1141,50 +1154,46 @@
             <style>
                 @keyframes bossIdle {
                     0% {
-                        transform: scale(1);
+                        transform: scale(1.1);
                     }
 
                     50% {
-                        transform: scale(1.05) translateY(-10px);
+                        transform: scale(1.15) translateY(-10px);
                     }
 
                     100% {
-                        transform: scale(1);
+                        transform: scale(1.1);
                     }
                 }
             </style>
             <!-- Dragon Area -->
             <div class="dragon-stage"
-                style="background: url('assets/boss_bg_fire.png') no-repeat center center; background-size: cover; height: 36vh; flex: 0 0 auto; width: calc(100% - 8px); margin: 4px auto 8px auto; border-radius: 8px; border: 2px solid #521; box-shadow: 0 4px 10px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                style="background: url('assets/boss_bg_fire.png') no-repeat center center; background-size: cover; height: 44vh; flex: 0 0 auto; width: 100%; margin: 0; border-top: 2px solid #521; border-bottom: 2px solid #521; box-shadow: 0 4px 10px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+
                 <!-- Animated Lava Platform (Commented out as 'Mist') -->
                 <!-- <div class="lava-platform"></div> -->
                 <!-- <div class="lava-platform"></div> -->
                 <img src="assets/fire_demon_boss.png?v=4" class="dragon-img" id="dragon"
-                    style="animation: bossIdle 4s ease-in-out infinite; height: 98%; max-height: none; width: auto;">
+                    style="animation: bossIdle 4s ease-in-out infinite; height: 98%; max-height: none; width: auto; position: relative; top: 10px; transform: scale(1.1);">
                 <div class="damage-floater" id="damageText">999</div>
             </div>
 
-            <!-- Bottom UI Wrapper (RESTORED) -->
-            <div class="bottom-ui">
-                <!-- Boss Info (Name & Element) -->
-                <div class="boss-info"
-                    style="text-align:center; padding-left: 0px; margin-bottom:-2px; margin-top: 0px; position: relative; z-index: 20;">
-                    <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                        <span id="stage2Icon" style="font-size:16px;">🔥</span>
-                        <div class="boss-name" id="bossName"
-                            style="font-size:18px; font-weight:bold; color:#ff4400; text-shadow:0 1px 2px #000;">Dark
-                            Overlord</div>
-                    </div>
-                    <!-- Phase Message -->
-                    <div class="phase-msg" id="phaseMsg"
-                        style="font-size:11px; color:#ffcc00; margin-top:0px; height:0px;"></div>
-                </div>
+            <!-- Bottom UI Wrapper -->
+            <div class="bottom-ui"
+                style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box; padding: 0 10px 15px 10px; background: linear-gradient(0deg, #111 20%, transparent 100%); margin-top: 0;">
+
+                <!-- MOVED BOSS INFO INTO HP BAR -->
 
                 <!-- Boss HP Bar -->
-                <div class="boss-hp-wrapper">
-                    <div class="boss-bar-frame">
+                <div class="boss-hp-wrapper" style="margin-top: 0; margin-bottom: 8px;">
+                    <div class="boss-bar-frame" style="position: relative;">
                         <div class="boss-bar-fill" id="bossFill"></div>
-                        <!-- REMOVED HP TEXT AS REQUESTED -->
+                        <!-- NAME INSIDE BAR -->
+                        <div class="boss-name-in-bar"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 14px; text-shadow: 0 1px 2px #000; z-index: 5;">
+                            <span id="stage2Icon" style="margin-right: 5px;">🔥</span> <span id="bossName">Dark
+                                Overlord</span>
+                        </div>
                     </div>
                 </div>
 
