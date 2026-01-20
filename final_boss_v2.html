@@ -2089,12 +2089,13 @@
             <div class="fusion-deck unique-style">
                 <div class="fusion-chamber"
                     style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
-                    <!-- Slot 1 (Brighter Gray + Cosmic Glow) -->
+                    <!-- Slot 1 (Brighter Gray + Cosmic Glow - No Inset) -->
                     <div id="fusion-slot-1" class="fusion-slot"
-                        style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5), inset 0 0 10px #000;">
+                        style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);">
                         <img src="assets/fusion_vortex.png" class="vortex-bg"
                             style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">
                     </div>
+
                     <!-- Spinning Core -->
                     <div class="fusion-plus" style="font-size: 30px; color: #aaa; text-shadow: 0 0 10px #0ff;">
                         <!-- 3D QUANTUM ATOM -->
@@ -2110,9 +2111,10 @@
                             <div class="atom-ring ring-3"></div>
                         </div>
                     </div>
-                    <!-- Slot 2 (Brighter Gray + Cosmic Glow) -->
+
+                    <!-- Slot 2 (Brighter Gray + Cosmic Glow - No Inset) -->
                     <div id="fusion-slot-2" class="fusion-slot"
-                        style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5), inset 0 0 10px #000;">
+                        style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);">
                         <img src="assets/fusion_vortex.png" class="vortex-bg"
                             style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">
                     </div>
@@ -2180,32 +2182,41 @@
 
                         if (!fusionSlot1Filled) {
                             slot1.innerHTML = innerHTML;
-                            slot1.style.borderColor = 'transparent';
+                            // Remove Border & Background (Pure Image + Glow)
+                            slot1.style.border = 'none';
+                            slot1.style.background = 'transparent';
                             slot1.style.boxShadow = `0 0 15px ${color}`;
                             slot1.style.opacity = '1';
                             fusionSlot1Filled = true;
                         } else if (!fusionSlot2Filled) {
                             slot2.innerHTML = innerHTML;
-                            slot2.style.borderColor = 'transparent';
+                            slot2.style.border = 'none';
+                            slot2.style.background = 'transparent';
                             slot2.style.boxShadow = `0 0 15px ${color}`;
                             slot2.style.opacity = '1';
                             fusionSlot2Filled = true;
                         } else {
                             // Reset (Both Full -> Clear)
-                            slot1.innerHTML = '<span style="font-size: 30px; opacity: 0.3;">❓</span>';
-                            slot1.style.borderColor = '#555'; /* Reset to Grey */
-                            slot1.style.boxShadow = 'none';   /* No Glow */
+                            // Restore Vortex & Styles
+                            const vortexHTML = '<img src="assets/fusion_vortex.png" class="vortex-bg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">';
 
-                            slot2.innerHTML = '<span style="font-size: 30px; opacity: 0.3;">❓</span>';
-                            slot2.style.borderColor = '#555';
-                            slot2.style.boxShadow = 'none';
+                            slot1.innerHTML = vortexHTML;
+                            slot1.style.border = '4px solid #777';
+                            slot1.style.background = '#1a1a1a'; // Restore Dark BG
+                            slot1.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
+
+                            slot2.innerHTML = vortexHTML;
+                            slot2.style.border = '4px solid #777';
+                            slot2.style.background = '#1a1a1a';
+                            slot2.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
 
                             fusionSlot1Filled = false;
                             fusionSlot2Filled = false;
 
-                            // Re-Add Current Selection to Slot 1
+                            // Add new one to slot 1
                             slot1.innerHTML = innerHTML;
-                            slot1.style.borderColor = 'transparent';
+                            slot1.style.border = 'none';
+                            slot1.style.background = 'transparent';
                             slot1.style.boxShadow = `0 0 15px ${color}`;
                             fusionSlot1Filled = true;
                         }
