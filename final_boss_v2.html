@@ -1354,7 +1354,8 @@
                         <!-- Name (Center) -->
                         <div class="boss-name-in-bar"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 14px; text-shadow: 0 1px 2px #000; z-index: 5;">
-                            <span id="stage2Icon" style="margin-right: 5px;">🔥</span> <span id="bossName">Dark
+
+                            <span id="bossName">Dark
                                 Overlord</span>
                         </div>
                     </div>
@@ -2315,11 +2316,16 @@
             <div class="fusion-deck unique-style">
                 <div class="fusion-chamber"
                     style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 25px;">
-                    <!-- Slot 1 (Square Frame) -->
-                    <div id="fusion-slot-1" class="fusion-slot"
-                        style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);">
-                        <img src="assets/fusion_vortex.png" class="vortex-bg"
-                            style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">
+                    <!-- Slot 1 Wrapper -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div id="fusion-slot-1" class="fusion-slot" onclick="clearFusionSlot(1)"
+                            style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5); cursor: pointer;">
+                            <img src="assets/fusion_vortex.png" class="vortex-bg"
+                                style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">
+                        </div>
+                        <div id="slot1-name"
+                            style="font-size: 10px; font-weight: bold; height: 15px; text-shadow: 0 1px 2px #000;">
+                        </div>
                     </div>
 
                     <!-- Spinning Core -->
@@ -2338,11 +2344,16 @@
                         </div>
                     </div>
 
-                    <!-- Slot 2 (Square Frame) -->
-                    <div id="fusion-slot-2" class="fusion-slot"
-                        style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);">
-                        <img src="assets/fusion_vortex.png" class="vortex-bg"
-                            style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">
+                    <!-- Slot 2 Wrapper -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <div id="fusion-slot-2" class="fusion-slot" onclick="clearFusionSlot(2)"
+                            style="width: 75px; height: 75px; background: #1a1a1a; border: 4px solid #777; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 0 15px rgba(138, 43, 226, 0.5); cursor: pointer;">
+                            <img src="assets/fusion_vortex.png" class="vortex-bg"
+                                style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">
+                        </div>
+                        <div id="slot2-name"
+                            style="font-size: 10px; font-weight: bold; height: 15px; text-shadow: 0 1px 2px #000;">
+                        </div>
                     </div>
                 </div>
                 <style>
@@ -2358,8 +2369,8 @@
                 </style>
                 <!-- Action Buttons -->
                 <div class="fusion-actions">
-                    <button class="btn-fuse">FUSE</button>
-                    <button class="btn-fuse mass">INSTANT<br>FUSE</button>
+                    <button class="btn-fuse" onclick="fuseMonsters('money')">FUSE</button>
+                    <button class="btn-fuse mass" onclick="fuseMonsters('gem')">INSTANT<br>FUSE</button>
                 </div>
             </div>
 
@@ -2378,60 +2389,158 @@
                 <script>
                     let fusionSlot1Filled = false;
                     let fusionSlot2Filled = false;
+                    let slot1Data = null;
+                    let slot2Data = null;
 
-                    function addToFusionSlot(content, color, isImage) {
+                    function getFusionCost(rank, type) {
+                        if (type === 'money') return 1000000 * rank;
+                        if (type === 'gem') return 100 * rank;
+                        return 0;
+                    }
+
+                    function fuseMonsters(type) {
+                        if (!fusionSlot1Filled || !fusionSlot2Filled) {
+                            alert("You need 2 monsters to fuse!");
+                            return;
+                        }
+
+                        const rank1 = slot1Data ? slot1Data.rank : 0;
+                        const rank2 = slot2Data ? slot2Data.rank : 0;
+
+                        if (rank1 !== rank2) {
+                            alert("Monsters must be the same rank to fuse!");
+                            return;
+                        }
+
+                        const cost = getFusionCost(rank1, type);
+                        const resource = type === 'money' ? 'Money' : 'Gems';
+                        const balance = type === 'money' ? state.money : state.gems;
+
+                        if (balance < cost) {
+                            alert(`Not enough ${resource}! Need ${cost.toLocaleString()}`);
+                            return;
+                        }
+
+                        if (type === 'money') state.money -= cost;
+                        else state.gems -= cost;
+                        updateUI();
+
+                        const chance = type === 'money' ? 0.4 : 1.0;
+                        const success = Math.random() < chance;
+
+                        if (success) {
+                            alert(`FUSION SUCCESS! You created a Tier ${rank1 + 1} Monster!`);
+                            clearFusionSlot(1);
+                            clearFusionSlot(2);
+                        } else {
+                            alert("FUSION FAILED! The monsters were destroyed.");
+                            clearFusionSlot(1);
+                            clearFusionSlot(2);
+                        }
+                    }
+
+                    function clearFusionSlot(slotNum) {
                         const slot1 = document.getElementById('fusion-slot-1');
                         const slot2 = document.getElementById('fusion-slot-2');
+                        const name1 = document.getElementById('slot1-name');
+                        const name2 = document.getElementById('slot2-name');
+                        const vortexHTML = '<img src="assets/fusion_vortex.png" class="vortex-bg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">';
+
+                        if (slotNum === 1 && fusionSlot1Filled) {
+                            slot1.innerHTML = vortexHTML;
+                            slot1.style.border = '4px solid #777';
+                            slot1.style.background = '#1a1a1a';
+                            slot1.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
+                            if (name1) name1.innerText = '';
+                            fusionSlot1Filled = false;
+                            slot1Data = null;
+                        } else if (slotNum === 2 && fusionSlot2Filled) {
+                            slot2.innerHTML = vortexHTML;
+                            slot2.style.border = '4px solid #777';
+                            slot2.style.background = '#1a1a1a';
+                            slot2.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
+                            if (name2) name2.innerText = '';
+                            fusionSlot2Filled = false;
+                            slot2Data = null;
+                        }
+                    }
+
+                    function addToFusionSlot(content, color, isImage, maxQty = 1, rank = 1, name = '', auraColor = null, element = null) {
+                        const slot1 = document.getElementById('fusion-slot-1');
+                        const slot2 = document.getElementById('fusion-slot-2');
+                        const name1 = document.getElementById('slot1-name');
+                        const name2 = document.getElementById('slot2-name');
+
+                        // Quantity Logic
+                        let usedCount = 0;
+                        if (slot1Data && slot1Data.content === content) usedCount++;
+                        if (slot2Data && slot2Data.content === content) usedCount++;
+                        if (usedCount >= maxQty) return;
+
+                        const badgeHTML = '';
 
                         const innerHTML = isImage
-                            ? `<img src="${content}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px; box-sizing: border-box; padding: 4px;">`
+                            ? `<img src="${content}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">${badgeHTML}`
                             : `<span style="font-size: 30px;">${content}</span>`;
+
+                        const dataObj = { content, rank };
 
                         if (!fusionSlot1Filled) {
                             slot1.innerHTML = innerHTML;
                             // Use Contain for Sharp Resolution
                             slot1.style.border = 'none';
-                            slot1.style.background = '#000';
-                            slot1.style.boxShadow = `0 0 15px ${color}`;
+                            slot1.style.background = 'transparent';
+                            slot1.style.boxShadow = `0 0 15px ${auraColor || color}`;
                             slot1.style.opacity = '1';
+                            if (name1) { name1.innerText = name; name1.style.color = color; }
                             fusionSlot1Filled = true;
+                            slot1Data = dataObj;
                         } else if (!fusionSlot2Filled) {
                             slot2.innerHTML = innerHTML;
                             slot2.style.border = 'none';
-                            slot2.style.background = '#000';
-                            slot2.style.boxShadow = `0 0 15px ${color}`;
+                            slot2.style.background = 'transparent';
+                            slot2.style.boxShadow = `0 0 15px ${auraColor || color}`;
                             slot2.style.opacity = '1';
+                            if (name2) { name2.innerText = name; name2.style.color = color; }
                             fusionSlot2Filled = true;
+                            slot2Data = dataObj;
                         } else {
-                            // Reset (Both Full -> Clear)
-                            // Restore Vortex & Styles
-                            const vortexHTML = '<img src="assets/fusion_vortex.png" class="vortex-bg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">';
-
-                            slot1.innerHTML = vortexHTML;
-                            slot1.style.border = '4px solid #777';
-                            slot1.style.background = '#1a1a1a'; // Restore Dark BG
-                            slot1.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
-
-                            slot2.innerHTML = vortexHTML;
-                            slot2.style.border = '4px solid #777';
-                            slot2.style.background = '#1a1a1a';
-                            slot2.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
-
-                            fusionSlot1Filled = false;
-                            fusionSlot2Filled = false;
+                            clearFusionSlot(1);
+                            clearFusionSlot(2);
 
                             // Add new one to slot 1
                             slot1.innerHTML = innerHTML;
                             slot1.style.border = 'none';
                             slot1.style.background = 'transparent';
-                            slot1.style.boxShadow = `0 0 15px ${color}`;
+                            slot1.style.boxShadow = `0 0 15px ${auraColor || color}`;
+                            slot1.style.opacity = '1';
+                            if (name1) { name1.innerText = name; name1.style.color = color; }
                             fusionSlot1Filled = true;
+                            slot1Data = dataObj;
                         }
                     }
                 </script>
                 <div class="rank-card tier-10">Deity <span class="count">0</span></div>
                 <div class="rank-card tier-9">God <span class="count">0</span></div>
-                <div class="rank-card tier-8">Demi God <span class="count">0</span></div>
+                <div class="rank-card tier-8" style="cursor: pointer;"
+                    onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';">
+                    Demi God <span class="count">2</span>
+                </div>
+                <div class="rank-monsters"
+                    style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ffaa00; margin-bottom: 5px;">
+                    <div class="monster-item"
+                        onclick="addToFusionSlot('assets/boss_clean.png', '#ffaa00', true, 2, 8, 'Dark Overlord', '#ff3300')"
+                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
+                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+                        <div class="mob-icon-square"
+                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
+                            <img src="assets/boss_clean.png" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x2</div>
+                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
+                            Dark Overlord</div>
+                    </div>
+                </div>
                 <div class="rank-card tier-7">Titan <span class="count">0</span></div>
                 <div class="rank-card tier-6">Mythic <span class="count">0</span></div>
                 <div class="rank-card tier-5">Myth <span class="count">0</span></div>
