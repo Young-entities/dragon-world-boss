@@ -2222,23 +2222,16 @@
     <!-- === MONSTER VIEW OVERLAY (Relocated) === -->
     <div id="view-monster">
         <!-- DUPLICATED TOP UI (For Overlay - Updated to Match Main UI) -->
-        <div class="top-ui-wrapper" style="position: relative; border-bottom: 1px solid #333; z-index: 5;">
+        <div class="top-ui-wrapper" style="border-bottom: 1px solid #333; z-index: 5;">
             <div class="top-row">
-                <div class="level-badge" style="display: flex; align-items: center;">
-                    <!-- Level Circle -->
+                <div class="level-badge">
                     <div class="level-number">
-                        <div class="level-star">⭐</div><span class="level-value" id="m_levelText">42</span>
+                        <span class="level-value" id="m_levelText">42</span>
                     </div>
-
-                    <!-- XP Bar (Metallic Tucked) -->
-                    <div class="xp-bar-wrapper">
+                    <div class="xp-bar-wrapper"><span id="m_xpText"></span>
                         <div class="xp-bar">
                             <div class="xp-fill" id="m_xpBar"></div>
-                            <div class="xp-gloss"></div>
                         </div>
-                        <!-- Centered Text -->
-                        <span id="m_xpText"
-                            style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 800; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000; width: 100%; text-align: center;"></span>
                     </div>
                 </div>
 
@@ -2292,7 +2285,6 @@
             <div class="sub-tab" onclick="monsterTab('monster', this)">Monster</div>
             <div class="sub-tab active" onclick="monsterTab('fusions', this)">Fusion</div>
             <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
-            <div class="sub-tab" onclick="monsterTab('summon', this)">Summon</div>
             <div class="sub-tab" onclick="monsterTab('collections', this)">Collections</div>
         </div>
 
@@ -2630,10 +2622,7 @@
             <div style="padding:20px; text-align:center; color:#888;">Pets Coming Soon</div>
         </div>
 
-        <!-- Summon Tab -->
-        <div id="mt-summon" class="mon-tab-content">
-            <div style="padding:20px; text-align:center; color:#888;">Summon Gate Locked</div>
-        </div>
+
 
         <!-- Collections Tab -->
         <div id="mt-collections" class="mon-tab-content">
@@ -2690,6 +2679,26 @@
         /* Force XP Bar Blue Gradient to match Main UI */
         #m_xpBar {
             background: linear-gradient(180deg, #4facfe 0%, #00c2e0 50%, #008eb0 100%) !important;
+        }
+
+        /* Match Main UI #xpText styling exactly */
+        #m_xpText {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+            z-index: 20;
+            white-space: nowrap;
+            pointer-events: none;
         }
 
         /* Fix Top UI Layout in Overlay */
@@ -2751,24 +2760,8 @@
             font-weight: bold;
         }
 
-        #view-monster .xp-bar-wrapper {
-            font-size: 10px;
-            color: #aaa;
-            display: flex;
-            flex-direction: column;
-        }
+        /* XP Bar styles removed - using global .xp-bar-wrapper and .xp-bar styles */
 
-        #view-monster .xp-bar {
-            width: 60px;
-            height: 4px;
-            background: #333;
-            margin-top: 2px;
-        }
-
-        #view-monster .xp-fill {
-            height: 100%;
-            background: #00ff00;
-        }
 
         /* Enforce Green Timer */
         #view-monster .resource-timer {
