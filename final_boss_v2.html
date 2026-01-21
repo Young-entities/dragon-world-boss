@@ -436,6 +436,7 @@
             height: 20px;
             width: 140px;
             background: #15151a;
+            /* Revert to dark for contrast */
             border: 2px solid #7a8b99;
             border-radius: 10px;
             margin-left: -16px;
@@ -533,6 +534,7 @@
 
         .money-amount-pill {
             background: #222;
+            /* Revert to dark for contrast */
             border: 2px solid #ffd700;
             border-radius: 12px;
             padding: 2px 10px 2px 16px;
@@ -1569,6 +1571,29 @@
             el.atkRank.textContent = "296";
 
             if (state.activeTab === 'damage') renderTabContent();
+
+            // --- SYNC MONSTER TAB UI ---
+            // Ensure data carries over to Monster Tab overlays
+            const mXpBar = document.getElementById('m_xpBar');
+            if (mXpBar) {
+                document.getElementById('m_levelText').textContent = state.level;
+                document.getElementById('m_xpText').textContent = `${formatBigNum(state.xp)}/${formatBigNum(state.xpToLevel)}`;
+                mXpBar.style.width = (state.xp / state.xpToLevel * 100) + '%';
+
+                document.getElementById('m_moneyText').textContent = state.money.toLocaleString();
+                document.getElementById('m_gemsText').textContent = state.gems.toLocaleString();
+
+                document.getElementById('m_hpText').textContent = `${state.hp}/${state.maxHp}`;
+                document.getElementById('m_hpBar').style.width = (state.hp / state.maxHp * 100) + '%';
+                // Also sync timer formatting if needed
+                const mHpTimer = document.getElementById('m_hpTimer');
+                if (mHpTimer) mHpTimer.textContent = state.hp < state.maxHp ? formatTime(state.hpSeconds) : '';
+
+                document.getElementById('m_staminaText').textContent = `${state.stamina}/${state.maxStamina}`;
+                document.getElementById('m_staminaBar').style.width = (state.stamina / state.maxStamina * 100) + '%';
+                const mStamTimer = document.getElementById('m_staminaTimer');
+                if (mStamTimer) mStamTimer.textContent = state.stamina < state.maxStamina ? formatTime(state.staminaSeconds) : '';
+            }
         }
 
         function attack(type) {
@@ -2196,60 +2221,68 @@
     </script>
     <!-- === MONSTER VIEW OVERLAY (Relocated) === -->
     <div id="view-monster">
-        <!-- DUPLICATED TOP UI (For Overlay - Matches Pill Design) -->
-        <div class="top-ui-wrapper"
-            style="position: relative; background: transparent; border-bottom: 1px solid #333; z-index: 5;">
+        <!-- DUPLICATED TOP UI (For Overlay - Updated to Match Main UI) -->
+        <div class="top-ui-wrapper" style="position: relative; border-bottom: 1px solid #333; z-index: 5;">
             <div class="top-row">
-                <div class="level-badge">
+                <div class="level-badge" style="display: flex; align-items: center;">
+                    <!-- Level Circle -->
                     <div class="level-number">
                         <div class="level-star">⭐</div><span class="level-value" id="m_levelText">42</span>
                     </div>
-                    <div class="xp-bar-wrapper">XP: <span id="m_xpText"></span>
+
+                    <!-- XP Bar (Metallic Tucked) -->
+                    <div class="xp-bar-wrapper">
                         <div class="xp-bar">
                             <div class="xp-fill" id="m_xpBar"></div>
+                            <div class="xp-gloss"></div>
                         </div>
+                        <!-- Centered Text -->
+                        <span id="m_xpText"
+                            style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 10px; font-family: 'Inter', sans-serif; font-weight: 800; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000; width: 100%; text-align: center;"></span>
                     </div>
                 </div>
+
+                <!-- Money Display (Gold Coin Pill) -->
                 <div class="money-display">
-                    <div class="money-amount" id="m_moneyText">0</div>
-                    <div class="money-sub" style="color: #888;">Next Check: 15:00</div>
+                    <div class="money-pill-wrapper">
+                        <div class="money-amount-pill">
+                            <span class="money-text" id="m_moneyText">0</span>
+                        </div>
+                        <div class="gold-coin">
+                            <span>⭐</span>
+                        </div>
+                    </div>
+                    <div class="money-sub">Next Check: 15:00</div>
                 </div>
             </div>
 
-            <style>
-                #view-monster .top-ui-wrapper {
-                    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%) !important;
-                }
-
-                #view-monster .money-amount {
-                    color: #44ff44 !important;
-                }
-
-                #view-monster .money-sub {
-                    font-size: 10px !important;
-                    line-height: 1.1;
-                }
-            </style>
-
+            <!-- RESOURCES (Pill Design - Consistent with Main UI) -->
             <div class="resource-row pill-design">
+                <!-- Health (Standard Pill) -->
                 <div class="resource-item pill">
-                    ❤️
+                    <span class="res-icon">❤️</span>
                     <div class="resource-bar">
-                        <div class="resource-fill stamina" id="m_hpBar" style="width:100%"></div>
+                        <div class="resource-fill" id="m_hpBar" style="width:100%; background: #ff4444;"></div>
                     </div>
                     <span class="resource-text"><span id="m_hpText">100/100</span><span id="m_hpTimer"
                             class="resource-timer"></span></span>
                 </div>
+
+                <!-- Stamina -->
                 <div class="resource-item pill">
-                    ⚡
+                    <span class="res-icon">⚡</span>
                     <div class="resource-bar">
-                        <div class="resource-fill stamina" id="m_staminaBar" style="width:100%"></div>
+                        <div class="resource-fill" id="m_staminaBar" style="width:100%; background: #ffcc00;"></div>
                     </div>
                     <span class="resource-text"><span id="m_staminaText">50/50</span><span id="m_staminaTimer"
                             class="resource-timer"></span></span>
                 </div>
+
+                <!-- Gems -->
                 <div class="resource-item pill">
-                    💎 <span class="resource-text" id="m_gemsText">5,717</span>
+                    <span class="res-icon">💎</span>
+                    <div class="resource-bar" style="display:none"></div>
+                    <span class="resource-text" id="m_gemsText">5,717</span>
                 </div>
             </div>
         </div>
@@ -2263,61 +2296,6 @@
             <div class="sub-tab" onclick="monsterTab('collections', this)">Collections</div>
         </div>
 
-        <!-- PILL CSS & SYNC LOGIC -->
-        <style>
-            .resource-row.pill-design {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                padding-bottom: 10px;
-            }
-
-            .resource-item.pill {
-                display: flex;
-                align-items: center;
-                background: #000;
-                border: 1px solid #333;
-                border-radius: 50px;
-                padding: 4px 12px;
-                min-width: 110px;
-                justify-content: space-between;
-            }
-
-            .resource-item.pill .resource-bar {
-                width: 60px;
-                height: 6px;
-                background: #222;
-                border-radius: 3px;
-                overflow: hidden;
-                margin: 0 5px;
-                display: inline-block;
-            }
-        </style>
-        <script>
-            // Sync Monster UI
-            const originalUpdateUI = window.updateUI;
-            window.updateUI = function () {
-                if (originalUpdateUI) originalUpdateUI();
-
-                // Sync duplicated Top UI elements
-                if (document.getElementById('m_levelText')) {
-                    document.getElementById('m_levelText').textContent = state.level;
-                    document.getElementById('m_xpText').textContent = `${state.xp.toLocaleString()}/${state.xpToLevel.toLocaleString()}`;
-                    document.getElementById('m_xpBar').style.width = (state.xp / state.xpToLevel * 100) + '%';
-
-                    document.getElementById('m_moneyText').textContent = state.money.toLocaleString();
-                    document.getElementById('m_gemsText').textContent = state.gems.toLocaleString();
-
-                    document.getElementById('m_hpText').textContent = `${state.hp}/${state.maxHp}`;
-                    document.getElementById('m_hpBar').style.width = (state.hp / state.maxHp * 100) + '%';
-                    document.getElementById('m_hpTimer').textContent = state.hp < state.maxHp ? formatTime(state.hpSeconds) : '';
-
-                    document.getElementById('m_staminaText').textContent = `${state.stamina}/${state.maxStamina}`;
-                    document.getElementById('m_staminaBar').style.width = (state.stamina / state.maxStamina * 100) + '%';
-                    document.getElementById('m_staminaTimer').textContent = state.stamina < state.maxStamina ? formatTime(state.staminaSeconds) : '';
-                }
-            };
-        </script>
 
         <!-- Monster List Tab (Placeholder) -->
         <div id="mt-monster" class="mon-tab-content">
@@ -2709,13 +2687,18 @@
     </script>
     <!-- MONSTER VIEW FIXES -->
     <style>
+        /* Force XP Bar Blue Gradient to match Main UI */
+        #m_xpBar {
+            background: linear-gradient(180deg, #4facfe 0%, #00c2e0 50%, #008eb0 100%) !important;
+        }
+
         /* Fix Top UI Layout in Overlay */
         #view-monster .top-ui-wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
             box-sizing: border-box;
-            background: transparent;
+            /* background: transparent; REMOVED to show Metallic Gradient */
         }
 
         #view-monster .top-row {
