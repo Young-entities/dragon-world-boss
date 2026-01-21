@@ -7,7 +7,8 @@
     <title>Fire Dragon World Boss</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800;900&display=swap"
+        rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -357,9 +358,10 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             position: relative;
             z-index: 10;
+            background-color: #000;
         }
 
         .monster-stage {
@@ -631,6 +633,10 @@
             color: #fff;
             font-weight: 800;
             font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            font-variant-numeric: tabular-nums;
             text-shadow:
                 -1px -1px 0 #000,
                 1px -1px 0 #000,
@@ -643,6 +649,13 @@
             color: #44ff44;
             margin-left: 4px;
             font-weight: normal;
+            font-variant-numeric: tabular-nums;
+            display: inline-block;
+            min-width: 28px;
+        }
+
+        .resource-timer:empty {
+            display: none;
         }
 
         /* OVERDRIVE */
@@ -705,7 +718,7 @@
 
         .dragon-img {
             max-width: 90%;
-            max-height: 45vh;
+            max-height: 40vh;
             /* Optimized for View */
             object-fit: contain;
             filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
@@ -797,22 +810,19 @@
         /* --- BOTTOM UI GROUP --- */
         .bottom-ui {
             z-index: 20;
-            padding: 10px 10px 12px 10px;
-
-            /* Stone Panel Look */
-            background: linear-gradient(180deg, #3a3a40 0%, #252528 50%, #1a1a1d 100%);
-            border-top: 4px solid #5a5a65;
-
-            /* Lava glow */
-            box-shadow:
-                0 -4px 15px rgba(255, 80, 0, 0.3),
-                inset 0 2px 0 rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+            background: #000;
+            border: none;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
         }
 
         /* Boss HP */
         .boss-hp-wrapper {
-            width: 96%;
-            margin: 0 auto 5px auto;
+            width: 100%;
+            margin: 0 0 5px 0;
         }
 
         .boss-meta {
@@ -835,7 +845,8 @@
             background: linear-gradient(180deg, #4a3a2a 0%, #2a1a0a 100%);
             border: 3px solid;
             border-color: #6a5a4a #4a3a2a #3a2a1a #5a4a3a;
-            border-radius: 6px;
+            border-radius: 0;
+            /* Squared for flush fit */
             position: relative;
             overflow: hidden;
             box-shadow:
@@ -888,7 +899,8 @@
             border-radius: 12px;
             border: 5px solid #2a2a3a;
             color: #fff;
-            font-family: 'Titan One', cursive;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -905,9 +917,8 @@
                 inset 0 -3px 0 rgba(0, 0, 0, 0.2),
                 0 5px 0 #1a1a2a;
 
-            /* Cartoon text stroke */
-            -webkit-text-stroke: 1.5px #000;
-            paint-order: stroke fill;
+            /* Standard Shadow matching UI */
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
         }
 
         .btn:active {
@@ -927,8 +938,7 @@
 
         .btn-cost {
             font-size: 12px;
-            font-weight: 400;
-            -webkit-text-stroke: 1px #000;
+            font-weight: 700;
         }
 
         /* 1. Normal Attack (Blue) */
@@ -1312,7 +1322,7 @@
             </style>
             <!-- Dragon Area -->
             <div class="dragon-stage"
-                style="background: url('assets/boss_bg_fire.png') no-repeat center center; background-size: cover; height: 52vh; flex: 0 0 auto; width: 100%; margin: 0; border-top: 2px solid #521; border-bottom: 2px solid #521; box-shadow: 0 4px 10px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                style="background: url('assets/boss_bg_fire.png') no-repeat center center; background-size: cover; height: 52vh; flex: 0 0 auto; width: 100%; margin: 0; margin-bottom: -1px; border: none; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
 
                 <!-- Animated Lava Platform (Commented out as 'Mist') -->
                 <!-- <div class="lava-platform"></div> -->
@@ -1324,15 +1334,15 @@
             </div>
 
             <!-- Bottom UI Wrapper -->
-            <div class="bottom-ui"
-                style="display: flex; flex-direction: column; width: 100%; box-sizing: border-box; padding: 0 10px 5px 10px; background: linear-gradient(0deg, #111 20%, transparent 100%); margin-top: 0;">
+            <div class="bottom-ui">
 
                 <!-- MOVED BOSS INFO INTO HP BAR -->
 
                 <!-- Boss HP Bar -->
                 <!-- Boss HP Bar -->
-                <div class="boss-hp-wrapper" style="margin-top: 0; margin-bottom: 8px;">
-                    <div class="boss-bar-frame" style="position: relative;">
+                <!-- Boss HP Bar -->
+                <div class="boss-hp-wrapper">
+                    <div class="boss-bar-frame">
                         <div class="boss-bar-fill" id="bossFill"></div>
 
                         <!-- HP Text (Left) - STATIC "HP" -->
@@ -1374,7 +1384,7 @@
 
             <!-- Status Panel Header (Relative with Padding) -->
             <div class="sticky-status-info">
-                <div class="status-header">Boss Battle Status (Participants: 6,586)</div>
+                <div class="status-header">Boss Battle (Participants: 6,586)</div>
                 <div class="status-summary">
                     <div class="summary-row">Damage Inflicted : <b id="totalDamage">0</b> <span class="rank-text">[Rank
                             : <span id="dmgRank">999+</span>]</span></div>
@@ -1539,7 +1549,7 @@
                 if (el.bossName) el.bossName.style.color = "#ffffff";
             } else {
                 // el.phaseMsg logic REMOVED
-                el.stage2Icon.style.display = 'none';
+                // el.stage2Icon.style.display = 'none';
             }
 
             el.hpFill.style.width = (state.hp / state.maxHp * 100) + '%';
@@ -2238,11 +2248,11 @@
                 <!-- Money Display (Gold Coin Pill) -->
                 <div class="money-display">
                     <div class="money-pill-wrapper">
-                        <div class="money-amount-pill">
-                            <span class="money-text" id="m_moneyText">0</span>
-                        </div>
                         <div class="gold-coin">
                             <span>⭐</span>
+                        </div>
+                        <div class="money-amount-pill">
+                            <span class="money-text" id="m_moneyText">0</span>
                         </div>
                     </div>
                     <div class="money-sub">Next Check: 15:00</div>
@@ -2280,12 +2290,11 @@
             </div>
         </div>
 
-        <div class="sub-nav-tabs"
-            style="overflow-x: auto; white-space: nowrap; justify-content: flex-start; padding-left: 10px;">
+        <div class="sub-nav-tabs">
             <div class="sub-tab" onclick="monsterTab('monster', this)">Monster</div>
             <div class="sub-tab active" onclick="monsterTab('fusions', this)">Fusion</div>
             <div class="sub-tab" onclick="monsterTab('pets', this)">Pets</div>
-            <div class="sub-tab" onclick="monsterTab('collections', this)">Collections</div>
+            <div class="sub-tab" onclick="monsterTab('collections', this)">Collection</div>
         </div>
 
 
@@ -2358,45 +2367,12 @@
             <div class="rank-list-unique">
                 <div class="rank-card tier-13">Primordial <span class="count">0</span></div>
                 <div class="rank-card tier-12">Eternal <span class="count">0</span></div>
-                <div class="rank-card tier-11"
-                    onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';"
-                    style="cursor: pointer;">
-                    Chaos <span class="count">1</span>
+                <div class="rank-card tier-11" style="cursor: pointer;">
+                    Chaos <span class="count">0</span>
                 </div>
-                <!-- Chaos Monster List (Expandable Grid) -->
                 <div class="rank-monsters"
                     style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #990000; margin-bottom: 5px;">
-                    <!-- World Boss Item -->
-                    <!-- Updated Monster Item with Image -->
-                    <div class="monster-item" onclick="addToFusionSlot('assets/chaos_dragon_full.png', '#990000', true)"
-                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
-                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-
-                        <!-- Square Icon (Rounded) - Full Art - Plain (No Glow/Line) -->
-                        <div class="mob-icon-square"
-                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
-                            <!-- Full Image (No Zoom) -->
-                            <img src="assets/chaos_dragon_full.png"
-                                style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
-                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
-                            Dark Overlord</div>
-                    </div>
-
-                    <!-- New Abyss Monster -->
-                    <div class="monster-item" onclick="addToFusionSlot('assets/abyss_monster.png?v=3', '#8a2be2', true)"
-                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
-                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                        <!-- Abyss Border Style -->
-                        <div class="mob-icon-square"
-                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
-                            <img src="assets/abyss_monster.png" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
-                        <div style="color: #bfaaff; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
-                            Abyss Lord</div>
-                    </div>
+                    <!-- Items removed -->
                 </div>
 
                 <script>
@@ -2701,7 +2677,107 @@
             pointer-events: none;
         }
 
-        /* Fix Top UI Layout in Overlay */
+        /* Premium Game Tab Styling */
+        #view-monster .sub-nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 2px;
+            background: linear-gradient(180deg, #0c1018 0%, #060a10 100%);
+            border-top: 1px solid #2a3a4a;
+            border-bottom: 1px solid #1a2535;
+        }
+
+        #view-monster .sub-tab {
+            flex: 1 1 auto;
+            /* Allow content-based sizing */
+            position: relative;
+            padding: 10px 4px;
+            text-align: center;
+            background: linear-gradient(180deg, #1a2530 0%, #121a22 50%, #0c1218 100%);
+            border: none;
+            border-radius: 6px;
+            color: #90b0c0;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0px;
+
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        /* Outer border frame - VISIBLE CYAN for all tabs */
+        #view-monster .sub-tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            padding: 2px;
+            background: linear-gradient(180deg, #40a0b0 0%, #308090 50%, #206070 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            box-shadow: 0 0 8px rgba(64, 160, 180, 0.3);
+        }
+
+        #view-monster .sub-tab:hover {
+            color: #a0d0e0;
+            background: linear-gradient(180deg, #1e2830 0%, #141c22 50%, #0c1014 100%);
+            transform: translateY(-1px);
+        }
+
+        #view-monster .sub-tab:hover::before {
+            background: linear-gradient(180deg, #5a7a8a 0%, #3a5a6a 50%, #2a4050 100%);
+        }
+
+        #view-monster .sub-tab.active {
+            color: #ffffff;
+            background: linear-gradient(180deg, #1a2a35 0%, #102030 50%, #0a1520 100%);
+            text-shadow:
+                0 0 10px rgba(0, 230, 255, 0.8),
+                0 0 20px rgba(0, 200, 255, 0.4),
+                0 2px 4px rgba(0, 0, 0, 1);
+            transform: translateY(-1px);
+        }
+
+        /* Glowing cyan border for active tab - STRONGER */
+        #view-monster .sub-tab.active::before {
+            background: linear-gradient(180deg, #00f0ff 0%, #00c8e0 30%, #00a0c0 70%, #0080a0 100%);
+            box-shadow:
+                0 0 20px rgba(0, 240, 255, 0.8),
+                0 0 40px rgba(0, 200, 255, 0.4),
+                inset 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Inner glow for active - STRONGER */
+        #view-monster .sub-tab.active::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 6px;
+            background: linear-gradient(180deg, rgba(0, 220, 255, 0.15) 0%, rgba(0, 180, 255, 0.05) 30%, transparent 60%);
+            pointer-events: none;
+            box-shadow: inset 0 0 15px rgba(0, 200, 255, 0.1);
+        }
+
+        .fusion-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+        }
+
+
+
+
+
+
+
         #view-monster .top-ui-wrapper {
             display: flex;
             flex-direction: column;
