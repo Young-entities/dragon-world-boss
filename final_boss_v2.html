@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fire Dragon World Boss</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -17,12 +20,11 @@
         /* STICKY HEADER GROUP REMOVED */
 
         /* BOTTOM NAV - CLEAN STYLE */
+        /* BOTTOM NAV - CLEAN STYLE */
         .bottom-nav {
-            position: fixed;
+            position: sticky;
             bottom: 0;
-            left: 50%;
-            margin-left: -240px;
-            width: 480px;
+            width: 100%;
             height: 48px;
 
             background: linear-gradient(180deg, #2d2d38 0%, #1a1a22 100%);
@@ -34,16 +36,16 @@
             padding: 0;
             z-index: 9999;
             box-sizing: border-box;
+
+            /* Remove fixed/absolute positioning props */
+            left: auto;
+            right: auto;
+            margin: 0;
+            max-width: none;
+            /* Inherits from container */
         }
 
-        @media (max-width: 480px) {
-            .bottom-nav {
-                width: 100%;
-                left: 0;
-                margin-left: 0;
-                border-radius: 0;
-            }
-        }
+        /* REMOVED MEDIA QUERY - No longer needed with margin: 0 auto */
 
         /* Status Info */
         .sticky-status-info {
@@ -387,81 +389,182 @@
             padding: 8px 10px 5px 10px;
         }
 
+        /* METALLIC LEVEL BADGE & XP BAR DESIGN */
         .level-badge {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 5;
         }
 
         .level-number {
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle at 30% 30%, #3a4b66, #1a2b40);
+            border: 2px solid #7a8b99;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            z-index: 10;
+            position: relative;
+            box-shadow:
+                inset 1px 1px 3px rgba(255, 255, 255, 0.3),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.6),
+                0 3px 4px rgba(0, 0, 0, 0.5);
         }
 
         .level-star {
+            display: none;
+        }
+
+        /* Hide old star */
+
+        .level-value {
+            color: #d0f0ff;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            text-shadow:
+                -1.5px -1.5px 0 #000,
+                1.5px -1.5px 0 #000,
+                -1.5px 1.5px 0 #000,
+                1.5px 1.5px 0 #000;
+        }
+
+        .xp-bar-wrapper {
+            height: 20px;
+            width: 140px;
+            background: #15151a;
+            border: 2px solid #7a8b99;
+            border-radius: 10px;
+            margin-left: -16px;
+            /* Overlap badge */
+            padding-left: 0;
+            /* REMOVED PADDING to let bar fill tuck under badge */
+            position: relative;
+            z-index: 4;
+            overflow: hidden;
+            display: flex;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+            margin-top: 0;
+        }
+
+        #xpText {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+            z-index: 20;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .xp-bar {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        .xp-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(180deg, #4facfe 0%, #00c2e0 50%, #008eb0 100%);
+            border-radius: 0 10px 10px 0;
+            box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4);
+            transition: width 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            position: relative;
+        }
+
+        /* Gloss highlight on top half of bar */
+        .xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0 10px 0 0;
+        }
+
+        .money-display {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-right: 5px;
+        }
+
+        .money-pill-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .gold-coin {
             width: 28px;
             height: 28px;
-            background: linear-gradient(135deg, #ffd700 0%, #ff8800 100%);
+            background: radial-gradient(circle at 30% 30%, #ffd700, #ffaa00);
+            border: 2px solid #b8860b;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            border: 2px solid #ffee88;
+            z-index: 10;
+            box-shadow:
+                inset 1px 1px 3px rgba(255, 255, 255, 0.6),
+                inset -1px -1px 3px rgba(0, 0, 0, 0.3),
+                0 2px 3px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
         }
 
-        .level-value {
-            color: #fff;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .xp-bar-wrapper {
-            margin-top: 3px;
-            font-size: 10px;
-            color: #ffffff !important;
-            transition: color 0.2s;
-        }
-
-        .xp-bar-wrapper.crit {
-            color: #ffd700 !important;
-            text-shadow: 0 0 8px rgba(255, 200, 0, 0.6);
-        }
-
-        .xp-bar {
-            width: 100px;
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .xp-fill {
-            height: 100%;
-            background: #44dd44;
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .money-display {
-            text-align: right;
-        }
-
-        .money-amount {
-            color: #44ff44;
-            font-weight: bold;
-            font-size: 18px;
-            display: inline-block;
+        .money-amount-pill {
+            background: #222;
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 2px 10px 2px 16px;
+            margin-left: -10px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            color: #ffd700;
+            font-family: 'Inter', "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            font-weight: 900;
+            font-size: 13px;
+            letter-spacing: -0.5px;
+            text-shadow:
+                -1.5px -1.5px 0 #000,
+                1.5px -1.5px 0 #000,
+                -1.5px 1.5px 0 #000,
+                1.5px 1.5px 0 #000;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+            z-index: 5;
             transition: transform 0.1s;
         }
 
-        .money-amount.pop {
+        .money-amount-pill.pop {
             transform: scale(1.2);
         }
 
         .money-sub {
-            font-size: 10px;
+            font-size: 8px;
             color: #888;
+            margin-top: 2px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
         .resource-row {
@@ -475,13 +578,19 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            background: linear-gradient(180deg, #3a3a45 0%, #252530 100%);
-            padding: 6px 12px;
-            border-radius: 10px;
-            border: 3px solid #4a4a5a;
-            border-top-color: #5a5a6a;
-            border-bottom-color: #2a2a3a;
-            box-shadow: 0 3px 0 #1a1a25, 0 0 8px rgba(255, 100, 0, 0.2);
+            background: #2d2d3d !important;
+            padding: 3px 10px;
+            border-radius: 50px !important;
+            border: 2px solid #15151a !important;
+            box-shadow: 0 3px 0 #505060 !important;
+        }
+
+        .res-icon {
+            font-size: 14px;
+            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.8));
+            transform: scale(1.1);
+            display: inline-block;
+            margin-right: 2px;
         }
 
         .resource-bar {
@@ -489,7 +598,7 @@
             height: 10px;
             background: #111;
             border-radius: 5px;
-            border: 2px solid #333;
+            border: 2px solid #15151a;
             overflow: hidden;
         }
 
@@ -516,11 +625,15 @@
         }
 
         .resource-text {
-            font-size: 12px;
+            font-size: 11px;
             color: #fff;
-            font-weight: bold;
-            font-family: 'Titan One', sans-serif;
-            text-shadow: 1px 1px 0 #000;
+            font-weight: 800;
+            font-family: 'Inter', sans-serif;
+            text-shadow:
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
         }
 
         .resource-timer {
@@ -538,11 +651,13 @@
         }
 
         .od-bar-frame {
-            height: 12px;
+            height: 16px;
             background: #111;
-            border: 1px solid #440000;
+            border: 2px solid #330000 !important;
+            border-radius: 6px !important;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 3px 0 #220000 !important;
         }
 
         .od-bar-fill {
@@ -1130,16 +1245,19 @@
                 <div class="top-row">
                     <div class="level-badge">
                         <div class="level-number">
-                            <div class="level-star">⭐</div><span class="level-value" id="levelText">42</span>
+                            <span class="level-value" id="levelText">42</span>
                         </div>
-                        <div class="xp-bar-wrapper">XP: <span id="xpText"></span>
+                        <div class="xp-bar-wrapper"><span id="xpText"></span>
                             <div class="xp-bar">
                                 <div class="xp-fill" id="xpBar"></div>
                             </div>
                         </div>
                     </div>
                     <div class="money-display">
-                        <div class="money-amount" id="moneyText">0</div>
+                        <div class="money-pill-wrapper">
+                            <div class="gold-coin">⭐</div>
+                            <div class="money-amount-pill" id="moneyText">0</div>
+                        </div>
                         <div class="money-sub">Next Check: 15:00</div>
                     </div>
                 </div>
@@ -1147,7 +1265,7 @@
                 <!-- Resource Pills (Keeping the Design User Liked) -->
                 <div class="resource-row pill-design">
                     <div class="resource-item pill">
-                        ❤️
+                        <span class="res-icon">❤️</span>
                         <div class="resource-bar">
                             <div class="resource-fill stamina" id="hpBar" style="width:100%"></div>
                         </div>
@@ -1155,7 +1273,7 @@
                                 class="resource-timer"></span></span>
                     </div>
                     <div class="resource-item pill">
-                        ⚡
+                        <span class="res-icon">⚡</span>
                         <div class="resource-bar">
                             <div class="resource-fill stamina" id="staminaBar" style="width:100%"></div>
                         </div>
@@ -1163,7 +1281,7 @@
                                 class="resource-timer"></span></span>
                     </div>
                     <div class="resource-item pill">
-                        💎 <span class="resource-text" id="gemsText">5,717</span>
+                        <span class="res-icon">💎</span> <span class="resource-text" id="gemsText">5,717</span>
                     </div>
                 </div>
 
@@ -1434,7 +1552,7 @@
             el.moneyText.textContent = state.money.toLocaleString();
 
             el.levelText.textContent = state.level;
-            el.xpText.textContent = `${state.xp.toLocaleString()}/${state.xpToLevel.toLocaleString()}`;
+            el.xpText.textContent = `${formatBigNum(state.xp)}/${formatBigNum(state.xpToLevel)}`;
             el.xpBar.style.width = (state.xp / state.xpToLevel * 100) + '%';
 
             const odPct = Math.min(100, (state.overdrive / state.maxOverdrive) * 100);
@@ -1510,7 +1628,7 @@
 
             // Spawn UI Floaters
             spawnUIFloater(el.xpText, "+" + xpVal.toLocaleString() + " XP", isOD ? "#ffd700" : "#fff");
-            spawnUIFloater(el.moneyText, "+" + moneyVal.toLocaleString(), "#4f4");
+            spawnUIFloater(el.moneyText, "+" + moneyVal.toLocaleString(), "#ffd700");
 
             // --- CRITICAL HIT COLORS ---
             let dmgColor = isOD ? '#ff4400' : '#ffcc00'; // Default Colors only (Stage 2 Removed)
@@ -1631,8 +1749,15 @@
         }
 
         function formatTime(s) {
-            let m = Math.floor(s / 60), sec = s % 60;
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
             return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        function formatBigNum(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return num.toLocaleString();
         }
 
         // --- PERSISTENCE ---
@@ -2005,7 +2130,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
-            max-width: 100%;
+            max-width: 480px;
             height: 100%;
             background: #050b14;
             /* Solid Dark Background */
@@ -2023,22 +2148,30 @@
     </style>
     <!-- MONSTER UI LOGIC -->
     <script>
-        function toggleView(viewId) {
-            const el = document.getElementById('view-' + viewId);
-            if (el) {
-                const isOpen = el.style.display === 'flex';
-                el.style.display = isOpen ? 'none' : 'flex';
-
-                // Toggle body class for conditional styling
-                if (!isOpen) {
-                    document.body.classList.add('view-open');
-                } else {
-                    document.body.classList.remove('view-open');
-                }
-
-                // Hide main scroll if open
-                document.body.style.overflow = isOpen ? 'auto' : 'hidden';
+        function toggleView(viewId, event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
             }
+
+            // Small delay to prevent "ghost clicks" falling through to game
+            setTimeout(() => {
+                const el = document.getElementById('view-' + viewId);
+                if (el) {
+                    const isOpen = el.style.display === 'flex';
+                    el.style.display = isOpen ? 'none' : 'flex';
+
+                    // Toggle body class for conditional styling
+                    if (!isOpen) {
+                        document.body.classList.add('view-open');
+                    } else {
+                        document.body.classList.remove('view-open');
+                    }
+
+                    // Hide main scroll if open
+                    document.body.style.overflow = isOpen ? 'auto' : 'hidden';
+                }
+            }, 50);
         }
 
         function monsterTab(tabName, clickedEl) {
@@ -2529,75 +2662,20 @@
             <div style="padding:20px; text-align:center; color:#888;">Collections Empty</div>
         </div>
         <!-- BOTTOM NAV (Inside Monster View) -->
-        <div class="bottom-nav"
-            style="position: absolute; bottom: 0; width: 100%; z-index: 10; border-top: 1px solid #333; background: #141419;">
-            <button class="nav-btn" onclick="toggleView('home')">
-                <span class="nav-icon">🏠</span>
-                <span>Home</span>
-            </button>
-            <button class="nav-btn" onclick="toggleView('battle')">
-                <span class="nav-icon">⚔️</span>
-                <span>Battle</span>
-            </button>
-            <button class="nav-btn" style="color: #ffcc00;">
-                <span class="nav-icon">👹</span>
-                <span>Monster</span>
-            </button>
-            <button class="nav-btn">
-                <span class="nav-icon">🎒</span>
-                <span>Equip</span>
-            </button>
-            <button class="nav-btn">
-                <span class="nav-icon">💰</span>
-                <span>Shop</span>
-            </button>
-        </div>
+        <!-- BOTTOM NAV REMOVED - USING GLOBAL NAV -->
     </div>
 
-    </div>
-
-    <!-- HOME VIEW OVERLAY -->
-    <div id="view-home" class="mon-tab-content"
-        style="display:none; position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; height:100%; background:#1a1f2a; z-index:9000; flex-direction:column;">
-        <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#888; font-size:20px;">
-            🏰 Home Base Coming Soon
-        </div>
-        <!-- BOTTOM NAV (Duplicate for Home) -->
-        <div class="bottom-nav" style="width:100%; border-top:1px solid #333; background:#141419;">
-            <button class="nav-btn" onclick="toggleView('home')">
-                <span class="nav-icon" style="color:#ffcc00;">🏠</span>
-                <span style="color:#ffcc00;">Home</span>
-            </button>
-            <button class="nav-btn" onclick="toggleView('battle')">
-                <span class="nav-icon">⚔️</span>
-                <span>Battle</span>
-            </button>
-            <button class="nav-btn" onclick="toggleView('monster')">
-                <span class="nav-icon">👹</span>
-                <span>Monster</span>
-            </button>
-            <button class="nav-btn">
-                <span class="nav-icon">🎒</span>
-                <span>Equip</span>
-            </button>
-            <button class="nav-btn">
-                <span class="nav-icon">💰</span>
-                <span>Shop</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- MAIN NAV MOVED HERE (Outside Scrollable Areas) -->
+    <!-- NAVBAR INSIDE CONTAINER -->
     <div class="bottom-nav">
-        <button class="nav-btn" onclick="toggleView('home')">
+        <button class="nav-btn" onclick="toggleView('home', event)">
             <img class="nav-icon" src="assets/icon_home.png" alt="">
             <span>Home</span>
         </button>
-        <button class="nav-btn" onclick="toggleView('battle')">
+        <button class="nav-btn" onclick="toggleView('battle', event)">
             <img class="nav-icon" src="assets/icon_battle.png" alt="">
             <span>Battle</span>
         </button>
-        <button class="nav-btn" onclick="toggleView('monster')">
+        <button class="nav-btn" onclick="toggleView('monster', event)">
             <img class="nav-icon" src="assets/icon_monster.png" alt="">
             <span>Monster</span>
         </button>
@@ -2610,6 +2688,20 @@
             <span>Shop</span>
         </button>
     </div>
+    </div>
+
+    <!-- HOME VIEW OVERLAY -->
+    <div id="view-home" class="mon-tab-content"
+        style="display:none; position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; height:100%; background:#1a1f2a; z-index:9000; flex-direction:column;">
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#888; font-size:20px;">
+            🏰 Home Base Coming Soon
+        </div>
+        <!-- BOTTOM NAV (Duplicate for Home) -->
+        <!-- BOTTOM NAV REMOVED - USING GLOBAL NAV -->
+    </div>
+
+    <!-- MAIN NAV MOVED HERE (Outside Scrollable Areas) -->
+    <!-- MAIN NAV MOVED INSIDE GAME CONTAINER -->
 
     <!-- SYNC SCRIPT REMOVED (Redundant with Global Header) -->
     <script>
