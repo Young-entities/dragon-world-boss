@@ -2521,10 +2521,28 @@
                     }
                 </script>
                 <div class="rank-card tier-10">Deity <span class="count">0</span></div>
-                <div class="rank-card tier-9">God <span class="count">0</span></div>
+                <div class="rank-card tier-9" style="cursor: pointer;"
+                    onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';">
+                    God <span class="count">1</span>
+                </div>
+                <div class="rank-monsters"
+                    style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ff4400; margin-bottom: 5px;">
+                    <div class="monster-item"
+                        onclick="addToFusionSlot('assets/masamune_icon.png', '#ff4400', true, 3, 9, 'Arch Masamune', '#ff4400')"
+                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
+                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+                        <div class="mob-icon-square"
+                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
+                            <img src="assets/masamune_icon.png" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
+                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
+                            Arch Masamune</div>
+                    </div>
+                </div>
                 <div class="rank-card tier-8" style="cursor: pointer;"
                     onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';">
-                    Demi God <span class="count">2</span>
+                    Demi God <span class="count">3</span>
                 </div>
                 <div class="rank-monsters"
                     style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ffaa00; margin-bottom: 5px;">
@@ -2539,6 +2557,18 @@
                         <div style="color: #fff; font-weight: bold; font-size: 12px;">x2</div>
                         <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
                             Dark Overlord</div>
+                    </div>
+                    <div class="monster-item"
+                        onclick="addToFusionSlot('assets/god_golem_final.png', '#00ff00', true, 3, 8, 'Nature\'s Wrath', '#00ff00')"
+                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
+                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
+                        <div class="mob-icon-square"
+                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
+                            <img src="assets/god_golem_final.png" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
+                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
+                            Nature's Wrath</div>
                     </div>
                 </div>
                 <div class="rank-card tier-7">Titan <span class="count">0</span></div>
