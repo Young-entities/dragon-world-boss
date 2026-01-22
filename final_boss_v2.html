@@ -15,6 +15,126 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* --- FUSION ANIMATION CLASSES --- */
+
+        /* Phase 1: Slide In */
+        .fusion-phase-1 #anim-left {
+            opacity: 1 !important;
+            transform: translateY(-50%) translateX(0) !important;
+            left: 5% !important;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .fusion-phase-1 #anim-right {
+            opacity: 1 !important;
+            transform: translateY(-50%) scaleX(-1) translateX(0) !important;
+            right: 5% !important;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Phase 2: Bounce */
+        .fusion-phase-2 #anim-left {
+            animation: monsterBounce 0.5s ease-in-out infinite !important;
+        }
+
+        .fusion-phase-2 #anim-right {
+            animation: monsterBounceRight 0.5s ease-in-out infinite !important;
+        }
+
+        .fusion-phase-2 #energy-particles {
+            opacity: 1 !important;
+            transition: opacity 0.5s;
+        }
+
+        /* Phase 3: Merge */
+        .fusion-phase-3 #anim-left {
+            left: 45% !important;
+            opacity: 0 !important;
+            transition: left 1s ease-in, opacity 0.2s ease-in 0.8s !important;
+            animation: none !important;
+        }
+
+        .fusion-phase-3 #anim-right {
+            right: 45% !important;
+            opacity: 0 !important;
+            transition: right 1s ease-in, opacity 0.2s ease-in 0.8s !important;
+            animation: none !important;
+        }
+
+        .fusion-phase-3 #fusion-orb {
+            width: 200px !important;
+            height: 200px !important;
+            opacity: 1 !important;
+            transition: all 1s ease-out 0.5s !important;
+        }
+
+        /* Phase 4: Flash */
+        .fusion-phase-4 #anim-flash {
+            animation: flashBang 1.5s forwards !important;
+        }
+
+        .fusion-phase-4 #light-rays {
+            opacity: 1 !important;
+        }
+
+        /* Phase 5: Reveal */
+        .fusion-phase-5 #anim-result-container {
+            display: flex !important;
+        }
+
+        .fusion-phase-5 #success-text {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+
+        .fusion-phase-5 #result-glow {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s !important;
+        }
+
+        .fusion-phase-5 #result-glow img {
+            animation: floatResult 3s ease-in-out infinite !important;
+        }
+
+        .fusion-phase-5 button {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            transition: all 0.5s ease-out 1s !important;
+        }
+
+        /* Initial States & Base Styles Override */
+        #anim-left,
+        #anim-right {
+            position: absolute !important;
+            top: 50% !important;
+            height: 30vh !important;
+            width: auto !important;
+            filter: drop-shadow(0 0 30px #8b00ff) brightness(1.2);
+            transition: none;
+            left: -30% !important;
+            /* Start off-screen */
+        }
+
+        #anim-right {
+            left: auto !important;
+            right: -30% !important;
+            /* Start off-screen */
+            transform: translateY(-50%) scaleX(-1);
+            /* mirror */
+        }
+
+        #anim-left {
+            transform: translateY(-50%);
+        }
+
+        #anim-result {
+            height: 50vh !important;
+            width: auto !important;
+            filter: drop-shadow(0 0 40px gold) drop-shadow(0 0 80px #ff6600);
+        }
+
         /* --- MONSTER TAB STYLES --- */
         /* REMOVED .unified-sticky-header - using direct children now */
 
@@ -2369,8 +2489,8 @@
                 </style>
                 <!-- Action Buttons -->
                 <div class="fusion-actions">
-                    <button class="btn-fuse" onclick="fuseMonsters('money')">FUSE</button>
-                    <button class="btn-fuse mass" onclick="fuseMonsters('gem')">INSTANT<br>FUSE</button>
+                    <button class="btn-fuse" onclick="window.showFusionModal('money')">FUSE</button>
+                    <button class="btn-fuse mass" onclick="window.showFusionModal('gem')">INSTANT<br>FUSE</button>
                 </div>
             </div>
 
@@ -2387,15 +2507,48 @@
                 </div>
 
                 <script>
-                    let fusionSlot1Filled = false;
-                    let fusionSlot2Filled = false;
-                    let slot1Data = null;
-                    let slot2Data = null;
+                    window.fusionSlot1Filled = false;
+                    window.fusionSlot2Filled = false;
+                    window.slot1Data = null;
+                    window.slot2Data = null;
 
                     function getFusionCost(rank, type) {
                         if (type === 'money') return 1000000 * rank;
                         if (type === 'gem') return 100 * rank;
                         return 0;
+                    }
+
+                    // --- FUSION SYSTEM ---
+                    window.monsterInventory = {
+                        "Arch Masamune": 1,
+                        "Dark Overlord": 2,
+                        "Nature's Wrath": 1
+                    };
+
+                    window.fusionRecipes = {
+                        "Dark Overlord": "Arch Masamune"
+                    };
+
+                    window.monsterTiers = {
+                        "Arch Masamune": "God",
+                        "Dark Overlord": "Demi God",
+                        "Nature's Wrath": "Demi God"
+                    };
+
+                    function updateInventoryUI() {
+                        for (const [name, qty] of Object.entries(monsterInventory)) {
+                            // Escape name for ID if needed, but current IDs use spaces
+                            const el = document.getElementById(`inv-qty-${name}`);
+                            if (el) el.innerText = `x${qty}`;
+                        }
+                        // Recalculate Tier Totals
+                        const tierCounts = { "God": 0, "Demi God": 0 };
+                        for (const [name, qty] of Object.entries(monsterInventory)) {
+                            const tier = monsterTiers[name];
+                            if (tier) tierCounts[tier] = (tierCounts[tier] || 0) + qty;
+                        }
+                        if (document.getElementById('header-count-God')) document.getElementById('header-count-God').innerText = tierCounts["God"];
+                        if (document.getElementById('header-count-Demi God')) document.getElementById('header-count-Demi God').innerText = tierCounts["Demi God"];
                     }
 
                     function fuseMonsters(type) {
@@ -2404,39 +2557,66 @@
                             return;
                         }
 
-                        const rank1 = slot1Data ? slot1Data.rank : 0;
-                        const rank2 = slot2Data ? slot2Data.rank : 0;
+                        // Check Names
+                        const name1 = slot1Data ? slot1Data.name : null;
+                        const name2 = slot2Data ? slot2Data.name : null;
 
-                        if (rank1 !== rank2) {
-                            alert("Monsters must be the same rank to fuse!");
+                        if (!name1 || !name2 || name1 !== name2) {
+                            alert("You must fuse 2 of the SAME monster!");
                             return;
                         }
 
+                        // Check Inventory (Do we actually have 2?)
+                        const qty = monsterInventory[name1] || 0;
+                        if (qty < 2) {
+                            alert(`You don't have enough ${name1}s! (Need 2, Have ${qty})`);
+                            return;
+                        }
+
+                        // Check Recipe
+                        const resultName = fusionRecipes[name1];
+                        if (!resultName) {
+                            alert(`${name1} cannot be fused further (No recipe found)!`);
+                            return;
+                        }
+
+                        // Check Cost
+                        const rank1 = slot1Data.rank;
                         const cost = getFusionCost(rank1, type);
-                        const resource = type === 'money' ? 'Money' : 'Gems';
-                        const balance = type === 'money' ? state.money : state.gems;
+                        const isMoney = type === 'money';
+                        const balance = isMoney ? state.money : state.gems;
 
                         if (balance < cost) {
-                            alert(`Not enough ${resource}! Need ${cost.toLocaleString()}`);
+                            alert(`Not enough ${isMoney ? 'Money' : 'Gems'}! Need ${cost.toLocaleString()}`);
                             return;
                         }
 
-                        if (type === 'money') state.money -= cost;
+                        // Deduct Cost
+                        if (isMoney) state.money -= cost;
                         else state.gems -= cost;
                         updateUI();
 
-                        const chance = type === 'money' ? 0.4 : 1.0;
-                        const success = Math.random() < chance;
-
-                        if (success) {
-                            alert(`FUSION SUCCESS! You created a Tier ${rank1 + 1} Monster!`);
+                        // Success Chance
+                        const chance = isMoney ? 0.4 : 1.0;
+                        if (Math.random() > chance) {
+                            alert("FUSION FAILED! The fusion core destabilized. Resources lost (but monsters survived).");
+                            // Note: Usually fusion failure destroys monsters, but being nice for demo unless requested.
                             clearFusionSlot(1);
                             clearFusionSlot(2);
-                        } else {
-                            alert("FUSION FAILED! The monsters were destroyed.");
-                            clearFusionSlot(1);
-                            clearFusionSlot(2);
+                            return;
                         }
+
+                        // SUCCESS Logic
+                        // 1. Remove Ingredients
+                        monsterInventory[name1] -= 2;
+                        // 2. Add Result
+                        monsterInventory[resultName] = (monsterInventory[resultName] || 0) + 1;
+
+                        alert(`FUSION SUCCESS! You created: ${resultName}!`);
+
+                        updateInventoryUI();
+                        clearFusionSlot(1);
+                        clearFusionSlot(2);
                     }
 
                     function clearFusionSlot(slotNum) {
@@ -2446,36 +2626,43 @@
                         const name2 = document.getElementById('slot2-name');
                         const vortexHTML = '<img src="assets/fusion_vortex.png" class="vortex-bg" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8; animation: vortexSpin 10s linear infinite;">';
 
-                        if (slotNum === 1 && fusionSlot1Filled) {
+                        if (slotNum === 1 && window.fusionSlot1Filled) {
                             slot1.innerHTML = vortexHTML;
                             slot1.style.border = '4px solid #777';
                             slot1.style.background = '#1a1a1a';
                             slot1.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
                             if (name1) name1.innerText = '';
-                            fusionSlot1Filled = false;
-                            slot1Data = null;
-                        } else if (slotNum === 2 && fusionSlot2Filled) {
+                            window.fusionSlot1Filled = false;
+                            window.slot1Data = null;
+                        } else if (slotNum === 2 && window.fusionSlot2Filled) {
                             slot2.innerHTML = vortexHTML;
                             slot2.style.border = '4px solid #777';
                             slot2.style.background = '#1a1a1a';
                             slot2.style.boxShadow = '0 0 15px rgba(138, 43, 226, 0.5)';
                             if (name2) name2.innerText = '';
-                            fusionSlot2Filled = false;
-                            slot2Data = null;
+                            window.fusionSlot2Filled = false;
+                            window.slot2Data = null;
                         }
                     }
 
                     function addToFusionSlot(content, color, isImage, maxQty = 1, rank = 1, name = '', auraColor = null, element = null) {
+                        // Inventory Check
+                        const currentQty = monsterInventory[name] || 0;
+
+                        // Count how many already in slots
+                        let inSlots = 0;
+                        if (window.slot1Data && window.slot1Data.name === name) inSlots++;
+                        if (window.slot2Data && window.slot2Data.name === name) inSlots++;
+
+                        if (inSlots >= currentQty) {
+                            alert(`You only have ${currentQty} ${name}(s)!`);
+                            return;
+                        }
+
                         const slot1 = document.getElementById('fusion-slot-1');
                         const slot2 = document.getElementById('fusion-slot-2');
                         const name1 = document.getElementById('slot1-name');
                         const name2 = document.getElementById('slot2-name');
-
-                        // Quantity Logic
-                        let usedCount = 0;
-                        if (slot1Data && slot1Data.content === content) usedCount++;
-                        if (slot2Data && slot2Data.content === content) usedCount++;
-                        if (usedCount >= maxQty) return;
 
                         const badgeHTML = '';
 
@@ -2483,27 +2670,26 @@
                             ? `<img src="${content}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;">${badgeHTML}`
                             : `<span style="font-size: 30px;">${content}</span>`;
 
-                        const dataObj = { content, rank };
+                        const dataObj = { content, rank, name }; // Store Name
 
-                        if (!fusionSlot1Filled) {
+                        if (!window.fusionSlot1Filled) {
                             slot1.innerHTML = innerHTML;
-                            // Use Contain for Sharp Resolution
                             slot1.style.border = 'none';
                             slot1.style.background = 'transparent';
                             slot1.style.boxShadow = `0 0 15px ${auraColor || color}`;
                             slot1.style.opacity = '1';
                             if (name1) { name1.innerText = name; name1.style.color = color; }
-                            fusionSlot1Filled = true;
-                            slot1Data = dataObj;
-                        } else if (!fusionSlot2Filled) {
+                            window.fusionSlot1Filled = true;
+                            window.slot1Data = dataObj;
+                        } else if (!window.fusionSlot2Filled) {
                             slot2.innerHTML = innerHTML;
                             slot2.style.border = 'none';
                             slot2.style.background = 'transparent';
                             slot2.style.boxShadow = `0 0 15px ${auraColor || color}`;
                             slot2.style.opacity = '1';
                             if (name2) { name2.innerText = name; name2.style.color = color; }
-                            fusionSlot2Filled = true;
-                            slot2Data = dataObj;
+                            window.fusionSlot2Filled = true;
+                            window.slot2Data = dataObj;
                         } else {
                             clearFusionSlot(1);
                             clearFusionSlot(2);
@@ -2515,15 +2701,288 @@
                             slot1.style.boxShadow = `0 0 15px ${auraColor || color}`;
                             slot1.style.opacity = '1';
                             if (name1) { name1.innerText = name; name1.style.color = color; }
-                            fusionSlot1Filled = true;
-                            slot1Data = dataObj;
+                            window.fusionSlot1Filled = true;
+                            window.slot1Data = dataObj;
                         }
                     }
+                    var currentFusionType = 'money';
+
+                    /*
+                                        function showFusionModal(type) {
+                                            if (!fusionSlot1Filled || !fusionSlot2Filled) {
+                                                alert("You need 2 monsters to fuse!");
+                                                return;
+                                            }
+                    
+                                            // Check Same Monster
+                                            const name1 = slot1Data ? slot1Data.name : null;
+                                            const name2 = slot2Data ? slot2Data.name : null;
+                                            if (!name1 || !name2 || name1 !== name2) {
+                                                alert("You must fuse 2 of the SAME monster!");
+                                                return;
+                                            }
+                    
+                                            // Populate Modal
+                                            const slot1Img = document.getElementById('fusion-slot-1').innerHTML;
+                                            const slot2Img = document.getElementById('fusion-slot-2').innerHTML;
+                    
+                                            document.getElementById('modal-slot-1').innerHTML = slot1Img;
+                                            document.getElementById('modal-slot-2').innerHTML = slot2Img;
+                    
+                                            // Calculate Cost/Chance
+                                            const rank = slot1Data ? slot1Data.rank : 1;
+                                            const cost = getFusionCost(rank, type);
+                                            const chance = type === 'money' ? '40%' : '100%';
+                                            const costText = type === 'money' ? `${cost.toLocaleString()} Gold` : `${cost.toLocaleString()} Gems`;
+                    
+                                            document.getElementById('modal-chance').innerText = chance;
+                                            document.getElementById('modal-cost').innerText = costText;
+                    
+                                            currentFusionType = type;
+                    
+                                            document.getElementById('fusion-modal').style.display = 'flex';
+                                        }
+                    
+                                        function closeFusionModal() {
+                                            document.getElementById('fusion-modal').style.display = 'none';
+                                        }
+                    */
+
+                    function executeFusion() {
+                        const type = window.currentFusionType;
+                        window.closeFusionModal();
+
+                        if (!window.fusionSlot1Filled || !window.fusionSlot2Filled) return;
+
+                        const name1 = window.slot1Data ? window.slot1Data.name : null;
+
+                        // Check Inventory (Again)
+                        const qty = window.monsterInventory[name1] || 0;
+                        if (qty < 2) {
+                            alert(`You don't have enough ${name1}s!`);
+                            return;
+                        }
+
+                        // Check Recipe
+                        const resultName = window.fusionRecipes[name1];
+                        if (!resultName) {
+                            alert(`${name1} cannot be fused further!`);
+                            return;
+                        }
+
+                        // Check Cost
+                        const rank1 = window.slot1Data.rank;
+                        const cost = getFusionCost(rank1, type);
+                        const isMoney = type === 'money';
+                        const balance = isMoney ? state.money : state.gems;
+
+                        if (balance < cost) {
+                            alert(`Not enough ${isMoney ? 'Money' : 'Gems'}! Need ${cost.toLocaleString()}`);
+                            return;
+                        }
+
+                        // Deduct Cost
+                        if (isMoney) state.money -= cost;
+                        else state.gems -= cost;
+                        updateUI();
+
+                        // Success Chance
+                        const chance = isMoney ? 0.4 : 1.0;
+                        if (Math.random() > chance) {
+                            alert("FUSION FAILED! The fusion core destabilized. Resources lost.");
+                            clearFusionSlot(1);
+                            clearFusionSlot(2);
+                            return;
+                        }
+
+                        // SUCCESS Logic
+                        monsterInventory[name1] -= 2;
+                        monsterInventory[resultName] = (monsterInventory[resultName] || 0) + 1;
+
+                        setTimeout(() => {
+                            // alert(`FUSION SUCCESS! You created: ${resultName}!`);
+                        }, 100);
+
+                        updateInventoryUI();
+                        // clearFusionSlot(1); // Keep slots for animation
+                        // clearFusionSlot(2);
+
+                        // === POKÉMON-STYLE EVOLUTION ANIMATION ===
+                        const fullBodyMap = {
+                            "Dark Overlord": "assets/fire_demon_final.png",
+                            "Arch Masamune": "assets/masamune_clean.png",
+                            "Nature's Wrath": "assets/god_golem_final.png"
+                        };
+                        const overlay = document.getElementById('fusion-anim-overlay');
+                        const imgLeft = document.getElementById('anim-left');
+                        const imgRight = document.getElementById('anim-right');
+                        const imgResult = document.getElementById('anim-result');
+                        const resContainer = document.getElementById('anim-result-container');
+
+                        const spriteIng = fullBodyMap[name1] || window.slot1Data.content;
+                        const spriteRes = fullBodyMap[resultName] || spriteIng;
+
+                        imgLeft.src = spriteIng;
+                        imgRight.src = spriteIng;
+                        imgResult.src = spriteRes;
+
+                        // Reset Steps by removing all phase classes
+                        overlay.classList.remove('fusion-phase-1', 'fusion-phase-2', 'fusion-phase-3', 'fusion-phase-4', 'fusion-phase-5');
+
+                        // Clear any lingering inline styles that might interfere with CSS classes
+                        imgLeft.removeAttribute('style');
+                        imgRight.removeAttribute('style');
+                        imgResult.removeAttribute('style'); // Important: clear any previous styles
+
+                        // Set basic display styles
+                        overlay.style.display = 'block';
+                        overlay.style.pointerEvents = 'auto'; // Block interaction
+                        resContainer.removeAttribute('style'); // Clear inline display:flex/none
+                        resContainer.style.display = 'none'; // Ensure result is hidden initially
+
+                        // Force Reflow
+                        void overlay.offsetWidth;
+
+                        // PHASE 1: Monsters fly in from sides (0-1s)
+                        setTimeout(() => {
+                            overlay.classList.add('fusion-phase-1');
+                        }, 50);
+
+                        // PHASE 2: Bouncing and energy build-up (1-2.5s)
+                        setTimeout(() => {
+                            overlay.classList.remove('fusion-phase-1');
+                            overlay.classList.add('fusion-phase-2');
+                        }, 1000);
+
+                        // PHASE 3: Merge toward center (2.5-4s)
+                        setTimeout(() => {
+                            overlay.classList.remove('fusion-phase-2');
+                            overlay.classList.add('fusion-phase-3');
+                        }, 2500);
+
+                        // PHASE 4: Flash and light rays (4s)
+                        setTimeout(() => {
+                            overlay.classList.remove('fusion-phase-3');
+                            overlay.classList.add('fusion-phase-4');
+                        }, 4000);
+
+                        // PHASE 5: Result reveal (5s+)
+                        setTimeout(() => {
+                            overlay.classList.remove('fusion-phase-4');
+                            overlay.classList.add('fusion-phase-5');
+                        }, 5000);
+                    }
+
+                    window.closeAnimOverlay = function () {
+                        const overlay = document.getElementById('fusion-anim-overlay');
+                        overlay.style.display = 'none';
+                        overlay.classList.remove('fusion-phase-1', 'fusion-phase-2', 'fusion-phase-3', 'fusion-phase-4', 'fusion-phase-5');
+
+                        // Clean up
+                        clearFusionSlot(1);
+                        clearFusionSlot(2);
+                    };
+
+
+
+                    // --- CINEMATIC FUSION LOGIC (Appended) ---
+                    // // Duplicate removed
+
+
+
+
+                    /*
+                                        function executeFusion() {
+                                            const type = currentFusionType;
+                                            closeFusionModal();
+                    
+                                            if (!fusionSlot1Filled || !fusionSlot2Filled) return;
+                    
+                                            const name1 = slot1Data ? slot1Data.name : null;
+                    
+                                            // Check Inventory 
+                                            const qty = monsterInventory[name1] || 0;
+                                            if (qty < 2) {
+                                                alert(`You don't have enough ${name1}s!`);
+                                                return;
+                                            }
+                    
+                                            // Check Recipe
+                                            const resultName = fusionRecipes[name1];
+                                            if (!resultName) {
+                                                alert(`${name1} cannot be fused further!`);
+                                                return;
+                                            }
+                    
+                                            // Check Cost
+                                            const rank1 = slot1Data.rank;
+                                            const cost = getFusionCost(rank1, type);
+                                            const isMoney = type === 'money';
+                                            const balance = isMoney ? state.money : state.gems;
+                    
+                                            if (balance < cost) {
+                                                alert(`Not enough ${isMoney ? 'Money' : 'Gems'}! Need ${cost.toLocaleString()}`);
+                                                return;
+                                            }
+                    
+                                            // Start Animation
+                                            const overlay = document.getElementById('fusion-anim-overlay');
+                                            const imgLeft = document.getElementById('anim-left');
+                                            const imgRight = document.getElementById('anim-right');
+                                            const imgResult = document.getElementById('anim-result');
+                                            const flash = document.getElementById('anim-flash');
+                                            const resContainer = document.getElementById('anim-result-container');
+                    
+                                            const spriteIng = fullBodyMap[name1] || slot1Data.content;
+                                            const spriteRes = fullBodyMap[resultName] || spriteIng;
+                    
+                                            imgLeft.src = spriteIng;
+                                            imgRight.src = spriteIng;
+                                            imgResult.src = spriteRes;
+                    
+                                            // Reset
+                                            overlay.style.display = 'block';
+                                            resContainer.style.display = 'none';
+                                            imgLeft.style.opacity = '1';
+                                            imgRight.style.opacity = '1';
+                                            imgLeft.style.left = '-300px';
+                                            imgRight.style.right = '-300px';
+                                            flash.style.opacity = '0';
+                    
+                                            // Animate (Force Reflow)
+                                            imgLeft.style.animation = 'none'; imgLeft.offsetHeight;
+                                            imgLeft.style.animation = 'dashLeft 0.8s forwards cubic-bezier(0.1, 0.9, 0.2, 1)';
+                    
+                                            imgRight.style.animation = 'none'; imgRight.offsetHeight;
+                                            imgRight.style.animation = 'dashRight 0.8s forwards cubic-bezier(0.1, 0.9, 0.2, 1)';
+                    
+                                            // Flash
+                                            setTimeout(() => {
+                                                flash.style.animation = 'none'; flash.offsetHeight;
+                                                flash.style.animation = 'flashBang 0.6s forwards';
+                                            }, 700);
+                    
+                                            // Reveal
+                                            setTimeout(() => {
+                                                if (isMoney) state.money -= cost;
+                                                else state.gems -= cost;
+                    
+                                                monsterInventory[name1] -= 2;
+                                                monsterInventory[resultName] = (monsterInventory[resultName] || 0) + 1;
+                                                updateUI();
+                                                updateInventoryUI();
+                    
+                                                resContainer.style.display = 'flex';
+                                                imgLeft.style.opacity = '0';
+                                                imgRight.style.opacity = '0';
+                                            }, 1000);
+                                        }
+                    */
                 </script>
                 <div class="rank-card tier-10">Deity <span class="count">0</span></div>
                 <div class="rank-card tier-9" style="cursor: pointer;"
                     onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';">
-                    God <span class="count">1</span>
+                    God <span class="count" id="header-count-God">1</span>
                 </div>
                 <div class="rank-monsters"
                     style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ff4400; margin-bottom: 5px;">
@@ -2535,14 +2994,15 @@
                             style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
                             <img src="assets/masamune_icon.png" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
+                        <div id="inv-qty-Arch Masamune" style="color: #fff; font-weight: bold; font-size: 12px;">x1
+                        </div>
                         <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
                             Arch Masamune</div>
                     </div>
                 </div>
                 <div class="rank-card tier-8" style="cursor: pointer;"
                     onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';">
-                    Demi God <span class="count">3</span>
+                    Demi God <span class="count" id="header-count-Demi God">3</span>
                 </div>
                 <div class="rank-monsters"
                     style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ffaa00; margin-bottom: 5px;">
@@ -2554,7 +3014,8 @@
                             style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
                             <img src="assets/boss_clean.png" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x2</div>
+                        <div id="inv-qty-Dark Overlord" style="color: #fff; font-weight: bold; font-size: 12px;">x2
+                        </div>
                         <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
                             Dark Overlord</div>
                     </div>
@@ -2566,7 +3027,8 @@
                             style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
                             <img src="assets/god_golem_final.png" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div style="color: #fff; font-weight: bold; font-size: 12px;">x1</div>
+                        <div id="inv-qty-Nature's Wrath" style="color: #fff; font-weight: bold; font-size: 12px;">x1
+                        </div>
                         <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
                             Nature's Wrath</div>
                     </div>
@@ -2786,6 +3248,532 @@
     <!-- MAIN NAV MOVED INSIDE GAME CONTAINER -->
 
     <!-- SYNC SCRIPT REMOVED (Redundant with Global Header) -->
+    <!-- FUSION MODAL -->
+    <div id="fusion-modal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; backdrop-filter: blur(5px);">
+        <div class="fusion-modal-content"
+            style="width:90%; max-width:360px; background:linear-gradient(180deg, #1a222e 0%, #0f1219 100%); border:2px solid #3a4b5c; border-radius:12px; padding:0; text-align:center; position:relative; box-shadow:0 0 30px rgba(0,0,0,0.9); overflow:hidden;">
+
+            <!-- Header -->
+            <div
+                style="background:#232d3d; padding:12px; border-bottom:1px solid #3a4b5c; color:#fff; font-weight:bold; font-size:16px; letter-spacing:1px;">
+                FUSION CHAMBER
+            </div>
+
+            <div style="padding:20px;">
+                <div style="color:#aaa; font-size:12px; margin-bottom:15px;">Monsters will be combined.</div>
+
+                <!-- Ingredients -->
+                <div
+                    style="display:flex; justify-content:center; align-items:flex-start; gap:15px; margin-bottom:15px;">
+                    <div style="text-align:center;">
+                        <div id="modal-slot-1"
+                            style="width:70px; height:70px; border:2px solid #555; border-radius:12px; background:#111; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 10px #000;">
+                        </div>
+                        <div
+                            style="background:#111; border:1px solid #444; border-radius:4px; padding:2px 8px; margin-top:5px; font-size:12px; color:#fff; display:inline-block;">
+                            1</div>
+                    </div>
+
+                    <div style="color:#888; font-size:24px; font-weight:bold; margin-top:20px;">+</div>
+
+                    <div style="text-align:center;">
+                        <div id="modal-slot-2"
+                            style="width:70px; height:70px; border:2px solid #555; border-radius:12px; background:#111; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 10px #000;">
+                        </div>
+                        <div
+                            style="background:#111; border:1px solid #444; border-radius:4px; padding:2px 8px; margin-top:5px; font-size:12px; color:#fff; display:inline-block;">
+                            1</div>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div
+                    style="color:#ffd700; font-size:24px; margin-bottom:15px; text-shadow:0 0 10px rgba(255, 215, 0, 0.5);">
+                    ▼
+                </div>
+
+                <!-- Result -->
+                <div class="result-circle"
+                    style="width:80px; height:80px; margin:0 auto 20px; position:relative; display:flex; align-items:center; justify-content:center;">
+                    <div
+                        style="position:absolute; inset:0; border:2px solid #ffd700; border-radius:50%; box-shadow:0 0 15px rgba(255, 215, 0, 0.3); animation: pulseGlow 2s infinite;">
+                    </div>
+                    <span style="font-size:40px; color:#ffd700; font-weight:bold;">?</span>
+                </div>
+
+                <!-- Info -->
+                <div class="fusion-info"
+                    style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:20px; border:1px solid #333;">
+                    <div
+                        style="display:flex; justify-content:space-between; margin-bottom:5px; color:#bbb; font-size:13px;">
+                        <span>Success Rate:</span>
+                        <span id="modal-chance" style="color:#4f4; font-weight:bold;">100%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; color:#bbb; font-size:13px;">
+                        <span>Fusion Cost:</span>
+                        <span id="modal-cost" style="color:#ffaa00; font-weight:bold;">100 Gems</span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div style="display:flex; gap:10px;">
+                    <button onclick="closeFusionModal()"
+                        style="flex:1; padding:12px; background:#333; color:#ccc; border:1px solid #555; border-radius:6px; font-weight:bold; cursor:pointer;">
+                        CANCEL
+                    </button>
+                    <button onclick="executeFusion()"
+                        style="flex:1; padding:12px; background:linear-gradient(180deg, #00c853, #009624); color:#fff; border:1px solid #00e676; border-radius:6px; font-weight:bold; box-shadow:0 0 15px rgba(0, 230, 118, 0.4); cursor:pointer; text-shadow:0 1px 2px rgba(0,0,0,0.5);">
+                        COMBINE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FUSION ANIMATION OVERLAY (Pokémon Evolution Style) -->
+    <div id="fusion-anim-overlay"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:20000; overflow:hidden;">
+
+        <!-- Animated Background -->
+        <div id="anim-bg"
+            style="position:absolute; width:100%; height:100%; background:radial-gradient(circle at center, #1a0a2e 0%, #0a0a15 50%, #000 100%); transition: background 0.5s;">
+        </div>
+
+        <!-- Energy Particles -->
+        <div id="energy-particles" style="position:absolute; inset:0; pointer-events:none; opacity:0;">
+            <div class="particle p1"></div>
+            <div class="particle p2"></div>
+            <div class="particle p3"></div>
+            <div class="particle p4"></div>
+            <div class="particle p5"></div>
+            <div class="particle p6"></div>
+        </div>
+
+        <!-- Central Fusion Orb -->
+        <div id="fusion-orb"
+            style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:0; height:0; border-radius:50%; background:radial-gradient(circle, #fff 0%, #ffd700 30%, #ff6600 60%, transparent 70%); opacity:0; transition: all 0.5s; box-shadow: 0 0 100px 50px rgba(255,215,0,0.5);">
+        </div>
+
+        <!-- Light Rays -->
+        <div id="light-rays" style="position:absolute; inset:0; opacity:0; pointer-events:none;">
+            <div
+                style="position:absolute; left:50%; top:50%; width:4px; height:200%; background:linear-gradient(180deg, transparent, #ffd700, transparent); transform:translate(-50%,-50%) rotate(0deg); opacity:0.7;">
+            </div>
+            <div
+                style="position:absolute; left:50%; top:50%; width:4px; height:200%; background:linear-gradient(180deg, transparent, #ffd700, transparent); transform:translate(-50%,-50%) rotate(45deg); opacity:0.7;">
+            </div>
+            <div
+                style="position:absolute; left:50%; top:50%; width:4px; height:200%; background:linear-gradient(180deg, transparent, #ffd700, transparent); transform:translate(-50%,-50%) rotate(90deg); opacity:0.7;">
+            </div>
+            <div
+                style="position:absolute; left:50%; top:50%; width:4px; height:200%; background:linear-gradient(180deg, transparent, #ffd700, transparent); transform:translate(-50%,-50%) rotate(135deg); opacity:0.7;">
+            </div>
+        </div>
+
+        <!-- Left Monster (Smaller, Animated) -->
+        <img id="anim-left" src=""
+            style="position:absolute; left:5%; top:50%; transform:translateY(-50%); height:30vh; width:auto; filter:drop-shadow(0 0 30px #8b00ff) brightness(1.2); opacity:0;">
+
+        <!-- Right Monster (Smaller, Mirrored) -->
+        <img id="anim-right" src=""
+            style="position:absolute; right:5%; top:50%; transform:translateY(-50%) scaleX(-1); height:30vh; width:auto; filter:drop-shadow(0 0 30px #8b00ff) brightness(1.2); opacity:0;">
+
+        <!-- Impact Flash -->
+        <div id="anim-flash"
+            style="position:absolute; width:100%; height:100%; background:radial-gradient(circle at center, #fff 0%, rgba(255,215,0,0.8) 30%, transparent 70%); opacity:0; pointer-events:none;">
+        </div>
+
+        <!-- Result Reveal Container -->
+        <div id="anim-result-container"
+            style="display:none; position:absolute; inset:0; flex-direction:column; align-items:center; justify-content:center; background:radial-gradient(circle at center, rgba(50,0,80,0.8) 0%, transparent 60%);">
+
+            <!-- Success Text -->
+            <div id="success-text"
+                style="font-size:32px; color:#ffd700; font-weight:bold; text-shadow:0 0 30px #ffaa00, 0 0 60px #ff6600; margin-bottom:30px; opacity:0; transform:scale(0);">
+                ✨ EVOLUTION COMPLETE ✨
+            </div>
+
+            <!-- Evolved Monster -->
+            <div id="result-glow" style="position:relative; opacity:0; transform:scale(0.5);">
+                <div
+                    style="position:absolute; inset:-50px; background:radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%); animation: pulseGlow 2s ease-in-out infinite;">
+                </div>
+                <img id="anim-result" src=""
+                    style="height:50vh; width:auto; filter:drop-shadow(0 0 40px gold) drop-shadow(0 0 80px #ff6600);">
+            </div>
+
+            <!-- Continue Button -->
+            <button onclick="closeAnimOverlay()"
+                style="margin-top:40px; padding:18px 50px; font-size:18px; background:linear-gradient(180deg, #ffd700 0%, #ff9500 100%); border:3px solid #fff; border-radius:50px; font-weight:bold; cursor:pointer; box-shadow:0 0 30px rgba(255,170,0,0.6), inset 0 2px 0 rgba(255,255,255,0.4); color:#000; text-transform:uppercase; letter-spacing:2px; opacity:0; transform:translateY(20px);">
+                CONTINUE
+            </button>
+        </div>
+    </div>
+
+    <style>
+        /* === POKÉMON-STYLE EVOLUTION ANIMATIONS === */
+
+        /* Bounce and slide in from left */
+        @keyframes slideInLeft {
+            0% {
+                left: -30%;
+                opacity: 0;
+                transform: translateY(-50%) scale(0.8);
+            }
+
+            60% {
+                left: 8%;
+                opacity: 1;
+                transform: translateY(-50%) scale(1.1);
+            }
+
+            80% {
+                left: 4%;
+                transform: translateY(-50%) scale(0.95);
+            }
+
+            100% {
+                left: 5%;
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+        }
+
+        /* Bounce and slide in from right */
+        @keyframes slideInRight {
+            0% {
+                right: -30%;
+                opacity: 0;
+                transform: translateY(-50%) scaleX(-1) scale(0.8);
+            }
+
+            60% {
+                right: 8%;
+                opacity: 1;
+                transform: translateY(-50%) scaleX(-1) scale(1.1);
+            }
+
+            80% {
+                right: 4%;
+                transform: translateY(-50%) scaleX(-1) scale(0.95);
+            }
+
+            100% {
+                right: 5%;
+                opacity: 1;
+                transform: translateY(-50%) scaleX(-1) scale(1);
+            }
+        }
+
+        /* Ingredient monsters bouncing in place */
+        @keyframes monsterBounce {
+
+            0%,
+            100% {
+                transform: translateY(-50%) scale(1);
+                filter: drop-shadow(0 0 30px #8b00ff) brightness(1.2);
+            }
+
+            25% {
+                transform: translateY(-55%) scale(1.05);
+                filter: drop-shadow(0 0 50px #ff00ff) brightness(1.5);
+            }
+
+            50% {
+                transform: translateY(-45%) scale(0.95);
+                filter: drop-shadow(0 0 40px #8b00ff) brightness(1.3);
+            }
+
+            75% {
+                transform: translateY(-52%) scale(1.02);
+                filter: drop-shadow(0 0 60px #ff00ff) brightness(1.6);
+            }
+        }
+
+        /* Right monster bounce (mirrored) */
+        @keyframes monsterBounceRight {
+
+            0%,
+            100% {
+                transform: translateY(-50%) scaleX(-1) scale(1);
+                filter: drop-shadow(0 0 30px #8b00ff) brightness(1.2);
+            }
+
+            25% {
+                transform: translateY(-55%) scaleX(-1) scale(1.05);
+                filter: drop-shadow(0 0 50px #ff00ff) brightness(1.5);
+            }
+
+            50% {
+                transform: translateY(-45%) scaleX(-1) scale(0.95);
+                filter: drop-shadow(0 0 40px #8b00ff) brightness(1.3);
+            }
+
+            75% {
+                transform: translateY(-52%) scaleX(-1) scale(1.02);
+                filter: drop-shadow(0 0 60px #ff00ff) brightness(1.6);
+            }
+        }
+
+        /* Monsters merge toward center */
+        @keyframes mergeLeft {
+            0% {
+                left: 5%;
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+
+            50% {
+                left: 35%;
+                opacity: 0.8;
+                transform: translateY(-50%) scale(0.6);
+                filter: brightness(3) drop-shadow(0 0 80px #fff);
+            }
+
+            100% {
+                left: 50%;
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+        }
+
+        @keyframes mergeRight {
+            0% {
+                right: 5%;
+                opacity: 1;
+                transform: translateY(-50%) scaleX(-1) scale(1);
+            }
+
+            50% {
+                right: 35%;
+                opacity: 0.8;
+                transform: translateY(-50%) scaleX(-1) scale(0.6);
+                filter: brightness(3) drop-shadow(0 0 80px #fff);
+            }
+
+            100% {
+                right: 50%;
+                opacity: 0;
+                transform: translate(50%, -50%) scaleX(-1) scale(0);
+            }
+        }
+
+        /* Fusion orb expansion */
+        @keyframes orbExpand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+
+            30% {
+                width: 80px;
+                height: 80px;
+                opacity: 1;
+            }
+
+            60% {
+                width: 150px;
+                height: 150px;
+                opacity: 1;
+                box-shadow: 0 0 150px 80px rgba(255, 215, 0, 0.8);
+            }
+
+            100% {
+                width: 100vw;
+                height: 100vh;
+                opacity: 0;
+            }
+        }
+
+        /* Flash bang effect */
+        @keyframes flashBang {
+            0% {
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Text pop in */
+        @keyframes textPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+
+            80% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Result monster reveal */
+        @keyframes resultReveal {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+                filter: brightness(5) blur(20px);
+            }
+
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+                filter: brightness(2) blur(5px);
+            }
+
+            70% {
+                transform: scale(0.95);
+                filter: brightness(1.2) blur(0);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+                filter: brightness(1) blur(0);
+            }
+        }
+
+        /* Floating result */
+        @keyframes floatResult {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-15px) scale(1.02);
+            }
+        }
+
+        /* Pulsing glow */
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Button fade in */
+        @keyframes buttonFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Energy particles */
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #fff, #ffd700);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        .particle.p1 {
+            left: 20%;
+            animation: particleFloat 2s ease-in-out infinite;
+            animation-delay: 0s;
+        }
+
+        .particle.p2 {
+            left: 40%;
+            animation: particleFloat 2.5s ease-in-out infinite;
+            animation-delay: 0.3s;
+        }
+
+        .particle.p3 {
+            left: 60%;
+            animation: particleFloat 1.8s ease-in-out infinite;
+            animation-delay: 0.6s;
+        }
+
+        .particle.p4 {
+            left: 80%;
+            animation: particleFloat 2.2s ease-in-out infinite;
+            animation-delay: 0.9s;
+        }
+
+        .particle.p5 {
+            left: 30%;
+            animation: particleFloat 2.4s ease-in-out infinite;
+            animation-delay: 1.2s;
+        }
+
+        .particle.p6 {
+            left: 70%;
+            animation: particleFloat 2.1s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                top: 100%;
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                top: -10%;
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Light rays spin */
+        @keyframes raysSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #light-rays.active {
+            animation: raysSpin 4s linear infinite;
+        }
+    </style>
     <script>
         // No sync needed, Header is global.
     </script>
@@ -3314,6 +4302,234 @@
 
         /* Add more if needed, keeps UI snappy */
     </style>
+    <style>
+        /* EXTRA ANIMATION STYLES */
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        @keyframes sunBurst {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes bgFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+
+            to {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+        }
+
+        .god-rays {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 215, 0, 0.4) 20deg, transparent 40deg, rgba(255, 215, 0, 0.4) 60deg, transparent 80deg, rgba(255, 215, 0, 0.4) 100deg, transparent 120deg, transparent 360deg);
+            border-radius: 50%;
+            animation: sunBurst 10s linear infinite;
+            z-index: -1;
+            filter: blur(20px);
+        }
+
+        @keyframes flashBang {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes textPop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes floatResult {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+
+
+
+    <script>
+        // Global Error Handler for Debugging
+        window.onerror = function (msg, url, line, col, error) {
+            // alert('Script Error: ' + msg); // Uncomment if desperate
+        };
+    </script>
+    <script>
+        // --- SAFETY PATCH: Ensure showFusionModal exists ---
+        window.showFusionModal = function (type) {
+            try {
+
+                if (!window.fusionSlot1Filled || !window.fusionSlot2Filled) {
+                    alert("You need 2 monsters to fuse! (Status: " + window.fusionSlot1Filled + "/" + window.fusionSlot2Filled + ")");
+                    return;
+                }
+
+                // Check Same Monster
+                const name1 = window.slot1Data ? window.slot1Data.name : null;
+                const name2 = window.slot2Data ? window.slot2Data.name : null;
+                if (!name1 || !name2 || name1 !== name2) {
+                    alert("You must fuse 2 of the SAME monster!");
+                    return;
+                }
+
+                // Populate Modal
+                const slot1Img = document.getElementById('fusion-slot-1') ? document.getElementById('fusion-slot-1').innerHTML : '';
+                const slot2Img = document.getElementById('fusion-slot-2') ? document.getElementById('fusion-slot-2').innerHTML : '';
+
+                const mSlot1 = document.getElementById('modal-slot-1');
+                const mSlot2 = document.getElementById('modal-slot-2');
+                if (mSlot1) mSlot1.innerHTML = slot1Img;
+                if (mSlot2) mSlot2.innerHTML = slot2Img;
+
+                // Calculate Cost/Chance
+                const rank = window.slot1Data ? window.slot1Data.rank : 1;
+                const cost = getFusionCost(rank, type);
+                const chance = type === 'money' ? '40%' : '100%';
+                const costText = type === 'money' ? cost.toLocaleString() + ' Gold' : cost.toLocaleString() + ' Gems';
+
+                const elChance = document.getElementById('modal-chance');
+                const elCost = document.getElementById('modal-cost');
+                if (elChance) elChance.innerText = chance;
+                if (elCost) elCost.innerText = costText;
+
+                window.currentFusionType = type;
+
+                const modal = document.getElementById('fusion-modal');
+                if (modal) modal.style.display = 'flex';
+            } catch (e) {
+                alert('Fusion Error: ' + e.message);
+            }
+        };
+
+        window.closeFusionModal = function () {
+            const modal = document.getElementById('fusion-modal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        // Global function to close fusion animation overlay
+        window.closeAnimOverlay = function () {
+            const overlay = document.getElementById('fusion-anim-overlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.style.pointerEvents = 'none';
+            }
+            // Clear fusion slots after animation
+            if (typeof clearFusionSlot === 'function') {
+                clearFusionSlot(1);
+                clearFusionSlot(2);
+            }
+        };
+
+        // REPARENTING REMOVED - Keep overlays in body with position:fixed
+        // The previous reparenting logic was causing click blocking issues.
+    </script>
+
+    <script>
+        // --- CLICK INSPECTOR (DEBUGGING) ---
+        // This will alert what you are actually clicking on.
+        // If an overlay is blocking, it will show up here.
+        document.addEventListener('click', function (e) {
+            console.log("Clicked:", e.target);
+            // alert("DEBUG: You clicked element: <" + e.target.tagName + "> id='" + e.target.id + "' class='" + e.target.className + "'");
+        }, true);
+
+        // Force pointer-events: none on overlays by default via CSS injection
+        const style = document.createElement('style');
+        style.innerHTML = `
+            /* Default: overlays don't block clicks */
+            #fusion-anim-overlay:not([style*="display"]),
+            #fusion-modal:not([style*="display"]) {
+                pointer-events: none !important;
+            }
+            /* When display:none, also no pointer events */
+            #fusion-anim-overlay[style*="none"],
+            #fusion-modal[style*="none"] {
+                pointer-events: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 
 </html>
