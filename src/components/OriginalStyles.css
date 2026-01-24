@@ -1,0 +1,125 @@
+/* --- EXACT STYLES IMPORTED FROM HTML FILE --- */
+
+/* 1. BUTTONS ROW */
+.btn-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    width: 100%;
+}
+
+.btn {
+    flex: 1;
+    height: 65px;
+    border-radius: 12px;
+    border: 5px solid #2a2a3a;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.1s;
+    text-transform: uppercase;
+
+    /* 3D Effect */
+    box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.2),
+        0 5px 0 #1a1a2a;
+
+    /* Standard Shadow matching UI */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.btn:active {
+    transform: translateY(4px);
+    box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.2),
+        0 1px 0 #1a1a2a !important;
+}
+
+.btn-title {
+    font-size: 14px;
+    font-weight: 900;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+}
+
+.btn-cost {
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+/* 1. Normal Attack (Blue) */
+.btn.normal {
+    background: linear-gradient(180deg, #44ddff 0%, #0088cc 100%);
+    border-color: #005588;
+}
+
+/* 2. United Attack (Green) */
+.btn.united {
+    background: linear-gradient(180deg, #66ff66 0%, #00aa00 100%);
+    border-color: #006600;
+}
+
+/* 3. Special Attack (Red) */
+.btn.special {
+    background: linear-gradient(180deg, #ff5555 0%, #cc0000 100%);
+    border-color: #880000;
+}
+
+
+/* 2. BOSS BAR FRAME */
+.boss-bar-frame {
+    height: 24px;
+    background: linear-gradient(180deg, #4a3a2a 0%, #2a1a0a 100%);
+    border: 3px solid;
+    border-color: #6a5a4a #4a3a2a #3a2a1a #5a4a3a;
+    position: relative;
+    box-shadow:
+        0 3px 0 #1a0a00,
+        0 0 10px rgba(255, 80, 0, 0.4),
+        inset 0 2px 3px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+}
+
+.boss-bar-fill {
+    height: 100%;
+    background: linear-gradient(180deg, #ff6600 0%, #ff0000 50%, #cc0000 100%);
+    width: 100%;
+    transition: width 0.2s;
+    box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.boss-hp-text {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    line-height: 20px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 3px #000;
+    z-index: 10;
+}
+
+/* 3. BATTLE INFO */
+.battle-status {
+    background: #1a2533;
+    border: 1px solid #334455;
+    border-top: 2px solid #506070;
+    color: #fff;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    font-size: 12px;
+    text-align: center;
+}
