@@ -529,7 +529,7 @@ const MonsterTab = () => {
             </div>
             <div className="monster-detail-body">
               <div className="monster-detail-image" style={{
-                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=22)`,
+                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=62)`,
                 backgroundSize: '100% 100%',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -543,7 +543,7 @@ const MonsterTab = () => {
                 position: 'relative'
               }}>
                 <img
-                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=22`}
+                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=62`}
                   alt={selectedMonster.name}
                   style={{
                     maxHeight: '90%',
