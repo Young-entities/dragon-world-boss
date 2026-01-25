@@ -69,9 +69,11 @@ const MonsterCard = ({ monster, onClick }) => {
 
             {/* Image */}
             <div style={{ height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
-                <img
+                <Motion.img
                     src={monster.fullImage || monster.image}
                     alt={monster.name}
+                    animate={{ y: [0, -6, 0], rotate: [0, -1.2, 0], scale: [1, 1.02, 1] }}
+                    transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
                     style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
                 />
             </div>

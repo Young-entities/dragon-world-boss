@@ -1475,8 +1475,7 @@
                         <div class="boss-name-in-bar"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 14px; text-shadow: 0 1px 2px #000; z-index: 5;">
 
-                            <span id="bossName">Dark
-                                Overlord</span>
+                            <span id="bossName">Inferno Dragon Knight Kael</span>
                         </div>
                     </div>
                 </div>
@@ -1665,7 +1664,7 @@
             // --- PHASE LOGIC REMOVED (One Phase) ---
             if (state.bossHp > 0) {
                 // el.phaseMsg logic REMOVED to prevent crash
-                el.bossName.textContent = "Dark Overlord";
+                el.bossName.textContent = "Inferno Dragon Knight Kael";
                 // Just Force White Name
                 if (el.bossName) el.bossName.style.color = "#ffffff";
             } else {
@@ -2520,19 +2519,13 @@
 
                     // --- FUSION SYSTEM ---
                     window.monsterInventory = {
-                        "Arch Masamune": 1,
-                        "Dark Overlord": 2,
-                        "Nature's Wrath": 1
+                        "Inferno Dragon Knight Kael": 2
                     };
 
-                    window.fusionRecipes = {
-                        "Dark Overlord": "Arch Masamune"
-                    };
+                    window.fusionRecipes = {};
 
                     window.monsterTiers = {
-                        "Arch Masamune": "God",
-                        "Dark Overlord": "Demi God",
-                        "Nature's Wrath": "Demi God"
+                        "Inferno Dragon Knight Kael": "Demi God"
                     };
 
                     function updateInventoryUI() {
@@ -2809,9 +2802,7 @@
 
                         // === POKÉMON-STYLE EVOLUTION ANIMATION ===
                         const fullBodyMap = {
-                            "Dark Overlord": "assets/fire_demon_final.png",
-                            "Arch Masamune": "assets/masamune_clean.png",
-                            "Nature's Wrath": "assets/god_golem_final.png"
+                            "Inferno Dragon Knight Kael": "assets/fire_demon_final.png"
                         };
                         const overlay = document.getElementById('fusion-anim-overlay');
                         const imgLeft = document.getElementById('anim-left');
@@ -2986,19 +2977,6 @@
                 </div>
                 <div class="rank-monsters"
                     style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ff4400; margin-bottom: 5px;">
-                    <div class="monster-item"
-                        onclick="addToFusionSlot('assets/masamune_icon.png', '#ff4400', true, 3, 9, 'Arch Masamune', '#ff4400')"
-                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
-                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                        <div class="mob-icon-square"
-                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
-                            <img src="assets/masamune_icon.png" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div id="inv-qty-Arch Masamune" style="color: #fff; font-weight: bold; font-size: 12px;">x1
-                        </div>
-                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
-                            Arch Masamune</div>
-                    </div>
                 </div>
                 <div class="rank-card tier-8" style="cursor: pointer;"
                     onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'flex' : 'none';">
@@ -3007,30 +2985,17 @@
                 <div class="rank-monsters"
                     style="display: none; padding: 15px; background: rgba(0,0,0,0.3); gap: 15px; flex-wrap: wrap; border-left: 2px solid #ffaa00; margin-bottom: 5px;">
                     <div class="monster-item"
-                        onclick="addToFusionSlot('assets/boss_clean.png', '#ffaa00', true, 2, 8, 'Dark Overlord', '#ff3300')"
+                        onclick="addToFusionSlot('assets/boss_clean.png', '#ffaa00', true, 2, 8, 'Inferno Dragon Knight Kael', '#ff3300')"
                         style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
                         onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
                         <div class="mob-icon-square"
                             style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
                             <img src="assets/boss_clean.png" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div id="inv-qty-Dark Overlord" style="color: #fff; font-weight: bold; font-size: 12px;">x2
+                        <div id="inv-qty-Inferno Dragon Knight Kael" style="color: #fff; font-weight: bold; font-size: 12px;">x2
                         </div>
                         <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
-                            Dark Overlord</div>
-                    </div>
-                    <div class="monster-item"
-                        onclick="addToFusionSlot('assets/god_golem_final.png', '#00ff00', true, 3, 8, 'Nature\'s Wrath', '#00ff00')"
-                        style="display: flex; flex-direction: column; align-items: center; width: 80px; cursor: pointer; transition: transform 0.1s;"
-                        onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">
-                        <div class="mob-icon-square"
-                            style="width: 50px; height: 50px; background: transparent; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; position: relative; overflow: hidden; box-shadow: none;">
-                            <img src="assets/god_golem_final.png" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div id="inv-qty-Nature's Wrath" style="color: #fff; font-weight: bold; font-size: 12px;">x1
-                        </div>
-                        <div style="color: #ffd700; font-size: 11px; margin-top: 2px; text-shadow: 0 1px 2px #000;">
-                            Nature's Wrath</div>
+                            Inferno Dragon Knight Kael</div>
                     </div>
                 </div>
                 <div class="rank-card tier-7">Titan <span class="count">0</span></div>

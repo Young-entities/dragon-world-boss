@@ -1,31 +1,39 @@
 import cv2
 import numpy as np
 
-# Source icons with black backgrounds
-icons = [
-    (r"C:\Users\kevin\.gemini\antigravity\brain\a5b19c6e-530d-45c8-a7ec-27d9452652ae\icon_home_v2_1768960048588.png", "assets/icon_home.png"),
-    (r"C:\Users\kevin\.gemini\antigravity\brain\a5b19c6e-530d-45c8-a7ec-27d9452652ae\icon_battle_v2_1768960061849.png", "assets/icon_battle.png"),
-    (r"C:\Users\kevin\.gemini\antigravity\brain\a5b19c6e-530d-45c8-a7ec-27d9452652ae\icon_monster_v2_1768960077344.png", "assets/icon_monster.png"),
-    (r"C:\Users\kevin\.gemini\antigravity\brain\a5b19c6e-530d-45c8-a7ec-27d9452652ae\icon_equip_v2_1768960092693.png", "assets/icon_equip.png"),
-    (r"C:\Users\kevin\.gemini\antigravity\brain\a5b19c6e-530d-45c8-a7ec-27d9452652ae\icon_shop_v2_1768960119861.png", "assets/icon_shop.png"),
-]
+def make_white_transparent(input_path, output_path):
+    # Load the image
+    img = cv2.imread(input_path)
+    if img is None:
+        print(f"Error: Could not load image from {input_path}")
+        return
 
-for src, dst in icons:
-    img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-    
-    # Convert to BGRA if needed
-    if img.shape[2] == 3:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-    
-    b, g, r, a = cv2.split(img)
-    
-    # Make black/near-black pixels transparent
-    # Black is where R, G, B are all low (< 30)
-    black_mask = (r < 30) & (g < 30) & (b < 30)
-    a[black_mask] = 0
-    
-    result = cv2.merge([b, g, r, a])
-    cv2.imwrite(dst, result)
-    print(f"Processed: {dst}")
+    # Convert to BGRA
+    bgra = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
 
-print("Done!")
+    # Define the range for white pixels
+    # In a generated image, white might not be exactly 255.
+    # We use a threshold.
+    lower_white = np.array([240, 240, 240, 255])
+    upper_white = np.array([255, 255, 255, 255])
+
+    # Create a mask for white pixels
+    white_mask = cv2.inRange(bgra, lower_white, upper_white)
+
+    # Set white pixels' alpha to 0
+    bgra[white_mask == 255, 3] = 0
+
+    # Optional: Smooth the alpha edge
+    # This can help with anti-aliasing artifacts
+    alpha = bgra[:, :, 3]
+    alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
+    bgra[:, :, 3] = alpha
+
+    # Save the result
+    cv2.imwrite(output_path, bgra)
+    print(f"Transparency applied and saved to {output_path}")
+
+input_img = r"C:\Users\kevin\New folder (2)\Gemini_Generated_Image_nkxb7lnkxb7lnkxb.png"
+output_img = r"C:\Users\kevin\New folder (2)\monster-warlord\public\assets\water_deity_unit_final.png"
+
+make_white_transparent(input_img, output_img)

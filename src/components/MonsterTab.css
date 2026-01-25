@@ -487,9 +487,9 @@
 }
 
 .monster-detail-body {
-  padding: 16px;
+  padding: 8px 16px;
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .monster-detail-image {
@@ -498,7 +498,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 260px;
+  min-height: 220px;
   position: relative;
   overflow: hidden;
 }
@@ -519,7 +519,7 @@
 
 .monster-detail-stats {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   font-size: 12px;
   color: #c3cada;
 }
@@ -529,7 +529,21 @@
 }
 
 .monster-detail-stat-line {
-  font-size: 12px;
+  font-size: 13px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.25);
+  margin: 8px -16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+}
+
+.monster-detail-stat-line .stat-divider {
+  display: inline;
+  opacity: 0.5;
 }
 
 .monster-detail-desc {

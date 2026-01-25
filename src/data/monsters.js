@@ -15,8 +15,8 @@ export const monsters = [
     name: "Abyssal Sea Deity",
     rank: "Deity",
     element: "Water",
-    image: "/assets/water_deity_card_bg.png",
-    fullImage: "/assets/water_deity_card_bg.png",
+    image: "/assets/water_deity_unit_final.png",
+    fullImage: "/assets/water_deity_unit_final.png",
     cardBackground: "/assets/water_deity_card_bg.png",
     owned: 1,
     stats: {
@@ -24,6 +24,7 @@ export const monsters = [
       def: 531441,
       hp: 866052
     },
+    leaderSkill: "Lower Stamina Recharge Time: 10 Seconds",
     description: "The supreme ruler of the infinite depths, her power grows threefold with every ascension."
   }
 ];

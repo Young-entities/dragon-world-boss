@@ -32,8 +32,8 @@ const fusionMonsters = [
   {
     name: 'Abyssal Sea Deity',
     tier: 'Deity',
-    icon: '/assets/water_deity_card_bg.png',
-    full: '/assets/water_deity_card_bg.png',
+    icon: '/assets/water_deity_unit_final.png',
+    full: '/assets/water_deity_unit_final.png',
     color: '#ff00ff',
     rankValue: 10,
     aura: '#00ccff'
@@ -287,12 +287,12 @@ const MonsterTab = () => {
                 <span className="frame-rivet r2" />
                 <span className="frame-rivet r3" />
                 <span className="frame-rivet r4" />
-                <img src={monster.image} alt={monster.name} />
+                <img src={`${monster.image}?v=21`} alt={monster.name} />
               </div>
               <div className="mon-info">
                 <div className="mon-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <img
-                    src={monster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : `/assets/element_${(monster.element || 'neutral').toLowerCase()}.png`}
+                    src={monster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (monster.element === 'Water' ? '/assets/element_water.png?v=4' : `/assets/element_${(monster.element || 'neutral').toLowerCase()}.png`)}
                     alt={monster.element}
                     style={{ width: '18px', height: '18px', objectFit: 'contain' }}
                   />
@@ -508,20 +508,28 @@ const MonsterTab = () => {
       {selectedMonster && (
         <div className="monster-detail-overlay" onClick={() => setSelectedMonster(null)}>
           <div className="monster-detail-card" onClick={(event) => event.stopPropagation()}>
-            <div className="monster-detail-header">
+            <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 0 2px 0', background: 'rgba(0,0,0,0.5)', borderBottom: '1px solid #333' }}>
               <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
-                  src={selectedMonster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : `/assets/element_${(selectedMonster.element || 'neutral').toLowerCase()}.png`}
+                  src={selectedMonster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (selectedMonster.element === 'Water' ? '/assets/element_water.png?v=4' : `/assets/element_${(selectedMonster.element || 'neutral').toLowerCase()}.png`)}
                   alt={selectedMonster.element}
-                  style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                  style={{ width: '20px', height: '20px', objectFit: 'contain' }}
                 />
-                {selectedMonster.name}
+                <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{selectedMonster.name}</span>
               </div>
-              <button className="monster-detail-close" onClick={() => setSelectedMonster(null)}>✕</button>
+              <div style={{
+                color: getTierColor(selectedMonster.rank),
+                fontWeight: 'normal',
+                fontSize: '0.95rem',
+                marginTop: '1px'
+              }}>
+                {selectedMonster.rank}
+              </div>
+              <button className="monster-detail-close" onClick={() => setSelectedMonster(null)} style={{ position: 'absolute', right: '15px', top: '15px' }}>✕</button>
             </div>
             <div className="monster-detail-body">
               <div className="monster-detail-image" style={{
-                backgroundImage: `url(${selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png'})`,
+                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=22)`,
                 backgroundSize: '100% 100%',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -535,7 +543,7 @@ const MonsterTab = () => {
                 position: 'relative'
               }}>
                 <img
-                  src={selectedMonster.fullImage || selectedMonster.image}
+                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=22`}
                   alt={selectedMonster.name}
                   style={{
                     maxHeight: '90%',
@@ -546,23 +554,37 @@ const MonsterTab = () => {
                 />
               </div>
               <div className="monster-detail-stats">
-                <div className="monster-detail-tier" style={{ color: getTierColor(selectedMonster.rank) }}>
-                  Tier: {selectedMonster.rank}
-                </div>
-                <div className="monster-detail-stat-line">
+
+                {selectedMonster.leaderSkill && (
+                  <div className="monster-detail-leader-skill" style={{
+                    textAlign: 'center',
+                    marginBottom: '4px',
+                    padding: '0'
+                  }}>
+                    <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0' }}>
+                      Leader Skill
+                    </span>
+                    <span style={{ color: '#fff', fontSize: '13px', fontStyle: 'italic' }}>
+                      {selectedMonster.leaderSkill}
+                    </span>
+                  </div>
+                )}
+
+                <div className="monster-detail-stat-line" style={{ margin: '8px -16px' }}>
                   <span className="stat-attack">ATK {selectedMonster.stats.atk.toLocaleString()}</span>
                   <span className="stat-divider"> • </span>
                   <span className="stat-defense">DEF {selectedMonster.stats.def.toLocaleString()}</span>
                   <span className="stat-divider"> • </span>
                   <span className="stat-hp">HP {selectedMonster.stats.hp.toLocaleString()}</span>
                 </div>
-                <div className="monster-detail-desc">{selectedMonster.description}</div>
+                <div className="monster-detail-desc" style={{ marginTop: '4px' }}>{selectedMonster.description}</div>
               </div>
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
