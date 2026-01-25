@@ -51,6 +51,7 @@ export const GameProvider = ({ children }) => {
     const [bossShake, setBossShake] = useState(false);
     const [resourcePopups, setResourcePopups] = useState([]);
     const [skillModalOpen, setSkillModalOpen] = useState(false);
+    const [isAttacking, setIsAttacking] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -145,7 +146,20 @@ export const GameProvider = ({ children }) => {
         }));
     };
 
+    const updateMonsterCollection = (updates) => {
+        if (!updates || typeof updates !== 'object') return;
+        setState(prev => {
+            const nextCollection = { ...prev.monsterCollection };
+            Object.entries(updates).forEach(([name, qty]) => {
+                nextCollection[name] = Math.max(0, qty);
+            });
+            return { ...prev, monsterCollection: nextCollection };
+        });
+    };
+
     const attackBoss = (dmgType) => {
+        if (isAttacking) return;
+
         let costSt = 1, costGm = 0, baseDmg = 15000, attacks = 1, odGain = 0.8;
         const collectionAttack = Math.max(1, getCollectionAttack(state.monsterCollection || {}));
 
@@ -169,18 +183,24 @@ export const GameProvider = ({ children }) => {
             }
         }
 
+        setIsAttacking(true);
         setBossShake(true);
-        setTimeout(() => setBossShake(false), 500);
+        setTimeout(() => {
+            setBossShake(false);
+            setIsAttacking(false);
+        }, 500);
 
         let roll = baseDmg * (0.9 + Math.random() * 0.2);
         let finalDmg = Math.floor(roll);
 
         let currentOD = state.overdrive;
-        let isCrit = (currentOD + odGain >= 100);
+        // Trigger crit if the NEXT gain fills it OR if it's already full
+        let isCrit = (currentOD >= 100) || (currentOD + odGain >= 100);
 
         if (isCrit) {
             finalDmg *= 5;
             currentOD = 0;
+            console.log("CRITICAL OVERDRIVE HIT!");
         } else {
             currentOD += odGain;
             if (currentOD > 100) currentOD = 100;
@@ -198,7 +218,7 @@ export const GameProvider = ({ children }) => {
             val: finalDmg.toLocaleString(),
             id: Date.now(),
             isCrit: isCrit,
-            color: isCrit ? '#ff4400' : '#ffcc00'
+            color: isCrit ? '#ff0000' : '#ffffff'
         });
         setTimeout(() => setDamagePopup(null), 800);
 
@@ -251,7 +271,7 @@ export const GameProvider = ({ children }) => {
     };
 
     return (
-        <GameContext.Provider value={{ state, attackBoss, damagePopup, bossShake, resourcePopups, spendSkillPoint, skillModalOpen, setSkillModalOpen, applyResourceDelta }}>
+        <GameContext.Provider value={{ state, attackBoss, damagePopup, bossShake, resourcePopups, spendSkillPoint, skillModalOpen, setSkillModalOpen, applyResourceDelta, updateMonsterCollection, isAttacking }}>
             {children}
         </GameContext.Provider>
     );

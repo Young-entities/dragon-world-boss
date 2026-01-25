@@ -45,7 +45,7 @@ const TopUI = ({ variant = 'boss' }) => {
                 {/* GEMS (TOP MIDDLE) */}
                 <div className="gems-display">
                     <div className="gems-pill">
-                        <span className="res-icon">💎</span>
+                        <img className="res-icon" src="/assets/icon_gem.svg" alt="Gems" />
                         <span className="gems-amount">{fmt(state.gems)}</span>
                     </div>
                 </div>
@@ -53,7 +53,9 @@ const TopUI = ({ variant = 'boss' }) => {
                 {/* MONEY */}
                 <div className="money-display">
                     <div className="money-pill-wrapper">
-                        <div className="gold-coin">⭐</div>
+                        <div className="gold-coin">
+                            <img className="gold-icon" src="/assets/icon_gold.svg" alt="Gold" />
+                        </div>
                         <div className="money-amount-pill">{fmt(state.money)}</div>
                     </div>
                     <div className="money-sub">Next Check: 15:00</div>
@@ -69,7 +71,7 @@ const TopUI = ({ variant = 'boss' }) => {
             <div className="resource-row pill-design">
                 {/* HP */}
                 <div className="resource-item pill">
-                    <span className="res-icon">❤️</span>
+                    <img className="res-icon" src="/assets/icon_hp.svg" alt="HP" />
                     <div className="resource-bar">
                         <div className="resource-fill hp" style={{ width: `${(state.hp / state.maxHp) * 100}%` }}></div>
                     </div>
@@ -85,7 +87,7 @@ const TopUI = ({ variant = 'boss' }) => {
 
                 {/* ENERGY (QUEST) */}
                 <div className="resource-item pill">
-                    <span className="res-icon">⚡</span>
+                    <img className="res-icon" src="/assets/icon_energy.svg" alt="Energy" />
                     <div className="resource-bar">
                         <div className="resource-fill energy" style={{ width: `${(state.energy / state.maxEnergy) * 100}%` }}></div>
                     </div>
@@ -101,7 +103,7 @@ const TopUI = ({ variant = 'boss' }) => {
 
                 {/* STAMINA (ARENA/WORLD BOSS) */}
                 <div className="resource-item pill">
-                    <span className="res-icon">⚔️</span>
+                    <img className="res-icon" src="/assets/icon_battle.png" alt="Stamina" />
                     <div className="resource-bar">
                         <div className="resource-fill stamina" style={{ width: `${(state.stamina / state.maxStamina) * 100}%` }}></div>
                     </div>

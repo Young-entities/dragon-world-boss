@@ -9,7 +9,7 @@ import './components/OriginalStyles.css';
 
 // --- BOSS SCREEN ---
 const BossScreen = () => {
-  const { state, attackBoss, damagePopup, bossShake } = useGameState();
+  const { state, attackBoss, damagePopup, bossShake, isAttacking } = useGameState();
   const hpPercent = (state.bossHp / state.maxBossHp) * 100;
 
   return (
@@ -17,93 +17,92 @@ const BossScreen = () => {
 
       {/* MONSTER AREA */}
       <div style={{
-        flex: 1,
-        minHeight: 0,
+        height: '70%',
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
         position: 'relative',
         paddingBottom: '0',
-        paddingTop: '30px'
+        paddingTop: '0',
+        backgroundImage: 'url(/assets/bg_final_no_mercy.png)',
+        backgroundSize: '100% 100%',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        borderBottom: '2px solid #444'
       }}>
         {/* Floor Shadow */}
         <div style={{
-          position: 'absolute', bottom: '20px', width: '80%', height: '40px',
+          position: 'absolute', bottom: '15px', width: '80%', height: '40px',
           background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%)',
           zIndex: 1
         }}></div>
 
         <img
-          src="/assets/fire_demon_final.png"
+          src="/assets/overlord_absolute_final.png"
           className={`boss-animation ${bossShake ? 'shake-effect' : ''}`}
           style={{
             width: 'auto',
-            height: '98%',
+            height: '92%',
             maxWidth: '95%',
             objectFit: 'contain',
             objectPosition: 'bottom center',
             marginBottom: '0px',
             zIndex: 2,
-            filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))'
+            filter: 'drop-shadow(0 0 25px rgba(255,80,0,0.4)) contrast(1.1)'
           }}
         />
 
         {/* FLOATING DAMAGE TEXT - PURE CSS CONTROL */}
-        {damagePopup && (() => {
-          const isError = typeof damagePopup.val === 'string';
-          const isCrit = !isError && damagePopup.isCrit;
-          const baseColor = damagePopup.color || (isError ? '#ff4444' : (isCrit ? '#ff4400' : '#ffcc00'));
-          const baseShadow = isError ? '0 1px 2px #000' : '0 0 10px #ff0000';
-          const baseFontSize = isError ? '24px' : (isCrit ? '50px' : '40px');
-          return (
-            <div
-              className={`damage-number ${isError ? 'error' : (isCrit ? 'crit' : 'normal')}`}
-              key={damagePopup.id}
-              style={{
-                color: baseColor,
-                textShadow: baseShadow,
-                fontFamily: 'Cinzel, serif',
-                fontWeight: 700,
-                fontSize: baseFontSize
-              }}
-            >
-              {isError ? damagePopup.val : `-${damagePopup.val}`}
-            </div>
-          );
-        })()}
+        {/* FLOATING DAMAGE TEXT */}
+        {damagePopup && (
+          <div
+            className={`damage-number ${damagePopup.isCrit ? 'crit' : (typeof damagePopup.val === 'string' && isNaN(parseFloat(damagePopup.val)) ? 'error' : 'normal')}`}
+            key={damagePopup.id}
+          >
+            {typeof damagePopup.val === 'string' ? damagePopup.val : `-${damagePopup.val.toLocaleString()}`}
+          </div>
+        )}
 
       </div>
 
       {/* CONTROLS */}
       <div style={{
         flexShrink: 0,
-        background: 'linear-gradient(to top, #000 80%, transparent 100%)',
-        padding: '0 10px 10px',
+        background: '#000',
         position: 'relative',
         zIndex: 10
       }}>
 
-        {/* BOSS HP BAR */}
-        <div className="boss-bar-frame" style={{ margin: '0', borderRadius: '4px', height: '22px' }}>
+        {/* BOSS HP BAR - FULL WIDTH */}
+        <div className="boss-bar-frame" style={{
+          margin: '0',
+          borderRadius: '0',
+          height: '24px',
+          width: '100%',
+          borderLeft: 'none',
+          borderRight: 'none'
+        }}>
           <div className="boss-bar-fill" style={{ width: `${hpPercent}%` }}></div>
-          <div style={{ position: 'absolute', left: '10px', top: 0, bottom: 0, display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '14px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 10 }}>HP</div>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 5 }}>Overlord</div>
+          <div style={{ position: 'absolute', left: '15px', top: 0, bottom: 0, display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '13px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 10 }}>HP</div>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '15px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 5 }}>Overlord</div>
         </div>
 
-        {/* 3-BUTTON ROW */}
-        <div className="btn-row" style={{ padding: '10px 0 0' }}>
-          <button className="btn normal" onClick={() => attackBoss(1000)}>
-            <span className="btn-title">ATTACK x1</span>
-            <span className="btn-cost">⚡ 1 STAMINA</span>
-          </button>
-          <button className="btn united" onClick={() => attackBoss(5000)}>
-            <span className="btn-title">ATTACK x5</span>
-            <span className="btn-cost">⚡ 5 STAMINA</span>
-          </button>
-          <button className="btn special" onClick={() => attackBoss(50000)}>
-            <span className="btn-title">ATTACK x50</span>
-            <span className="btn-cost">💎 10 GEMS</span>
-          </button>
+        {/* 3-BUTTON ROW (Padded) */}
+        <div style={{ padding: '0 10px 10px' }}>
+          <div className="btn-row" style={{ padding: '10px 0 0' }}>
+            <button className="btn normal" onClick={() => attackBoss(1000)} disabled={isAttacking} style={{ opacity: isAttacking ? 0.7 : 1 }}>
+              <span className="btn-title">ATTACK x1</span>
+              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_energy.svg" alt="Energy" /> 1 ENERGY</span>
+            </button>
+            <button className="btn united" onClick={() => attackBoss(5000)} disabled={isAttacking} style={{ opacity: isAttacking ? 0.7 : 1 }}>
+              <span className="btn-title">ATTACK x5</span>
+              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_energy.svg" alt="Energy" /> 5 ENERGY</span>
+            </button>
+            <button className="btn special" onClick={() => attackBoss(50000)} disabled={isAttacking} style={{ opacity: isAttacking ? 0.7 : 1 }}>
+              <span className="btn-title">ATTACK x50</span>
+              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_gem.svg" alt="Gems" /> 10 GEMS</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -142,7 +141,7 @@ const GameLayout = () => {
       }}>
         <NavButton label="HOME" image="/assets/icon_home.png" active={false} onClick={() => { }} />
         <NavButton label="BATTLE" image="/assets/icon_battle.png" active={activeTab === 'boss'} onClick={() => setActiveTab('boss')} />
-        <NavButton label="MONSTER" image="/assets/icon_monster.png" active={activeTab === 'monsters'} onClick={() => setActiveTab('monsters')} />
+        <NavButton label="UNIT" image="/assets/icon_monster.png" active={activeTab === 'monsters'} onClick={() => setActiveTab('monsters')} />
         <NavButton label="EQUIP" image="/assets/icon_equip.png" active={activeTab === 'fusion'} onClick={() => alert("Fusion Coming!")} />
         <NavButton label="SHOP" image="/assets/icon_shop.png" active={activeTab === 'shop'} onClick={() => setActiveTab('shop')} />
       </div>

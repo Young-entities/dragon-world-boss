@@ -21,36 +21,26 @@ const tierOrder = [
 
 const fusionMonsters = [
   {
-    name: 'Arch Overlord',
-    tier: 'God',
-    icon: '/assets/masamune_icon.png',
-    full: '/assets/masamune_clean.png',
-    color: '#ff4400',
-    rankValue: 9
-  },
-  {
-    name: 'Overlord',
+    name: 'Inferno Dragon Knight Kael',
     tier: 'Demi God',
-    icon: '/assets/boss_clean.png',
-    full: '/assets/fire_demon_final.png',
+    icon: '/assets/overlord_portrait_v2_clean.png',
+    full: '/assets/overlord_absolute_final.png',
     color: '#ffaa00',
     rankValue: 8,
     aura: '#ff3300'
   },
   {
-    name: "Nature's Wrath",
-    tier: 'Demi God',
-    icon: '/assets/god_golem_final.png',
-    full: '/assets/god_golem_final.png',
-    color: '#00ff00',
-    rankValue: 8,
-    aura: '#00ff00'
+    name: 'Abyssal Sea Deity',
+    tier: 'Deity',
+    icon: '/assets/water_deity_card_bg.png',
+    full: '/assets/water_deity_card_bg.png',
+    color: '#ff00ff',
+    rankValue: 10,
+    aura: '#00ccff'
   }
 ];
 
-const fusionRecipes = {
-  'Overlord': 'Arch Overlord'
-};
+const fusionRecipes = {};
 
 const getFusionCost = (rank, type) => {
   if (type === 'money') return 1000000 * rank;
@@ -68,17 +58,27 @@ const getTierColor = (tier) => {
 const formatTierClass = (tier) => tier.toLowerCase().replace(/\s+/g, '-');
 const formatElementClass = (element) => (element || 'neutral').toLowerCase().replace(/\s+/g, '-');
 
+const pickFallbackMonster = (monsters, seed) => {
+  if (!monsters.length) return null;
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) | 0;
+  }
+  const safeIndex = Math.abs(hash) % monsters.length;
+  return monsters[safeIndex];
+};
+
 
 const MonsterTab = () => {
-  const { state, applyResourceDelta } = useGameState();
+  const { state, applyResourceDelta, updateMonsterCollection } = useGameState();
   const [subTab, setSubTab] = useState('fusions');
-  const [expandedTiers, setExpandedTiers] = useState({ God: false, 'Demi God': false, Chaos: false });
+  const [expandedTiers, setExpandedTiers] = useState({ God: false, 'Demi God': false, Chaos: false, Deity: false });
   const [selectedMonster, setSelectedMonster] = useState(null);
-  const [monsterInventory, setMonsterInventory] = useState({
-    'Arch Overlord': 1,
-    'Overlord': 2,
-    "Nature's Wrath": 1
-  });
+  const monsterInventory = useMemo(() => ({
+    'Inferno Dragon Knight Kael': 2,
+    'Abyssal Sea Deity': 1,
+    ...(state.monsterCollection || {})
+  }), [state.monsterCollection]);
   const [fusionSlots, setFusionSlots] = useState({ slot1: null, slot2: null });
   const [fusionModal, setFusionModal] = useState(null);
   const [fusionAnim, setFusionAnim] = useState({
@@ -89,6 +89,15 @@ const MonsterTab = () => {
     success: true
   });
   const animTimeouts = useRef([]);
+
+
+  const sortedMonsters = useMemo(() => {
+    return [...baseMonsters].sort((a, b) => {
+      const valA = tierOrder.find((t) => t.key === a.rank)?.rankValue || 0;
+      const valB = tierOrder.find((t) => t.key === b.rank)?.rankValue || 0;
+      return valB - valA;
+    });
+  }, []);
 
   const tierCounts = useMemo(() => {
     const counts = Object.fromEntries(tierOrder.map(t => [t.key, 0]));
@@ -117,7 +126,7 @@ const MonsterTab = () => {
     const inSlots = [fusionSlots.slot1, fusionSlots.slot2].filter((s) => s?.name === monster.name).length;
 
     if (currentQty === 0 || inSlots >= currentQty) {
-      window.alert(`You only have ${currentQty} ${monster.name}(s)!`);
+      window.alert(`You only have ${currentQty} ${monster.name} unit(s)!`);
       return;
     }
 
@@ -131,12 +140,12 @@ const MonsterTab = () => {
 
   const openFusionModal = (type) => {
     if (!fusionSlots.slot1 || !fusionSlots.slot2) {
-      window.alert('You need 2 monsters to fuse!');
+      window.alert('You need 2 units to fuse!');
       return;
     }
 
     if (fusionSlots.slot1.name !== fusionSlots.slot2.name) {
-      window.alert('You must fuse 2 of the SAME monster!');
+      window.alert('You must fuse 2 of the SAME unit!');
       return;
     }
 
@@ -161,7 +170,7 @@ const MonsterTab = () => {
     const name2 = fusionSlots.slot2.name;
 
     if (name1 !== name2) {
-      window.alert('You must fuse 2 of the SAME monster!');
+      window.alert('You must fuse 2 of the SAME unit!');
       return;
     }
 
@@ -189,23 +198,39 @@ const MonsterTab = () => {
     if (!rollFusionSuccess(chance)) {
       const fallbackTier = fusionSlots.slot1.tier;
       const sameTierMonsters = fusionMonsters.filter((monster) => monster.tier === fallbackTier);
-      const fallbackMonster = sameTierMonsters[Math.floor(Math.random() * sameTierMonsters.length)];
+      const fallbackMonster = pickFallbackMonster(sameTierMonsters, name1);
 
-      setMonsterInventory((prev) => ({
-        ...prev,
-        [name1]: (prev[name1] || 0) - 2,
-        [fallbackMonster.name]: (prev[fallbackMonster.name] || 0) + 1
-      }));
+      if (!fallbackMonster) {
+        window.alert('No fallback unit found for this tier.');
+        return;
+      }
+
+      const currentQty = monsterInventory[name1] || 0;
+      const nextName1 = Math.max(0, currentQty - 2);
+
+      if (fallbackMonster.name === name1) {
+        updateMonsterCollection({
+          [name1]: Math.max(0, nextName1 + 1)
+        });
+      } else {
+        updateMonsterCollection({
+          [name1]: nextName1,
+          [fallbackMonster.name]: (monsterInventory[fallbackMonster.name] || 0) + 1
+        });
+      }
 
       startFusionAnimation(name1, fallbackMonster.name, false);
       return;
     }
 
-    setMonsterInventory((prev) => ({
-      ...prev,
-      [name1]: (prev[name1] || 0) - 2,
-      [resultName]: (prev[resultName] || 0) + 1
-    }));
+    const currentQty = monsterInventory[name1] || 0;
+    const nextName1 = Math.max(0, currentQty - 2);
+    const nextResult = (monsterInventory[resultName] || 0) + 1;
+
+    updateMonsterCollection({
+      [name1]: nextName1,
+      [resultName]: nextResult
+    });
 
     startFusionAnimation(name1, resultName, true);
   };
@@ -242,7 +267,7 @@ const MonsterTab = () => {
   return (
     <div className="monster-tab-wrapper">
       <div className="sub-nav-tabs">
-        <button className={`sub-tab ${subTab === 'monster' ? 'active' : ''}`} onClick={() => setSubTab('monster')}>Monster</button>
+        <button className={`sub-tab ${subTab === 'monster' ? 'active' : ''}`} onClick={() => setSubTab('monster')}>Unit</button>
         <button className={`sub-tab ${subTab === 'fusions' ? 'active' : ''}`} onClick={() => setSubTab('fusions')}>Fusion</button>
         <button className={`sub-tab ${subTab === 'pets' ? 'active' : ''}`} onClick={() => setSubTab('pets')}>Pets</button>
         <button className={`sub-tab ${subTab === 'collections' ? 'active' : ''}`} onClick={() => setSubTab('collections')}>Collection</button>
@@ -250,7 +275,7 @@ const MonsterTab = () => {
 
       {subTab === 'monster' && (
         <div className="mon-tab-content active">
-          {baseMonsters.map((monster) => (
+          {sortedMonsters.map((monster) => (
             <div key={monster.id} className="mon-row" onClick={() => setSelectedMonster(monster)}>
               <div className={`mon-icon-frame tier-${formatTierClass(monster.rank)} element-${formatElementClass(monster.element)}`}>
                 <span className="frame-inner" />
@@ -265,7 +290,14 @@ const MonsterTab = () => {
                 <img src={monster.image} alt={monster.name} />
               </div>
               <div className="mon-info">
-                <div className="mon-name">{monster.name}</div>
+                <div className="mon-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <img
+                    src={monster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : `/assets/element_${(monster.element || 'neutral').toLowerCase()}.png`}
+                    alt={monster.element}
+                    style={{ width: '18px', height: '18px', objectFit: 'contain' }}
+                  />
+                  {monster.name}
+                </div>
                 <div className="mon-stats" style={{ color: getTierColor(monster.rank) }}>Tier: {monster.rank}</div>
                 <div className="mon-stats">
                   <span className="stat-attack">ATK {monster.stats.atk.toLocaleString()}</span>
@@ -347,7 +379,7 @@ const MonsterTab = () => {
 
           <div className="rank-list-unique">
             {tierOrder.map((tier) => {
-              const isExpandable = tier.key === 'God' || tier.key === 'Demi God' || tier.key === 'Chaos';
+              const isExpandable = tier.key === 'God' || tier.key === 'Demi God' || tier.key === 'Chaos' || tier.key === 'Deity';
               const isExpanded = expandedTiers[tier.key] || false;
 
               return (
@@ -409,7 +441,7 @@ const MonsterTab = () => {
           <div className="fusion-modal-content">
             <div className="fusion-modal-header">FUSION CHAMBER</div>
             <div className="fusion-modal-body">
-              <div className="fusion-modal-info">Monsters will be combined.</div>
+              <div className="fusion-modal-info">Units will be combined.</div>
               <div className="fusion-modal-ingredients">
                 <div className="fusion-modal-slot">
                   <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot1 ? `<img src='${fusionSlots.slot1.icon}' />` : '' }} />
@@ -477,12 +509,41 @@ const MonsterTab = () => {
         <div className="monster-detail-overlay" onClick={() => setSelectedMonster(null)}>
           <div className="monster-detail-card" onClick={(event) => event.stopPropagation()}>
             <div className="monster-detail-header">
-              <div className="monster-detail-name">{selectedMonster.name}</div>
+              <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <img
+                  src={selectedMonster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : `/assets/element_${(selectedMonster.element || 'neutral').toLowerCase()}.png`}
+                  alt={selectedMonster.element}
+                  style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                />
+                {selectedMonster.name}
+              </div>
               <button className="monster-detail-close" onClick={() => setSelectedMonster(null)}>✕</button>
             </div>
             <div className="monster-detail-body">
-              <div className="monster-detail-image">
-                <img src={selectedMonster.fullImage || selectedMonster.image} alt={selectedMonster.name} />
+              <div className="monster-detail-image" style={{
+                backgroundImage: `url(${selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png'})`,
+                backgroundSize: '100% 100%',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                paddingBottom: '20px',
+                minHeight: '260px',
+                borderRadius: '8px',
+                border: '1px solid #444',
+                position: 'relative'
+              }}>
+                <img
+                  src={selectedMonster.fullImage || selectedMonster.image}
+                  alt={selectedMonster.name}
+                  style={{
+                    maxHeight: '90%',
+                    maxWidth: '90%',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 0 15px rgba(255,100,0,0.4))'
+                  }}
+                />
               </div>
               <div className="monster-detail-stats">
                 <div className="monster-detail-tier" style={{ color: getTierColor(selectedMonster.rank) }}>
