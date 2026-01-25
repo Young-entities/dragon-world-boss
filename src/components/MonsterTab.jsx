@@ -292,7 +292,7 @@ const MonsterTab = () => {
               <div className="mon-info">
                 <div className="mon-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <img
-                    src={monster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (monster.element === 'Water' ? '/assets/element_water.png?v=6' : `/assets/element_${(monster.element || 'neutral').toLowerCase()}.png`)}
+                    src={monster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (monster.element === 'Water' ? '/assets/element_water.png?v=12' : `/assets/element_${(monster.element || 'neutral').toLowerCase()}.png`)}
                     alt={monster.element}
                     style={{ width: '18px', height: '18px', objectFit: 'contain' }}
                   />
@@ -511,7 +511,7 @@ const MonsterTab = () => {
             <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 0 2px 0', background: 'rgba(0,0,0,0.5)', borderBottom: '1px solid #333' }}>
               <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
-                  src={selectedMonster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (selectedMonster.element === 'Water' ? '/assets/element_water.png?v=6' : `/assets/element_${(selectedMonster.element || 'neutral').toLowerCase()}.png`)}
+                  src={selectedMonster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (selectedMonster.element === 'Water' ? '/assets/element_water.png?v=12' : `/assets/element_${(selectedMonster.element || 'neutral').toLowerCase()}.png`)}
                   alt={selectedMonster.element}
                   style={{ width: '20px', height: '20px', objectFit: 'contain' }}
                 />
