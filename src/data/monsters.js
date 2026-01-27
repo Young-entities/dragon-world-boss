@@ -15,7 +15,7 @@ export const monsters = [
     name: "Abyssal Sea Deity",
     rank: "Deity",
     element: "Water",
-    image: "/assets/water_deity_unit_final.png",
+    image: "/assets/water_deity_icon_clean.png",
     fullImage: "/assets/water_deity_unit_final.png",
     cardBackground: "/assets/water_deity_card_bg.png",
     owned: 1,
