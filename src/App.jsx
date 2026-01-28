@@ -10,10 +10,46 @@ import './components/OriginalStyles.css';
 // --- BOSS SCREEN ---
 const BossScreen = () => {
   const { state, attackBoss, damagePopup, bossShake, isAttacking } = useGameState();
-  const hpPercent = (state.bossHp / state.maxBossHp) * 100;
+  const hpPercent = state.maxBossHp > 0 ? (state.bossHp / state.maxBossHp) * 100 : 0;
+
+  // Timer Logic
+  const [now, setNow] = React.useState(Date.now());
+  React.useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const formatTime = (ms) => {
+    if (ms < 0) return "00:00:00";
+    const h = Math.floor(ms / (1000 * 60 * 60));
+    const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((ms % (1000 * 60)) / 1000);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  let timerText = "";
+  let overlay = null;
+
+  if (state.bossState === 'active') {
+    timerText = `Event Ends In: ${formatTime(state.bossEndTime - now)}`;
+  } else {
+    timerText = `Respawn In: ${formatTime(state.bossRespawnTime - now)}`;
+    overlay = (
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'rgba(0,0,0,0.7)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        zIndex: 50, color: '#fff'
+      }}>
+        <h1 style={{ fontSize: '40px', color: '#ff3333', textShadow: '0 0 10px #000' }}>BOSS DEFEATED</h1>
+        <h2 style={{ fontSize: '24px', marginTop: '10px' }}>{timerText}</h2>
+      </div>
+    );
+  }
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      {overlay}
 
       {/* MONSTER AREA */}
       <div style={{
@@ -24,7 +60,7 @@ const BossScreen = () => {
         position: 'relative',
         paddingBottom: '0',
         paddingTop: '0',
-        backgroundImage: 'url(/assets/bg_final_no_mercy.png)',
+        backgroundImage: 'url(/assets/electric_bg_final.png)',
         backgroundSize: '100% 100%',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -38,7 +74,7 @@ const BossScreen = () => {
         }}></div>
 
         <img
-          src="/assets/overlord_absolute_final.png"
+          src="/assets/electric_god_unit_clean.png"
           className={`boss-animation ${bossShake ? 'shake-effect' : ''}`}
           style={{
             width: 'auto',
@@ -84,21 +120,22 @@ const BossScreen = () => {
         }}>
           <div className="boss-bar-fill" style={{ width: `${hpPercent}%` }}></div>
           <div style={{ position: 'absolute', left: '15px', top: 0, bottom: 0, display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '13px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 10 }}>HP</div>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '15px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 5 }}>Overlord</div>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '15px', color: '#fff', textShadow: '0 1px 2px #000', zIndex: 5 }}>Thunder Emperor Zylos</div>
+          <div style={{ position: 'absolute', right: '15px', top: 0, bottom: 0, display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '12px', color: '#ffd700', textShadow: '0 1px 2px #000', zIndex: 10, fontFamily: 'monospace' }}>{timerText}</div>
         </div>
 
         {/* 3-BUTTON ROW (Padded) */}
         <div style={{ padding: '0 10px 10px' }}>
           <div className="btn-row" style={{ padding: '10px 0 0' }}>
-            <button className="btn normal" onClick={() => attackBoss(1000)} disabled={isAttacking} style={{ opacity: isAttacking ? 0.7 : 1 }}>
+            <button className="btn normal" onClick={() => attackBoss(1000)} disabled={isAttacking || state.bossState !== 'active'} style={{ opacity: (isAttacking || state.bossState !== 'active') ? 0.7 : 1 }}>
               <span className="btn-title">ATTACK x1</span>
               <span className="btn-cost"><img className="btn-icon" src="/assets/icon_energy.svg" alt="Energy" /> 1 ENERGY</span>
             </button>
-            <button className="btn united" onClick={() => attackBoss(5000)} disabled={isAttacking} style={{ opacity: isAttacking ? 0.7 : 1 }}>
+            <button className="btn united" onClick={() => attackBoss(5000)} disabled={isAttacking || state.bossState !== 'active'} style={{ opacity: (isAttacking || state.bossState !== 'active') ? 0.7 : 1 }}>
               <span className="btn-title">ATTACK x5</span>
               <span className="btn-cost"><img className="btn-icon" src="/assets/icon_energy.svg" alt="Energy" /> 5 ENERGY</span>
             </button>
-            <button className="btn special" onClick={() => attackBoss(50000)} disabled={isAttacking} style={{ opacity: isAttacking ? 0.7 : 1 }}>
+            <button className="btn special" onClick={() => attackBoss(50000)} disabled={isAttacking || state.bossState !== 'active'} style={{ opacity: (isAttacking || state.bossState !== 'active') ? 0.7 : 1 }}>
               <span className="btn-title">ATTACK x50</span>
               <span className="btn-cost"><img className="btn-icon" src="/assets/icon_gem.svg" alt="Gems" /> 10 GEMS</span>
             </button>

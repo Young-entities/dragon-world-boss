@@ -29,8 +29,8 @@ export const GameProvider = ({ children }) => {
         stamina: 50,
         maxStamina: 50,
         staminaSeconds: 120,
-        bossHp: 75000000,
-        maxBossHp: 75000000,
+        bossHp: 100000000000000,
+        maxBossHp: 100000000000000,
         totalDamage: 0,
         totalAttacks: 1204,
         overdrive: 0,
@@ -44,7 +44,10 @@ export const GameProvider = ({ children }) => {
             critDmg: 0
         },
         monsterCollection: buildInitialCollection(),
-        showLevelUp: false
+        showLevelUp: false,
+        bossState: 'active', // active, cooldown
+        bossEndTime: Date.now() + 23 * 60 * 60 * 1000,
+        bossRespawnTime: null
     });
 
     const [damagePopup, setDamagePopup] = useState(null);
@@ -109,6 +112,26 @@ export const GameProvider = ({ children }) => {
                 if (prev.maxStamina !== realMaxStamina) { updates.maxStamina = realMaxStamina; changed = true; }
                 if (prev.maxHp !== realMaxHp) { updates.maxHp = realMaxHp; changed = true; }
 
+                // BOSS LIFECYCLE LOGIC
+                const now = Date.now();
+                if (prev.bossState === 'active') {
+                    if (now >= prev.bossEndTime) {
+                        // Boss Time Expired (Fled) -> Cooldown
+                        updates.bossState = 'cooldown';
+                        updates.bossRespawnTime = now + 23 * 60 * 60 * 1000;
+                        updates.bossHp = 0; // Or keep it? Usually reset.
+                        changed = true;
+                    }
+                } else if (prev.bossState === 'cooldown') {
+                    if (now >= prev.bossRespawnTime) {
+                        // Respawn
+                        updates.bossState = 'active';
+                        updates.bossHp = prev.maxBossHp;
+                        updates.bossEndTime = now + 23 * 60 * 60 * 1000;
+                        changed = true;
+                    }
+                }
+
                 return changed ? { ...prev, ...updates } : prev;
             });
         }, 1000);
@@ -158,6 +181,7 @@ export const GameProvider = ({ children }) => {
     };
 
     const attackBoss = (dmgType) => {
+        if (state.bossState !== 'active') return;
         if (isAttacking) return;
 
         let costSt = 1, costGm = 0, baseDmg = 15000, attacks = 1, odGain = 0.8;
@@ -252,12 +276,23 @@ export const GameProvider = ({ children }) => {
                 tempEnergy = prev.maxEnergy;
             }
 
+            let newBossHp = Math.max(0, prev.bossHp - finalDmg);
+            let nextState = prev.bossState;
+            let nextRespawn = prev.bossRespawnTime;
+
+            if (prev.bossState === 'active' && newBossHp <= 0) {
+                nextState = 'cooldown';
+                nextRespawn = Date.now() + 23 * 60 * 60 * 1000;
+            }
+
             return {
                 ...prev,
                 stamina: tempStamina,
                 energy: tempEnergy,
                 gems: tempGems,
-                bossHp: Math.max(0, prev.bossHp - finalDmg),
+                bossHp: newBossHp,
+                bossState: nextState,
+                bossRespawnTime: nextRespawn,
                 totalDamage: prev.totalDamage + finalDmg,
                 totalAttacks: prev.totalAttacks + attacks,
                 money: prev.money + moneyGain,
