@@ -35,7 +35,7 @@ export const monsters = [
     image: "/assets/electric_god_icon.png",
     fullImage: "/assets/electric_god_unit_clean.png",
     cardBackground: "/assets/electric_bg_final.png",
-    leaderSkill: "Increases Overdrive Damage by 50%",
+    leaderSkill: "Increases Overdrive Damage by 85%",
     owned: 1,
     stats: {
       atk: 15411789,
@@ -48,17 +48,17 @@ export const monsters = [
   {
     id: 5,
     name: "Tidal Goddess Elara",
-    rank: "Primordial",
+    rank: "God",
     element: "Water",
     image: "/assets/water_god_icon.png",
     fullImage: "/assets/water_god_unit_clean.png",
     cardBackground: "/assets/water_deity_card_bg.png",
-    leaderSkill: "Increases HP by 50%",
-    owned: 1,
+    leaderSkill: "Lower Stamina Recharge Time: 5 Seconds",
+    owned: 4,
     stats: {
-      atk: 8503056,
-      def: 14348907,
-      hp: 23383404
+      atk: 104976,
+      def: 177147,
+      hp: 288684
     },
     description: "The source of all life-giving waters, her ocean currents can wash away entire civilizations."
   }
