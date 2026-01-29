@@ -144,6 +144,14 @@ const MonsterTab = () => {
       return;
     }
 
+    // Check Tier Compatibility
+    if (fusionSlots.slot1 && !fusionSlots.slot2) {
+      if (fusionSlots.slot1.tier !== monster.tier) {
+        window.alert('You can only fuse units of the same Tier!');
+        return;
+      }
+    }
+
     setFusionSlots((prev) => {
       if (!prev.slot1) return { ...prev, slot1: monster };
       if (!prev.slot2) return { ...prev, slot2: monster };
@@ -278,7 +286,6 @@ const MonsterTab = () => {
   const getSlotStyle = (slot) => {
     if (!slot) return undefined;
     return {
-      border: 'none',
       background: 'transparent',
       boxShadow: `0 0 15px ${slot.aura || slot.color}`
     };
@@ -349,11 +356,6 @@ const MonsterTab = () => {
                       <img src="/assets/fusion_vortex.png" className="vortex-bg" />
                     )}
                   </div>
-                  {fusionSlots.slot1 && (
-                    <div className="fusion-slot-name" style={{ color: getTierColor(fusionSlots.slot1.tier) }}>
-                      {fusionSlots.slot1.name}
-                    </div>
-                  )}
                 </div>
 
                 <div className="fusion-plus">
@@ -382,11 +384,6 @@ const MonsterTab = () => {
                       <img src="/assets/fusion_vortex.png" className="vortex-bg" />
                     )}
                   </div>
-                  {fusionSlots.slot2 && (
-                    <div className="fusion-slot-name" style={{ color: getTierColor(fusionSlots.slot2.tier) }}>
-                      {fusionSlots.slot2.name}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -537,7 +534,7 @@ const MonsterTab = () => {
             {/* Auto Transition - No Continue Button */}
           </div>
 
-          {fusionAnim.phase === 6 && phase6Monster && (
+          {fusionAnim.phase === 6 && fusionAnim.success && phase6Monster && (
             <div className="monster-detail-overlay" style={{ zIndex: 21000, background: 'rgba(0,0,0,0.4)', position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <style>{`
                 @keyframes scaleIn {

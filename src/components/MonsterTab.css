@@ -647,8 +647,8 @@
 }
 
 .fusion-slot {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   background: #1a1a1a;
   border: 3px solid #666;
   border-radius: 10px;
@@ -668,7 +668,7 @@
 }
 
 .fusion-slot.filled {
-  border: none;
+  border: 3px solid transparent;
   background: transparent;
 }
 
@@ -1202,21 +1202,82 @@
   position: relative;
   opacity: 0;
   transform: scale(0.5);
+  transform-style: preserve-3d;
+  isolation: isolate;
+  /* Create new stacking context */
+  z-index: 100;
 }
 
-.result-glow-ring {
-  position: absolute;
-  inset: -50px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
-  animation: pulseGlow 2s ease-in-out infinite;
+/* CSS Magic Circle Platform w/ Rainbow Style */
+/* Nuke the Ring - User Request */
+.fusion-phase-5 .result-glow-ring {
+  display: none !important;
+}
+
+/* Solid Black Background - User Request */
+.fusion-phase-5.fusion-anim-overlay {
+  background: #000000 !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+@keyframes platformSpin {
+  from {
+    transform: translate(-50%, 40%) scaleY(0.3) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, 40%) scaleY(0.3) rotate(360deg);
+  }
+}
+
+@keyframes spinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes rainbowPulse {
+  0% {
+    filter: drop-shadow(0 0 10px #00ffff) hue-rotate(0deg);
+    opacity: 0.8;
+  }
+
+  50% {
+    filter: drop-shadow(0 0 20px #ff00ff) hue-rotate(180deg);
+    opacity: 1;
+  }
+
+  100% {
+    filter: drop-shadow(0 0 10px #00ffff) hue-rotate(360deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes platformSpin {
+  from {
+    transform: translate(-50%, -50%) scaleY(0.25) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scaleY(0.25) rotate(360deg);
+  }
 }
 
 #anim-result {
+  position: relative;
+  z-index: 21000 !important;
+  /* On top of platform (20005) */
   max-height: 55cqh;
   max-width: 90cqw;
   height: auto;
   width: auto;
-  filter: drop-shadow(0 0 40px gold) drop-shadow(0 0 80px #ff6600) drop-shadow(0 0 16px rgba(120, 220, 255, 0.5));
+  filter: none !important;
+  /* No Glow */
 }
 
 .fusion-continue {
@@ -1407,12 +1468,7 @@
 }
 
 .particle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: radial-gradient(circle, #fff, #ffd700);
-  border-radius: 50%;
-  box-shadow: 0 0 20px #ffd700;
+  display: none !important;
 }
 
 .particle.p1 {
@@ -1450,51 +1506,116 @@
   animation-delay: 0.5s;
 }
 
-.fusion-phase-1 #anim-left,
-.fusion-phase-1 #anim-right {
+/* Allow Overlay to Break Out */
+.monster-tab-container {
+  overflow: visible !important;
+  position: relative;
+}
+
+/* Safe Blackout Overlay - Relative to Container */
+.fusion-anim-overlay {
+  position: absolute !important;
+  top: -10% !important;
+  left: -10% !important;
+  width: 120% !important;
+  height: 120% !important;
+  background: #000000 !important;
   opacity: 1 !important;
-  transition: all 0.9s cubic-bezier(0.22, 1.1, 0.36, 1);
+  z-index: 20000 !important;
+}
+
+.fusion-phase-5.fusion-anim-overlay {
+  background: #000000 !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+/* Nuke Inner Yellow Elements in Phase 5 */
+.fusion-phase-5 #anim-bg,
+.fusion-phase-5 #light-rays,
+.fusion-phase-5 #fusion-orb,
+.fusion-phase-5 #energy-particles {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+@keyframes bgScroll {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 512px 512px;
+  }
 }
 
 .fusion-phase-1 #anim-left {
-  left: 6% !important;
-  transform: translateY(-50%) scale(1) !important;
+  left: 15% !important;
+  /* Adjusted for Center Anchor */
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scaleX(-1) scale(1) !important;
+  transition: all 0.9s cubic-bezier(0.22, 1.1, 0.36, 1);
 }
 
 .fusion-phase-1 #anim-right {
-  right: 6% !important;
-  transform: translateY(-50%) scaleX(-1) scale(1) !important;
+  right: 15% !important;
+  /* Adjusted for Center Anchor */
+  opacity: 1 !important;
+  transform: translate(50%, -50%) scale(1) !important;
 }
 
+/* Phase 2: Charging with Hover (Drifting In) */
 .fusion-phase-2 #anim-left {
-  animation: monsterChargeLeft 0.8s ease-in-out infinite alternate !important;
+  left: 35% !important;
+  /* Drift to nearby, leave room for impact */
+  opacity: 1 !important;
+  /* Keep visible! */
+  transition: left 1.5s ease-in !important;
+  animation: monsterChargeLeft 3s ease-in-out infinite !important;
 }
 
 .fusion-phase-2 #anim-right {
-  animation: monsterChargeRight 0.8s ease-in-out infinite alternate !important;
+  right: 35% !important;
+  /* Drift to nearby, leave room for impact */
+  opacity: 1 !important;
+  /* Keep visible! */
+  transition: right 1.5s ease-in !important;
+  animation: monsterChargeRight 3s ease-in-out infinite !important;
 }
 
 @keyframes monsterChargeLeft {
   0% {
-    transform: translateY(-50%) scale(1);
-    filter: brightness(1) drop-shadow(0 0 0px transparent);
+    transform: translate(-50%, -50%) scaleX(-1) scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: translate(-50%, calc(-50% - 12px)) scaleX(-1) scale(1.05);
+    /* Float Up, Center X */
+    filter: brightness(1.2) drop-shadow(0 0 15px cyan);
   }
 
   100% {
-    transform: translateY(-52%) scale(1.1);
-    filter: brightness(1.3) drop-shadow(0 0 15px cyan);
+    transform: translate(-50%, -50%) scaleX(-1) scale(1);
+    filter: brightness(1);
   }
 }
 
 @keyframes monsterChargeRight {
   0% {
-    transform: translateY(-50%) scaleX(-1) scale(1);
-    filter: brightness(1) drop-shadow(0 0 0px transparent);
+    transform: translate(50%, -50%) scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: translate(50%, calc(-50% - 12px)) scale(1.05);
+    /* Float Up, Center X */
+    filter: brightness(1.2) drop-shadow(0 0 15px cyan);
   }
 
   100% {
-    transform: translateY(-52%) scaleX(-1) scale(1.1);
-    filter: brightness(1.3) drop-shadow(0 0 15px cyan);
+    transform: translate(50%, -50%) scale(1);
+    filter: brightness(1);
   }
 }
 
@@ -1503,41 +1624,62 @@
 }
 
 .fusion-phase-3 #anim-left {
-  left: 46% !important;
+  left: 50% !important;
+  /* Center X */
   opacity: 0 !important;
   filter: blur(4px) !important;
-  transition: left 1.1s ease-in, opacity 0.2s ease-in 0.8s !important;
-  animation: none !important;
+  transition: left 0.1s linear, opacity 0.1s ease-in 0.5s !important;
+  /* Keep animation running to prevent jump */
+  animation: monsterChargeLeft 3s ease-in-out infinite !important;
 }
 
 .fusion-phase-3 #anim-right {
-  right: 46% !important;
+  right: 50% !important;
+  /* Center X */
   opacity: 0 !important;
   filter: blur(4px) !important;
-  transition: right 1.1s ease-in, opacity 0.2s ease-in 0.8s !important;
-  animation: none !important;
+  transition: right 0.1s linear, opacity 0.1s ease-in 0.5s !important;
+  /* Keep animation running to prevent jump */
+  animation: monsterChargeRight 3s ease-in-out infinite !important;
 }
 
+
+
 .fusion-phase-3 #fusion-orb {
-  width: 240px !important;
-  height: 240px !important;
+  width: 200px !important;
+  /* Small */
+  height: 200px !important;
   opacity: 1 !important;
-  transition: all 1.1s ease-out 0.4s !important;
-  animation: orbPulse 0.9s ease-in-out infinite;
+  background: radial-gradient(circle, #ffffff 40%, rgba(255, 255, 255, 0) 70%) !important;
+  box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.5) !important;
+  filter: blur(8px) !important;
+  mix-blend-mode: normal !important;
+  animation: smokeExpand 0.4s ease-out forwards !important;
+}
+
+@keyframes smokeExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(2.0);
+    opacity: 0;
+  }
 }
 
 .fusion-phase-3 #fusion-orb::after {
-  opacity: 1 !important;
-  animation: ringExpand 1.4s ease-in-out infinite;
+  display: none !important;
 }
 
 .fusion-phase-4 #anim-flash {
-  animation: flashBang 1.5s forwards !important;
+  display: none !important;
+  /* Remove flash effect */
 }
 
 .fusion-phase-4 #light-rays {
-  opacity: 1 !important;
-  animation: raySpin 2.2s ease-in-out infinite;
+  display: none !important;
 }
 
 .fusion-phase-4.fusion-anim-overlay {
@@ -2184,3 +2326,5 @@
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
+/* Text Override Removed */
