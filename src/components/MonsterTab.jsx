@@ -48,12 +48,22 @@ const fusionMonsters = [
     rankValue: 10,
     aura: '#00ccff',
     stats: { atk: '314,928', def: '531,441' }
+  },
+  {
+    name: 'Dark Deity Azaerth', /* Renamed */
+    tier: 'Deity',
+    icon: '/assets/dark_deity_icon.png',
+    full: '/assets/dark_deity_unit.png',
+    color: '#ff00ff',
+    rankValue: 10,
+    aura: '#aa00ff',
+    stats: { atk: '669,222', def: '255,879' } /* Base Dark * 3^9 */
   }
 ];
 
 const fusionRecipes = {
   'Tidal Goddess Elara': 'Abyssal Queen Nereid',
-  // 'Inferno Dragon Knight Kael': 'Next Fire Unit?'
+  'Abyssal Queen Nereid': 'Dark Deity Azaerth'
 };
 
 const getFusionCost = (rank, type) => {
@@ -91,7 +101,8 @@ const MonsterTab = () => {
   const monsterInventory = useMemo(() => ({
     'Inferno Dragon Knight Kael': 2,
     'Abyssal Sea Deity': 1,
-    ...(state.monsterCollection || {})
+    ...(state.monsterCollection || {}),
+    'Dark Deity Azaerth': 2,   /* Force Test: Overwrite any saved state */
   }), [state.monsterCollection]);
   const [fusionSlots, setFusionSlots] = useState({ slot1: null, slot2: null });
   const [fusionModal, setFusionModal] = useState(null);
@@ -319,7 +330,7 @@ const MonsterTab = () => {
               <div className="mon-info">
                 <div className="mon-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <img
-                    src={`/assets/element_${(monster.element || 'neutral').toLowerCase()}_circle.png?v=102`}
+                    src={`/assets/element_${(monster.element || 'neutral').toLowerCase()}_circle.png?v=110`}
                     alt={monster.element}
                     style={{ width: '18px', height: '18px', objectFit: 'contain' }}
                   />
@@ -534,7 +545,7 @@ const MonsterTab = () => {
             {/* Auto Transition - No Continue Button */}
           </div>
 
-          {fusionAnim.phase === 6 && fusionAnim.success && phase6Monster && (
+          {fusionAnim.phase === 6 && phase6Monster && (
             <div className="monster-detail-overlay" style={{ zIndex: 21000, background: 'rgba(0,0,0,0.4)', position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <style>{`
                 @keyframes scaleIn {
@@ -571,7 +582,7 @@ const MonsterTab = () => {
 
                 <div className="monster-detail-body" style={{ padding: '0', flex: 1 }}>
                   <div className="monster-detail-image" style={{
-                    backgroundImage: `url(${(phase6Monster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=75)`,
+                    backgroundImage: `url(${(phase6Monster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=110)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     display: 'flex',
@@ -582,7 +593,7 @@ const MonsterTab = () => {
                     position: 'relative'
                   }}>
                     <img
-                      src={`${phase6Monster.fullImage || phase6Monster.full || phase6Monster.image}?v=75`}
+                      src={`${phase6Monster.fullImage || phase6Monster.full || phase6Monster.image}?v=110`}
                       alt={phase6Monster.name}
                       style={{ maxHeight: '95%', maxWidth: '95%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
                     />
@@ -655,7 +666,7 @@ const MonsterTab = () => {
             </div>
             <div className="monster-detail-body">
               <div className="monster-detail-image" style={{
-                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=75)`,
+                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=110)`,
                 backgroundSize: '100% 100%',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -669,13 +680,21 @@ const MonsterTab = () => {
                 position: 'relative'
               }}>
                 <img
-                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=75`}
+                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=110`}
                   alt={selectedMonster.name}
                   style={{
                     maxHeight: '90%',
                     maxWidth: '90%',
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 0 15px rgba(255,100,0,0.4))'
+                    filter: `drop-shadow(0 0 15px ${selectedMonster.element === 'Fire' ? 'rgba(255, 50, 0, 0.6)' :
+                      selectedMonster.element === 'Water' ? 'rgba(0, 100, 255, 0.6)' :
+                        selectedMonster.element === 'Earth' || selectedMonster.element === 'Grass' ? 'rgba(0, 255, 50, 0.6)' :
+                          selectedMonster.element === 'Wind' || selectedMonster.element === 'Air' ? 'rgba(0, 255, 255, 0.6)' :
+                            selectedMonster.element === 'Electric' ? 'rgba(0, 0, 0, 0)' :
+                              selectedMonster.element === 'Dark' ? 'rgba(130, 0, 255, 0.7)' :
+                                selectedMonster.element === 'Holy' || selectedMonster.element === 'Light' ? 'rgba(255, 215, 0, 0.6)' :
+                                  'rgba(255, 255, 255, 0.3)'
+                      })`
                   }}
                 />
               </div>

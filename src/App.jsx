@@ -84,7 +84,7 @@ const BossScreen = () => {
             objectPosition: 'bottom center',
             marginBottom: '0px',
             zIndex: 2,
-            filter: 'drop-shadow(0 0 25px rgba(255,80,0,0.4)) contrast(1.1)'
+            filter: 'contrast(1.1)'
           }}
         />
 

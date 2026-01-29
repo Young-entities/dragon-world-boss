@@ -61,6 +61,57 @@ export const monsters = [
       hp: 288684
     },
     description: "The source of all life-giving waters, her ocean currents can wash away entire civilizations."
+  },
+  {
+    id: 6,
+    name: "Dark Deity Azaerth",
+    rank: "Primordial",
+    element: "Dark",
+    image: "/assets/dark_deity_icon.png",
+    fullImage: "/assets/dark_deity_unit_v4.png",
+    cardBackground: "/assets/dark_void_bg.png",
+    leaderSkill: "Increase Attack 5%",
+    owned: 2,
+    stats: {
+      atk: 18069123,
+      def: 6908542,
+      hp: 20194876
+    },
+    description: "A dark entity from the void, wielding a massive lance of chaos."
+  },
+  {
+    id: 7,
+    name: "Inferno Empress Pyra",
+    rank: "Primordial",
+    element: "Fire",
+    image: "/assets/fire_empress_icon.png",
+    fullImage: "/assets/fire_empress_unit.png",
+    cardBackground: "/assets/fire_empress_bg.png",
+    leaderSkill: "Lower Energy Recharge Time: 25 Seconds",
+    owned: 1,
+    stats: {
+      atk: 12754584,
+      def: 9565938,
+      hp: 22320522
+    },
+    description: "The supreme ruler of the eternal flames, wielding a sword forged in the planet's core."
+  },
+  {
+    id: 8,
+    name: "Divine Ocean Oracle",
+    rank: "Primordial",
+    element: "Water",
+    image: "/assets/water_oracle_icon.png",
+    fullImage: "/assets/water_oracle_unit.png",
+    cardBackground: "/assets/water_oracle_bg.png",
+    leaderSkill: "Lower Stamina Recharge Time: 25 Seconds",
+    owned: 1,
+    stats: {
+      atk: 8503056,
+      def: 14348907,
+      hp: 23383404
+    },
+    description: "An ancient celestial being who guards the secrets of the deep."
   }
 ];
 
