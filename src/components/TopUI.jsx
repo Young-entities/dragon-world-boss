@@ -12,7 +12,7 @@ const formatTime = (seconds) => {
 };
 
 const TopUI = ({ variant = 'boss' }) => {
-    const { state, resourcePopups } = useGameState();
+    const { state, resourcePopups, setSkillModalOpen } = useGameState();
     const xpPercent = (state.xp / state.xpToLevel) * 100;
     const odPercent = (state.overdrive / state.maxOverdrive) * 100;
 
@@ -25,9 +25,14 @@ const TopUI = ({ variant = 'boss' }) => {
 
             <div className="top-row">
                 {/* LEVEL BADGE & XP */}
-                <div className="level-badge">
+                <div
+                    className={`level-badge ${state.skillPoints > 0 ? 'has-points' : ''}`}
+                    onClick={() => setSkillModalOpen(true)}
+                    style={{ cursor: state.skillPoints > 0 ? 'pointer' : 'default' }}
+                >
                     <div className="level-number">
                         <span className="level-value">{state.level}</span>
+                        {state.skillPoints > 0 && <div className="points-notif">UP</div>}
                     </div>
 
                     {/* XP BAR WRAPPER */}

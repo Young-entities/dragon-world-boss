@@ -1,0 +1,197 @@
+.battle-menu-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    background: radial-gradient(circle at center, #2a0a4a 0%, #000 100%);
+    padding: 10px;
+    overflow-y: auto;
+    gap: 15px;
+}
+
+.battle-banners-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 20px;
+}
+
+/* BANNER CONTAINER */
+.battle-banner-container {
+    position: relative;
+    width: 100%;
+    height: 130px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.1s ease;
+    display: flex;
+    flex-direction: column;
+    background: #111;
+}
+
+.battle-banner-container:active {
+    transform: scale(0.98);
+}
+
+/* ART BOX */
+.banner-art-box {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+    background-color: #0c0f14;
+    position: relative;
+    border: 3px solid #ffd700;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.banner-overlay-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+.banner-text-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 15px;
+    z-index: 2;
+}
+
+.banner-category {
+    font-size: 11px;
+    font-weight: 900;
+    color: #00e5ff;
+    text-transform: uppercase;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px rgba(0, 229, 255, 0.5);
+    margin-bottom: 2px;
+}
+
+.banner-main-title {
+    font-size: 22px;
+    font-weight: 950;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 3px 5px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+/* FOOTER STATUS BAR */
+.banner-status-bar {
+    height: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 12px;
+    background: linear-gradient(180deg, #664400 0%, #332200 100%);
+    border: 3px solid #ffd700;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.status-label {
+    font-size: 10px;
+    font-weight: 900;
+    color: #ffd700;
+    text-transform: uppercase;
+    text-shadow: 0 1px 1px #000;
+}
+
+.status-timer {
+    font-size: 10px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 1px 1px #000;
+}
+
+/* CARD SPECIFIC ART BORDERS */
+.boss-raid .banner-art-box {
+    border-color: #ff3300;
+}
+
+.boss-raid .banner-status-bar {
+    background: linear-gradient(180deg, #882200 0%, #441100 100%);
+    border-color: #ff3300;
+}
+
+.boss-raid .banner-category {
+    color: #ff6600;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px rgba(255, 102, 0, 0.5);
+}
+
+.dungeon-evolver .banner-art-box {
+    border-color: #ff00ff;
+}
+
+.dungeon-evolver .banner-status-bar {
+    background: linear-gradient(180deg, #660066 0%, #330033 100%);
+    border-color: #ff00ff;
+}
+
+.dungeon-evolver .banner-category {
+    color: #ff66ff;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px rgba(255, 102, 255, 0.5);
+}
+
+.arena-rank .banner-art-box {
+    border-color: #00ffaa;
+}
+
+.arena-rank .banner-status-bar {
+    background: linear-gradient(180deg, #006644 0%, #003322 100%);
+    border-color: #00ffaa;
+}
+
+.arena-rank .banner-category {
+    color: #00ffaa;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px rgba(0, 255, 170, 0.5);
+}
+
+.tower-climb .banner-art-box {
+    border-color: #aa00ff;
+}
+
+.tower-climb .banner-status-bar {
+    background: linear-gradient(180deg, #440066 0%, #220033 100%);
+    border-color: #aa00ff;
+}
+
+.tower-climb .banner-category {
+    color: #cc66ff;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px rgba(170, 0, 255, 0.5);
+}
+
+/* LOCKED STATE */
+.battle-banner-container.locked {
+    filter: grayscale(0.7) brightness(0.6);
+}
+
+.banner-locked-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.lock-icon {
+    font-size: 30px;
+    filter: drop-shadow(0 0 10px #000);
+}
+
+.lock-text {
+    font-size: 14px;
+    font-weight: 950;
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px #000;
+}

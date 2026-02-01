@@ -3,8 +3,44 @@ import { GameContext } from './gameContext';
 import { monsters as baseMonsters } from '../data/monsters';
 
 const buildInitialCollection = () => (
-    Object.fromEntries(baseMonsters.map((monster) => [monster.name, monster.owned ?? 1]))
+    Object.fromEntries(baseMonsters.map((monster) => [monster.name, 5]))
 );
+
+const getLeaderSkillEffect = (leaderName) => {
+    if (!leaderName) return {};
+    const leader = baseMonsters.find(m => m.name === leaderName);
+    if (!leader || !leader.leaderSkill) return {};
+
+    const skill = leader.leaderSkill;
+    const effect = {};
+
+    if (skill.includes("Increase Attack")) {
+        const val = parseInt(skill.match(/\d+/)[0]);
+        effect.atkMult = 1 + (val / 100);
+    }
+    if (skill.includes("Increase Experience Gain")) {
+        const val = parseInt(skill.match(/\d+/)[0]);
+        effect.xpMult = 1 + (val / 100);
+    }
+    if (skill.includes("Overdrive Damage")) {
+        const val = parseInt(skill.match(/\d+/)[0]);
+        effect.odCritMult = val / 100;
+    }
+    if (skill.includes("Energy Recharge Time")) {
+        const val = parseInt(skill.match(/\d+/)[0]);
+        effect.energyReduction = val;
+    }
+    if (skill.includes("Stamina Recharge Time")) {
+        const val = parseInt(skill.match(/\d+/)[0]);
+        effect.staminaReduction = val;
+    }
+    if (skill.includes("Increase Defense")) {
+        const val = parseInt(skill.match(/\d+/)[0]);
+        effect.defMult = 1 + (val / 100);
+    }
+
+    return effect;
+};
 
 const getCollectionAttack = (collection) => (
     baseMonsters.reduce((total, monster) => {
@@ -14,41 +50,115 @@ const getCollectionAttack = (collection) => (
 );
 
 export const GameProvider = ({ children }) => {
-    const [state, setState] = useState({
-        money: 416531953,
-        gems: 5717,
-        level: 42,
-        xp: 4200,
-        xpToLevel: 50000,
-        hp: 100,
-        maxHp: 100,
-        hpSeconds: 60,
-        energy: 50,
-        maxEnergy: 50,
-        energySeconds: 120,
-        stamina: 50,
-        maxStamina: 50,
-        staminaSeconds: 120,
-        bossHp: 100000000000000,
-        maxBossHp: 100000000000000,
-        totalDamage: 0,
-        totalAttacks: 1204,
-        overdrive: 0,
-        maxOverdrive: 100,
-        skillPoints: 0,
-        stats: {
-            energy: 0,
-            stamina: 0,
-            attack: 0,
-            defense: 0,
-            critDmg: 0
-        },
-        monsterCollection: buildInitialCollection(),
-        showLevelUp: false,
-        bossState: 'active', // active, cooldown
-        bossEndTime: Date.now() + 23 * 60 * 60 * 1000,
-        bossRespawnTime: null
+    const [state, setState] = useState(() => {
+        const saved = localStorage.getItem('monster_warlord_save');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                const defaultState = {
+                    money: 50000,
+                    gems: 50000,
+                    level: 1,
+                    xp: 0,
+                    xpToLevel: 1000,
+                    hp: 100,
+                    maxHp: 100,
+                    hpSeconds: 60,
+                    energy: 50,
+                    maxEnergy: 50,
+                    energySeconds: 120,
+                    stamina: 50,
+                    maxStamina: 50,
+                    staminaSeconds: 120,
+                    bossHp: 500000000,
+                    maxBossHp: 500000000,
+                    worldBossDamage: 0,
+                    worldBossPlayers: [
+                        { name: "Top-G", damage: 150000000 },
+                        { name: "Slayer", damage: 120000000 },
+                        { name: "Shadow", damage: 90000000 }
+                    ],
+                    totalDamage: 0,
+                    totalAttacks: 0,
+                    overdrive: 0,
+                    maxOverdrive: 100,
+                    skillPoints: 0,
+                    stats: {
+                        health: 0, energy: 0, stamina: 0, attack: 0, defense: 0, od: 0
+                    },
+                    monsterCollection: buildInitialCollection(),
+                    leader: "Cinderpaw",
+                    summonCurrency: 0,
+                    showLevelUp: false,
+                    bossState: 'active',
+                    bossEndTime: Date.now() + 12 * 60 * 60 * 1000,
+                    bossRespawnTime: null
+                };
+
+                return {
+                    ...defaultState,
+                    ...parsed,
+                    gems: 50000,
+                    bossHp: 500000000000,
+                    maxBossHp: 500000000000,
+                    showLevelUp: false,
+                    bossState: 'active',
+                    monsterCollection: buildInitialCollection()
+                };
+            } catch (e) {
+                console.error("Save load failed", e);
+            }
+        }
+
+        return {
+            money: 50000,
+            gems: 50000,
+            level: 1,
+            xp: 0,
+            xpToLevel: 1000,
+            hp: 100,
+            maxHp: 100,
+            hpSeconds: 60,
+            energy: 50,
+            maxEnergy: 50,
+            energySeconds: 120,
+            stamina: 50,
+            maxStamina: 50,
+            staminaSeconds: 120,
+            bossHp: 500000000000,
+            maxBossHp: 500000000000,
+            worldBossDamage: 0,
+            worldBossPlayers: [
+                { name: "Top-G", damage: 150000000000 },
+                { name: "Slayer", damage: 120000000000 },
+                { name: "Shadow", damage: 90000000000 }
+            ],
+            totalDamage: 0,
+            totalAttacks: 0,
+            overdrive: 0,
+            maxOverdrive: 100,
+            skillPoints: 0,
+            stats: {
+                health: 0,
+                energy: 0,
+                stamina: 0,
+                attack: 0,
+                defense: 0,
+                od: 0
+            },
+            monsterCollection: buildInitialCollection(),
+            leader: "Cinderpaw",
+            summonCurrency: 0,
+            showLevelUp: false,
+            bossState: 'active',
+            bossEndTime: Date.now() + 12 * 60 * 60 * 1000,
+            bossRespawnTime: null
+        };
     });
+
+    useEffect(() => {
+        localStorage.setItem('monster_warlord_save', JSON.stringify(state));
+    }, [state]);
 
     const [damagePopup, setDamagePopup] = useState(null);
     const [bossShake, setBossShake] = useState(false);
@@ -62,39 +172,39 @@ export const GameProvider = ({ children }) => {
                 let updates = {};
                 let changed = false;
 
-                // Stat Bonuses
-                const bonusStamina = prev.stats.stamina; // +1 Max Stamina per point
-                const bonusHp = prev.stats.energy * 10; // +10 Max HP per point 
+                const bonusStamina = prev.stats.stamina;
+                const bonusHp = prev.stats.health * 10;
+                const bonusEnergy = prev.stats.energy;
 
                 const realMaxStamina = 50 + bonusStamina;
                 const realMaxHp = 100 + bonusHp;
+                const realMaxEnergy = 50 + bonusEnergy;
 
-                if (prev.energy < prev.maxEnergy) {
+                const leaderEffect = getLeaderSkillEffect(prev.leader);
+                const baseWait = 120;
+                const energyWait = Math.max(10, baseWait - (leaderEffect.energyReduction || 0));
+                const staminaWait = Math.max(10, baseWait - (leaderEffect.staminaReduction || 0));
+
+                if (prev.energy < realMaxEnergy) {
                     if (prev.energySeconds > 0) {
-                        updates.energySeconds = prev.energySeconds - 1;
+                        updates.energySeconds = Math.min(prev.energySeconds - 1, energyWait);
                         changed = true;
                     } else {
-                        updates.energySeconds = 120;
+                        updates.energySeconds = energyWait;
                         updates.energy = prev.energy + 1;
                         changed = true;
                     }
-                } else if (prev.energySeconds !== 120) {
-                    updates.energySeconds = 120;
-                    changed = true;
                 }
 
                 if (prev.stamina < realMaxStamina) {
                     if (prev.staminaSeconds > 0) {
-                        updates.staminaSeconds = prev.staminaSeconds - 1;
+                        updates.staminaSeconds = Math.min(prev.staminaSeconds - 1, staminaWait);
                         changed = true;
                     } else {
-                        updates.staminaSeconds = 120;
+                        updates.staminaSeconds = staminaWait;
                         updates.stamina = prev.stamina + 1;
                         changed = true;
                     }
-                } else if (prev.staminaSeconds !== 120) {
-                    updates.staminaSeconds = 120;
-                    changed = true;
                 }
 
                 if (prev.hp < realMaxHp) {
@@ -108,26 +218,34 @@ export const GameProvider = ({ children }) => {
                     }
                 }
 
-                // If max values changed due to stats, update them in state for UI consistency
-                if (prev.maxStamina !== realMaxStamina) { updates.maxStamina = realMaxStamina; changed = true; }
-                if (prev.maxHp !== realMaxHp) { updates.maxHp = realMaxHp; changed = true; }
+                if (prev.bossState === 'active' && prev.bossHp > 0) {
+                    const simulatedDmg = Math.floor(Math.random() * 500000) + 100000;
+                    updates.bossHp = Math.max(0, prev.bossHp - simulatedDmg);
+                    updates.worldBossPlayers = prev.worldBossPlayers.map(p => ({
+                        ...p,
+                        damage: p.damage + Math.floor(simulatedDmg * (0.8 + Math.random() * 0.4))
+                    }));
+                    changed = true;
+                }
 
-                // BOSS LIFECYCLE LOGIC
                 const now = Date.now();
                 if (prev.bossState === 'active') {
-                    if (now >= prev.bossEndTime) {
-                        // Boss Time Expired (Fled) -> Cooldown
+                    if (prev.bossHp <= 0 || now >= prev.bossEndTime) {
                         updates.bossState = 'cooldown';
-                        updates.bossRespawnTime = now + 23 * 60 * 60 * 1000;
-                        updates.bossHp = 0; // Or keep it? Usually reset.
+                        updates.bossRespawnTime = now + 12 * 60 * 60 * 1000;
                         changed = true;
                     }
                 } else if (prev.bossState === 'cooldown') {
                     if (now >= prev.bossRespawnTime) {
-                        // Respawn
                         updates.bossState = 'active';
                         updates.bossHp = prev.maxBossHp;
-                        updates.bossEndTime = now + 23 * 60 * 60 * 1000;
+                        updates.bossEndTime = now + 12 * 60 * 60 * 1000;
+                        updates.worldBossDamage = 0;
+                        updates.worldBossPlayers = [
+                            { name: "Top-G", damage: 150000000000 },
+                            { name: "Slayer", damage: 120000000000 },
+                            { name: "Shadow", damage: 90000000000 }
+                        ];
                         changed = true;
                     }
                 }
@@ -146,18 +264,15 @@ export const GameProvider = ({ children }) => {
         }, 1000);
     };
 
-    const spendSkillPoint = (stat) => {
-        setState(prev => {
-            if (prev.skillPoints <= 0) return prev;
-            return {
-                ...prev,
-                skillPoints: prev.skillPoints - 1,
-                stats: {
-                    ...prev.stats,
-                    [stat]: prev.stats[stat] + 1
-                }
-            };
-        });
+    const bulkUpdateStats = (newStats, pointsSpent) => {
+        setState(prev => ({
+            ...prev,
+            skillPoints: prev.skillPoints - pointsSpent,
+            stats: {
+                ...prev.stats,
+                ...newStats
+            }
+        }));
     };
 
     const applyResourceDelta = ({ money = 0, gems = 0 }) => {
@@ -167,6 +282,26 @@ export const GameProvider = ({ children }) => {
             money: Math.max(0, prev.money + money),
             gems: Math.max(0, prev.gems + gems)
         }));
+    };
+
+    const resetStats = () => {
+        setState(prev => {
+            if (prev.gems < 200) return prev;
+            const totalSpent = Object.values(prev.stats).reduce((a, b) => a + b, 0);
+            return {
+                ...prev,
+                gems: prev.gems - 200,
+                skillPoints: prev.skillPoints + totalSpent,
+                stats: {
+                    health: 0, energy: 0, stamina: 0, attack: 0, defense: 0, od: 0
+                }
+            };
+        });
+    };
+
+    const dismissLevelUp = () => {
+        setState(prev => ({ ...prev, showLevelUp: false }));
+        setSkillModalOpen(true);
     };
 
     const updateMonsterCollection = (updates) => {
@@ -180,20 +315,27 @@ export const GameProvider = ({ children }) => {
         });
     };
 
+    const appointLeader = (monsterName) => {
+        setState(prev => ({ ...prev, leader: monsterName }));
+    };
+
     const attackBoss = (dmgType) => {
         if (state.bossState !== 'active') return;
         if (isAttacking) return;
 
         let costSt = 1, costGm = 0, baseDmg = 15000, attacks = 1, odGain = 0.8;
+        const leaderEffect = getLeaderSkillEffect(state.leader);
         const collectionAttack = Math.max(1, getCollectionAttack(state.monsterCollection || {}));
+        const statAtkBonus = 1 + (state.stats.attack * 0.001);
+        const totalAttackPower = collectionAttack * (leaderEffect.atkMult || 1) * statAtkBonus;
 
         let type = 'normal';
         if (dmgType === 5000) type = 'united';
         if (dmgType === 50000) type = 'special';
 
-        if (type === 'normal') { costSt = 1; costGm = 0; baseDmg = collectionAttack; attacks = 1; odGain = 0.8; }
-        if (type === 'united') { costSt = 5; costGm = 0; baseDmg = collectionAttack * 5; attacks = 5; odGain = 4.0; }
-        if (type === 'special') { costSt = 0; costGm = 10; baseDmg = collectionAttack * 50; attacks = 50; odGain = 10.0; }
+        if (type === 'normal') { costSt = 1; costGm = 0; baseDmg = totalAttackPower; attacks = 1; odGain = 0.8; }
+        if (type === 'united') { costSt = 5; costGm = 0; baseDmg = totalAttackPower * 5; attacks = 5; odGain = 4.0; }
+        if (type === 'special') { costSt = 0; costGm = 10; baseDmg = totalAttackPower * 50; attacks = 50; odGain = 10.0; }
 
         if (type !== 'special') {
             if (state.stamina < costSt) {
@@ -218,21 +360,20 @@ export const GameProvider = ({ children }) => {
         let finalDmg = Math.floor(roll);
 
         let currentOD = state.overdrive;
-        // Trigger crit if the NEXT gain fills it OR if it's already full
         let isCrit = (currentOD >= 100) || (currentOD + odGain >= 100);
 
         if (isCrit) {
-            finalDmg *= 5;
+            const statODMult = state.stats.od * 0.001;
+            const critMult = 3 + (leaderEffect.odCritMult || 0) + statODMult;
+            finalDmg *= critMult;
             currentOD = 0;
-            console.log("CRITICAL OVERDRIVE HIT!");
         } else {
             currentOD += odGain;
             if (currentOD > 100) currentOD = 100;
         }
 
         let rewardMult = isCrit ? 2 : 1;
-
-        let xpGain = 10 * attacks * rewardMult;
+        let xpGain = 10 * attacks * rewardMult * (leaderEffect.xpMult || 1);
         let moneyGain = (15000 + Math.floor(Math.random() * 10000)) * attacks * rewardMult;
 
         triggerResourcePopup('xp', xpGain, isCrit);
@@ -246,21 +387,13 @@ export const GameProvider = ({ children }) => {
         });
         setTimeout(() => setDamagePopup(null), 800);
 
+        let leveledUp = false;
         setState(prev => {
             let newXp = prev.xp + xpGain;
             let newLevel = prev.level;
             let newXpToLevel = prev.xpToLevel;
-
-            // Adjust stamina/gems costs first to check availability? 
-            // Logic above already checked costs, so we just deduct unless level up refilled them?
-            // Actually, costs should be deducted first, then level up might refill them.
-            // But in HTML: state.stamina -= costSt happens BEFORE attack logic.
-            // Level up happens AFTER attack logic.
-            // So: deduct cost -> add rewards -> check level up -> refill if needed.
-
-            // Let's calculate newStamina/newGems based on cost first.
-            // Note: type 'special' uses gems, others use stamina.
-
+            let tempPoints = prev.skillPoints || 0;
+            let tempShowLevelUp = false;
             let tempStamina = (type !== 'special') ? prev.stamina - costSt : prev.stamina;
             let tempGems = (type === 'special') ? prev.gems - costGm : prev.gems;
             let tempHp = prev.hp;
@@ -270,19 +403,29 @@ export const GameProvider = ({ children }) => {
                 newXp -= newXpToLevel;
                 newLevel++;
                 newXpToLevel = Math.floor(newXpToLevel * 1.1);
-                // Refill HP and Stamina on level up
-                tempHp = prev.maxHp;
-                tempStamina = prev.maxStamina;
-                tempEnergy = prev.maxEnergy;
+                tempPoints += 5;
+                tempShowLevelUp = true;
+                leveledUp = true;
+                tempHp = 100 + (prev.stats.health * 10);
+                tempStamina = 50 + prev.stats.stamina;
+                tempEnergy = 50 + prev.stats.energy;
             }
 
-            let newBossHp = Math.max(0, prev.bossHp - finalDmg);
             let nextState = prev.bossState;
             let nextRespawn = prev.bossRespawnTime;
+            let nextWorldDamage = (prev.worldBossDamage || 0) + finalDmg;
+            let newBossHp = Math.max(0, prev.bossHp - finalDmg);
 
             if (prev.bossState === 'active' && newBossHp <= 0) {
                 nextState = 'cooldown';
-                nextRespawn = Date.now() + 23 * 60 * 60 * 1000;
+                nextRespawn = Date.now() + 12 * 60 * 60 * 1000;
+                const players = [...prev.worldBossPlayers, { name: "YOU", damage: nextWorldDamage }];
+                players.sort((a, b) => b.damage - a.damage);
+                const rank = players.findIndex(p => p.name === "YOU") + 1;
+                let bonusMoney = 1000000 / rank;
+                let bonusGems = Math.max(1, Math.floor(50 / rank));
+                moneyGain += bonusMoney;
+                tempGems += bonusGems;
             }
 
             return {
@@ -294,21 +437,33 @@ export const GameProvider = ({ children }) => {
                 bossState: nextState,
                 bossRespawnTime: nextRespawn,
                 totalDamage: prev.totalDamage + finalDmg,
+                worldBossDamage: nextWorldDamage,
                 totalAttacks: prev.totalAttacks + attacks,
                 money: prev.money + moneyGain,
                 xp: newXp,
                 level: newLevel,
                 xpToLevel: newXpToLevel,
                 hp: tempHp,
+                skillPoints: tempPoints,
+                showLevelUp: tempShowLevelUp,
                 overdrive: currentOD
             };
         });
+
+        if (leveledUp) {
+            setTimeout(() => {
+                setState(s => {
+                    if (s.showLevelUp) return { ...s, showLevelUp: false };
+                    return s;
+                });
+                setSkillModalOpen(true);
+            }, 2500);
+        }
     };
 
     return (
-        <GameContext.Provider value={{ state, attackBoss, damagePopup, bossShake, resourcePopups, spendSkillPoint, skillModalOpen, setSkillModalOpen, applyResourceDelta, updateMonsterCollection, isAttacking }}>
+        <GameContext.Provider value={{ state, attackBoss, damagePopup, bossShake, resourcePopups, bulkUpdateStats, resetStats, dismissLevelUp, skillModalOpen, setSkillModalOpen, applyResourceDelta, updateMonsterCollection, appointLeader, isAttacking }}>
             {children}
         </GameContext.Provider>
     );
 };
-

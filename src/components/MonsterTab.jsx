@@ -94,15 +94,25 @@ const pickFallbackMonster = (monsters, seed) => {
 
 
 const MonsterTab = () => {
-  const { state, applyResourceDelta, updateMonsterCollection } = useGameState();
-  const [subTab, setSubTab] = useState('fusions');
+  const { state, applyResourceDelta, updateMonsterCollection, appointLeader } = useGameState();
+  const [subTab, setSubTab] = useState('monster');
   const [expandedTiers, setExpandedTiers] = useState({ God: false, 'Demi God': false, Chaos: false, Deity: false });
   const [selectedMonster, setSelectedMonster] = useState(null);
+  const [sellModalData, setSellModalData] = useState(null);
+  const [sellAmount, setSellAmount] = useState(1);
+  const [selectedElement, setSelectedElement] = useState('Fire');
+  const activeLeader = useMemo(() => baseMonsters.find(m => m.name === state.leader), [state.leader]);
+  const elements = ['Fire', 'Water', 'Electric', 'Earth', 'Void', 'Celestial'];
+
+  const getElementIcon = (el) => {
+    const lower = (el || 'neutral').toLowerCase();
+    if (lower === 'void') return 'dark';
+    if (lower === 'celestial') return 'holy';
+    return lower;
+  };
+
   const monsterInventory = useMemo(() => ({
-    'Inferno Dragon Knight Kael': 2,
-    'Abyssal Sea Deity': 1,
     ...(state.monsterCollection || {}),
-    'Dark Deity Azaerth': 2,   /* Force Test: Overwrite any saved state */
   }), [state.monsterCollection]);
   const [fusionSlots, setFusionSlots] = useState({ slot1: null, slot2: null });
   const [fusionModal, setFusionModal] = useState(null);
@@ -117,12 +127,16 @@ const MonsterTab = () => {
 
 
   const sortedMonsters = useMemo(() => {
-    return [...baseMonsters].sort((a, b) => {
-      const valA = tierOrder.find((t) => t.key === a.rank)?.rankValue || 0;
-      const valB = tierOrder.find((t) => t.key === b.rank)?.rankValue || 0;
-      return valB - valA;
-    });
-  }, []);
+    const targetElement = selectedElement;
+
+    return baseMonsters
+      .filter(m => m.element === targetElement && (monsterInventory[m.name] || 0) > 0)
+      .sort((a, b) => {
+        const valA = tierOrder.find((t) => t.key === a.rank)?.rankValue || 0;
+        const valB = tierOrder.find((t) => t.key === b.rank)?.rankValue || 0;
+        return valB - valA;
+      });
+  }, [selectedElement]);
 
   const tierCounts = useMemo(() => {
     const counts = Object.fromEntries(tierOrder.map(t => [t.key, 0]));
@@ -312,41 +326,168 @@ const MonsterTab = () => {
       </div>
 
       {subTab === 'monster' && (
-        <div className="mon-tab-content active">
-          {sortedMonsters.map((monster) => (
-            <div key={monster.id} className="mon-row" onClick={() => setSelectedMonster(monster)}>
-              <div className={`mon-icon-frame tier-${formatTierClass(monster.rank)} element-${formatElementClass(monster.element)}`}>
-                <span className="frame-inner" />
-                <span className="frame-ornament o1" />
-                <span className="frame-ornament o2" />
-                <span className="frame-ornament o3" />
-                <span className="frame-ornament o4" />
-                <span className="frame-rivet r1" />
-                <span className="frame-rivet r2" />
-                <span className="frame-rivet r3" />
-                <span className="frame-rivet r4" />
-                <img src={`${monster.image}?v=21`} alt={monster.name} />
+        <>
+          <div className="element-tabs">
+            {elements.map(el => (
+              <div
+                key={el}
+                className={`element-tab ${el.toLowerCase()} ${selectedElement === el ? 'active' : ''}`}
+                onClick={() => setSelectedElement(el)}
+              >
+                {el}
               </div>
-              <div className="mon-info">
-                <div className="mon-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <img
-                    src={`/assets/element_${(monster.element || 'neutral').toLowerCase()}_circle.png?v=110`}
-                    alt={monster.element}
-                    style={{ width: '18px', height: '18px', objectFit: 'contain' }}
+            ))}
+          </div>
+          <div className="element-header">
+            <div className="element-header-text">{selectedElement} Unit</div>
+            {activeLeader?.leaderSkill && (
+              <div className="active-leader-skill-hud">
+                <span className="skill-tag">LEADER</span>
+                <span className="skill-desc">{activeLeader.leaderSkill}</span>
+              </div>
+            )}
+            <div style={{ width: '80px' }} />
+          </div>
+          <div className="mon-tab-content active">
+            {sortedMonsters.length > 0 ? sortedMonsters.map((monster) => {
+              const qty = monsterInventory[monster.name] || 0;
+              const rankItem = tierOrder.find(t => t.key === monster.rank) || { rankValue: 1 };
+              const rv = rankItem.rankValue;
+
+              /* getElementIcon moved to top-level */
+
+              // Dynamic Values
+              const sellPrice = Math.pow(rv, 4) * 1000000; // Primordial (rv=13) -> ~28B? Maybe too high? rv=8 -> 4B.
+              const dissAmount = rv * 5;
+
+              return (
+                <div key={monster.id} className="mon-row" onClick={() => setSelectedMonster(monster)}>
+                  <div className="mon-icon-box">
+                    <img src={monster.icon || monster.image} alt={monster.name} style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
+                  </div>
+
+                  <div className="mon-info">
+                    <div className="mon-name">
+                      <img
+                        src={`/assets/element_${getElementIcon(monster.element)}_circle.png?v=129`}
+                        alt={monster.element}
+                        className={`mon-element-icon-mini el-${getElementIcon(monster.element)}`}
+                        style={{ marginRight: '6px' }}
+                      />
+                      {monster.name}
+                    </div>
+
+                    <div className="mon-tier-label" style={{ color: getTierColor(monster.rank), fontSize: '11px', fontWeight: 'bold' }}>
+                      {monster.rank} {state.leader === monster.name && '[LEADER]'}
+                    </div>
+
+                    <div className="mon-stats-row">
+                      <span className="stat-atk"><span className="stat-label">ATK</span> {monster.stats.atk.toLocaleString()}</span>
+                      <span className="stat-def"><span className="stat-label">DEF</span> {monster.stats.def.toLocaleString()}</span>
+                      <span className="stat-hp"><span className="stat-label">HP</span> {monster.stats.hp.toLocaleString()}</span>
+                    </div>
+
+                    {monster.leaderSkill && (
+                      <div className={`mon-leader-skill ${state.leader === monster.name ? 'active' : ''}`}>
+                        <span className="skill-label">LEADER SKILL:</span> <span className="skill-desc">{monster.leaderSkill}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mon-act" onClick={e => e.stopPropagation()}>
+                    <div className="mon-owned-corner">
+                      <div className="mon-owned-label">OWNED</div>
+                      <div className="mon-owned-val">x{qty}</div>
+                    </div>
+
+                    <div className="mon-act-buttons">
+                      <button
+                        className={`btn-act btn-leader ${state.leader === monster.name ? 'active' : ''}`}
+                        disabled={qty <= 0 || state.leader === monster.name}
+                        onClick={() => appointLeader(monster.name)}
+                      >
+                        {state.leader === monster.name ? 'ACTIVE' : (
+                          <>
+                            <span className="btn-sub-text">SET AS</span>
+                            <span className="btn-main-text">LEADER</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        className="btn-act btn-sell"
+                        disabled={qty <= 0}
+                        onClick={() => {
+                          setSellAmount(1);
+                          setSellModalData({ monster, qty, sellPrice });
+                        }}
+                      >
+                        SELL
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }) : (
+              <div className="tab-placeholder">No {selectedElement} units in inventory.</div>
+            )}
+          </div>
+        </>
+      )}
+
+      {sellModalData && (
+        <div className="monster-detail-overlay sell-modal-overlay" onClick={() => setSellModalData(null)}>
+          <div className="monster-detail-card sell-modal-card" onClick={e => e.stopPropagation()}>
+            <div className="monster-detail-header">
+              <div className="monster-detail-name">SELL {sellModalData.monster.name}</div>
+              <button className="monster-detail-close" onClick={() => setSellModalData(null)}>✕</button>
+            </div>
+            <div className="sell-modal-body">
+              <div className="sell-preview-unit">
+                <div className={`mon-icon-frame tier-${formatTierClass(sellModalData.monster.rank)}`}>
+                  <img src={sellModalData.monster.image} alt="" />
+                </div>
+                <div className="sell-unit-stats">
+                  <div style={{ color: getTierColor(sellModalData.monster.rank), fontWeight: 'bold' }}>{sellModalData.monster.rank}</div>
+                  <div style={{ color: '#fff', fontSize: '11px' }}>Owned: {sellModalData.qty}</div>
+                </div>
+              </div>
+
+              <div className="sell-governor">
+                <div className="sell-gov-label">SELECT QUANTITY</div>
+                <div className="sell-gov-controls">
+                  <button onClick={() => setSellAmount(Math.max(1, sellAmount - 1))}>-</button>
+                  <input
+                    type="number"
+                    value={sellAmount}
+                    onChange={e => setSellAmount(Math.min(sellModalData.qty, Math.max(1, parseInt(e.target.value) || 1)))}
                   />
-                  {monster.name}
+                  <button onClick={() => setSellAmount(Math.min(sellModalData.qty, sellAmount + 1))}>+</button>
                 </div>
-                <div className="mon-stats" style={{ color: getTierColor(monster.rank) }}>Tier: {monster.rank}</div>
-                <div className="mon-stats">
-                  <span className="stat-attack">ATK {monster.stats.atk.toLocaleString()}</span>
-                  <span className="stat-divider"> • </span>
-                  <span className="stat-defense">DEF {monster.stats.def.toLocaleString()}</span>
-                  <span className="stat-divider"> • </span>
-                  <span className="stat-hp">HP {monster.stats.hp.toLocaleString()}</span>
+                <div className="sell-quick-buttons">
+                  <button onClick={() => setSellAmount(1)}>1</button>
+                  <button onClick={() => setSellAmount(Math.floor(sellModalData.qty / 2))}>50%</button>
+                  <button onClick={() => setSellAmount(sellModalData.qty)}>MAX</button>
                 </div>
+              </div>
+
+              <div className="sell-result-box">
+                <div className="sell-result-label">TOTAL GOLD RECEIVE</div>
+                <div className="sell-result-value">
+                  <img src="/assets/icon_gold.svg" alt="" />
+                  {(sellModalData.sellPrice * sellAmount).toLocaleString()}
+                </div>
+              </div>
+
+              <div className="sell-modal-actions">
+                <button className="btn-cancel" onClick={() => setSellModalData(null)}>CANCEL</button>
+                <button className="btn-confirm-sell" onClick={() => {
+                  updateMonsterCollection({ [sellModalData.monster.name]: sellModalData.qty - sellAmount });
+                  applyResourceDelta({ money: sellModalData.sellPrice * sellAmount });
+                  setSellModalData(null);
+                }}>SELL UNITS</button>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       )}
 
@@ -407,7 +548,8 @@ const MonsterTab = () => {
 
           <div className="rank-list-unique">
             {tierOrder.filter(t => t.key !== 'Primordial').map((tier) => {
-              const isExpandable = tier.key === 'God' || tier.key === 'Demi God' || tier.key === 'Chaos' || tier.key === 'Deity';
+              const hasUnits = (tierCounts[tier.key] || 0) > 0;
+              const isExpandable = (tier.key === 'God' || tier.key === 'Demi God' || tier.key === 'Chaos' || tier.key === 'Deity') && hasUnits;
               const isExpanded = expandedTiers[tier.key] || false;
 
               return (
@@ -568,9 +710,9 @@ const MonsterTab = () => {
                 <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4px 0', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid #333' }}>
                   <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <img
-                      src={phase6Monster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (phase6Monster.element === 'Water' ? '/assets/element_water.png?v=12' : `/assets/element_${(phase6Monster.element || 'neutral').toLowerCase()}.png`)}
+                      src={`/assets/element_${getElementIcon(phase6Monster.element)}_circle.png?v=129`}
                       alt={phase6Monster.element}
-                      style={{ width: '14px', height: '14px', objectFit: 'contain' }}
+                      style={{ width: getElementIcon(phase6Monster.element) === 'dark' ? '16px' : '14px', height: getElementIcon(phase6Monster.element) === 'dark' ? '16px' : '14px', objectFit: 'contain' }}
                     />
                     <span style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#fff' }}>{phase6Monster.name}</span>
                   </div>
@@ -582,7 +724,7 @@ const MonsterTab = () => {
 
                 <div className="monster-detail-body" style={{ padding: '0', flex: 1 }}>
                   <div className="monster-detail-image" style={{
-                    backgroundImage: `url(${(phase6Monster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=110)`,
+                    backgroundImage: `url(${(phase6Monster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=119)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     display: 'flex',
@@ -593,7 +735,7 @@ const MonsterTab = () => {
                     position: 'relative'
                   }}>
                     <img
-                      src={`${phase6Monster.fullImage || phase6Monster.full || phase6Monster.image}?v=110`}
+                      src={`${phase6Monster.fullImage || phase6Monster.full || phase6Monster.image}?v=119`}
                       alt={phase6Monster.name}
                       style={{ maxHeight: '95%', maxWidth: '95%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
                     />
@@ -648,9 +790,9 @@ const MonsterTab = () => {
             <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 0 2px 0', background: 'rgba(0,0,0,0.5)', borderBottom: '1px solid #333' }}>
               <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <img
-                  src={selectedMonster.element === 'Fire' ? '/assets/element_fire_v4.png?v=4' : (selectedMonster.element === 'Water' ? '/assets/element_water.png?v=12' : `/assets/element_${(selectedMonster.element || 'neutral').toLowerCase()}.png`)}
+                  src={`/assets/element_${getElementIcon(selectedMonster.element)}_circle.png?v=129`}
                   alt={selectedMonster.element}
-                  style={{ width: '20px', height: '20px', objectFit: 'contain' }}
+                  style={{ width: getElementIcon(selectedMonster.element) === 'dark' ? '23px' : '20px', height: getElementIcon(selectedMonster.element) === 'dark' ? '23px' : '20px', objectFit: 'contain' }}
                 />
                 <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{selectedMonster.name}</span>
               </div>
@@ -666,7 +808,7 @@ const MonsterTab = () => {
             </div>
             <div className="monster-detail-body">
               <div className="monster-detail-image" style={{
-                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=110)`,
+                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=119)`,
                 backgroundSize: '100% 100%',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -680,21 +822,13 @@ const MonsterTab = () => {
                 position: 'relative'
               }}>
                 <img
-                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=110`}
+                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=119`}
                   alt={selectedMonster.name}
                   style={{
                     maxHeight: '90%',
                     maxWidth: '90%',
                     objectFit: 'contain',
-                    filter: `drop-shadow(0 0 15px ${selectedMonster.element === 'Fire' ? 'rgba(255, 50, 0, 0.6)' :
-                      selectedMonster.element === 'Water' ? 'rgba(0, 100, 255, 0.6)' :
-                        selectedMonster.element === 'Earth' || selectedMonster.element === 'Grass' ? 'rgba(0, 255, 50, 0.6)' :
-                          selectedMonster.element === 'Wind' || selectedMonster.element === 'Air' ? 'rgba(0, 255, 255, 0.6)' :
-                            selectedMonster.element === 'Electric' ? 'rgba(0, 0, 0, 0)' :
-                              selectedMonster.element === 'Dark' ? 'rgba(130, 0, 255, 0.7)' :
-                                selectedMonster.element === 'Holy' || selectedMonster.element === 'Light' ? 'rgba(255, 215, 0, 0.6)' :
-                                  'rgba(255, 255, 255, 0.3)'
-                      })`
+                    objectFit: 'contain'
                   }}
                 />
               </div>

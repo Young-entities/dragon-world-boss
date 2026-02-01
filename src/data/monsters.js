@@ -66,7 +66,7 @@ export const monsters = [
     id: 6,
     name: "Dark Deity Azaerth",
     rank: "Primordial",
-    element: "Dark",
+    element: "Void",
     image: "/assets/dark_deity_icon.png?v=normalized",
     fullImage: "/assets/dark_deity_unit_v4.png?v=normalized",
     cardBackground: "/assets/dark_void_bg.png?v=normalized",
@@ -117,7 +117,7 @@ export const monsters = [
     id: 110,
     name: "Celestial Seraphim",
     rank: "Primordial",
-    element: "Holy",
+    element: "Celestial",
     image: "/assets/celestial_icon.png?v=normalized",
     fullImage: "/assets/celestial_valkyrie.png?v=normalized",
     cardBackground: "/assets/celestial_bg.png?v=normalized",
@@ -147,20 +147,6 @@ export const monsters = [
     },
     description: "An ancient guardian of nature, older than time itself."
   },
-  {
-    id: 1,
-    name: "Green Slime",
-    rank: "Rare",
-    element: "Earth",
-    image: "/assets/slime_neutral.png",
-    owned: 10,
-    stats: {
-      atk: 120,
-      def: 80,
-      hp: 250
-    },
-    description: "A simple forest slime. Not very powerful, but remarkably resilient."
-  }
 ];
 
 export const fusionRecipes = {};

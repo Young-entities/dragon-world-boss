@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { GameProvider } from './context/GameContext.jsx';
 import { useGameState } from './context/useGameState';
 import { monsters } from './data/monsters';
 import MonsterCard from './components/MonsterCard';
 import MonsterTab from './components/MonsterTab';
 import TopUI from './components/TopUI';
+import SkillModal from './components/SkillModal';
+import BattleMenu from './components/BattleMenu';
 import './components/OriginalStyles.css';
 
 // --- BOSS SCREEN ---
-const BossScreen = () => {
+const BossScreen = ({ onBack }) => {
   const { state, attackBoss, damagePopup, bossShake, isAttacking } = useGameState();
   const hpPercent = state.maxBossHp > 0 ? (state.bossHp / state.maxBossHp) * 100 : 0;
 
@@ -34,24 +36,52 @@ const BossScreen = () => {
     timerText = `Event Ends In: ${formatTime(state.bossEndTime - now)}`;
   } else {
     timerText = `Respawn In: ${formatTime(state.bossRespawnTime - now)}`;
+
+    // Sort players to find rank
+    const players = [...(state.worldBossPlayers || []), { name: "YOU", damage: state.worldBossDamage || 0 }];
+    players.sort((a, b) => b.damage - a.damage);
+    const finalRank = players.findIndex(p => p.name === "YOU") + 1;
+
     overlay = (
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'rgba(0,0,0,0.7)',
+        background: 'rgba(0,0,0,0.8)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        zIndex: 50, color: '#fff'
+        zIndex: 50, color: '#fff', textAlign: 'center'
       }}>
-        <h1 style={{ fontSize: '40px', color: '#ff3333', textShadow: '0 0 10px #000' }}>BOSS DEFEATED</h1>
-        <h2 style={{ fontSize: '24px', marginTop: '10px' }}>{timerText}</h2>
+        <h1 style={{ fontSize: '40px', color: '#ff3333', textShadow: '0 0 10px #000', margin: 0 }}>WORLD BOSS DEFEATED</h1>
+        <div style={{ margin: '20px 0', padding: '15px 30px', background: 'rgba(255,215,0,0.1)', border: '1px solid #ffd700', borderRadius: '12px' }}>
+          <div style={{ fontSize: '14px', color: '#ffd700', fontWeight: 'bold' }}>FINAL GLOBAL RANK</div>
+          <div style={{ fontSize: '48px', fontWeight: '900', textShadow: '0 0 15px rgba(255,215,0,0.5)' }}>#{finalRank}</div>
+        </div>
+        <h2 style={{ fontSize: '20px', color: '#888' }}>{timerText}</h2>
       </div>
     );
   }
+
+  const leaderboard = useMemo(() => {
+    const players = [...(state.worldBossPlayers || []), { name: "YOU", damage: state.worldBossDamage || 0 }];
+    players.sort((a, b) => b.damage - a.damage);
+    return players.slice(0, 5); // Top 5
+  }, [state.worldBossPlayers, state.worldBossDamage]);
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {overlay}
 
-      {/* MONSTER AREA */}
+      {/* BACK BUTTON */}
+      <button
+        onClick={onBack}
+        style={{
+          position: 'absolute', top: '10px', right: '10px', zIndex: 100,
+          background: 'rgba(0,0,0,0.6)', border: '2px solid #39b6ff', color: '#fff',
+          padding: '4px 12px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold',
+          cursor: 'pointer', backdropFilter: 'blur(4px)', textTransform: 'uppercase'
+        }}
+      >
+        BACK TO MENU
+      </button>
+
       <div style={{
         height: '70%',
         display: 'flex',
@@ -61,11 +91,35 @@ const BossScreen = () => {
         paddingBottom: '0',
         paddingTop: '0',
         backgroundImage: 'url(/assets/electric_bg_final.png)',
-        backgroundSize: '100% 100%',
+        backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        borderBottom: '2px solid #444'
+        borderBottom: '2px solid #334466'
       }}>
+        {/* Cinematic Lighting Overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 40%, rgba(0,180,255,0.1) 100%)',
+          zIndex: 1
+        }}></div>
+        {/* WORLD LEADERBOARD */}
+        <div style={{
+          position: 'absolute', top: '10px', left: '10px', width: '140px',
+          background: 'rgba(0,0,0,0.6)', borderRadius: '8px', padding: '8px', zIndex: 10,
+          border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{ fontSize: '9px', color: '#ffd700', fontWeight: '900', marginBottom: '4px', letterSpacing: '1px' }}>WORLD RANKING</div>
+          {leaderboard.map((p, i) => (
+            <div key={i} style={{
+              display: 'flex', justifyContent: 'space-between', fontSize: '10px',
+              color: p.name === 'YOU' ? '#ffd700' : '#fff', opacity: p.name === 'YOU' ? 1 : 0.8,
+              marginBottom: '2px'
+            }}>
+              <span>{i + 1}. {p.name}</span>
+              <span>{(p.damage / 1000000).toFixed(1)}M</span>
+            </div>
+          ))}
+        </div>
+
         {/* Floor Shadow */}
         <div style={{
           position: 'absolute', bottom: '15px', width: '80%', height: '40px',
@@ -88,7 +142,6 @@ const BossScreen = () => {
           }}
         />
 
-        {/* FLOATING DAMAGE TEXT - PURE CSS CONTROL */}
         {/* FLOATING DAMAGE TEXT */}
         {damagePopup && (
           <div
@@ -129,11 +182,11 @@ const BossScreen = () => {
           <div className="btn-row" style={{ padding: '10px 0 0' }}>
             <button className="btn normal" onClick={() => attackBoss(1000)} disabled={isAttacking || state.bossState !== 'active'} style={{ opacity: (isAttacking || state.bossState !== 'active') ? 0.7 : 1 }}>
               <span className="btn-title">ATTACK x1</span>
-              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_energy.svg" alt="Energy" /> 1 ENERGY</span>
+              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_battle.png" alt="Stamina" /> 1 STAMINA</span>
             </button>
             <button className="btn united" onClick={() => attackBoss(5000)} disabled={isAttacking || state.bossState !== 'active'} style={{ opacity: (isAttacking || state.bossState !== 'active') ? 0.7 : 1 }}>
               <span className="btn-title">ATTACK x5</span>
-              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_energy.svg" alt="Energy" /> 5 ENERGY</span>
+              <span className="btn-cost"><img className="btn-icon" src="/assets/icon_battle.png" alt="Stamina" /> 5 STAMINA</span>
             </button>
             <button className="btn special" onClick={() => attackBoss(50000)} disabled={isAttacking || state.bossState !== 'active'} style={{ opacity: (isAttacking || state.bossState !== 'active') ? 0.7 : 1 }}>
               <span className="btn-title">ATTACK x50</span>
@@ -146,26 +199,44 @@ const BossScreen = () => {
   );
 };
 
-// ... Inventory same ...
-const InventoryScreen = () => (
-  <div style={{ padding: '15px' }}>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '8px' }}>
-      {monsters.map(m => <MonsterCard key={m.id} monster={m} onClick={() => { }} />)}
-    </div>
-  </div>
-);
-
 const GameLayout = () => {
   const [activeTab, setActiveTab] = useState('boss');
+  const [battleMode, setBattleMode] = useState('menu');
+  const { state, skillModalOpen, setSkillModalOpen, dismissLevelUp } = useGameState();
+
+  const handleBattleSelect = (id) => {
+    if (id === 'world-boss') setBattleMode('world-boss');
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {state.showLevelUp && (
+        <div className="level-up-splash" onClick={dismissLevelUp}>
+          <div className="splash-content">
+            <h1 className="splash-title">LEVEL UP!</h1>
+            <h2 className="splash-subtitle">RANK {state.level} REACHED</h2>
+            <div style={{ color: '#aaa', fontSize: '12px', marginTop: '20px' }}>TAP TO CONTINUE</div>
+          </div>
+        </div>
+      )}
+      <SkillModal isOpen={skillModalOpen} onClose={() => setSkillModalOpen(false)} />
       <div style={{ flexShrink: 0 }}>
-        <TopUI variant={activeTab === 'boss' ? 'boss' : 'menu'} />
+        <TopUI variant={(activeTab === 'boss' && battleMode === 'world-boss') ? 'boss' : 'menu'} />
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'transparent' }}>
-        {activeTab === 'boss' && <BossScreen />}
+        {activeTab === 'boss' && (
+          battleMode === 'menu' ? (
+            <BattleMenu onSelect={handleBattleSelect} />
+          ) : (
+            <BossScreen onBack={() => setBattleMode('menu')} />
+          )
+        )}
         {activeTab === 'monsters' && <MonsterTab />}
+        {activeTab === 'shop' && (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
+            SHOP COMING SOON
+          </div>
+        )}
       </div>
       <div style={{
         height: '60px',
@@ -179,7 +250,7 @@ const GameLayout = () => {
         <NavButton label="HOME" image="/assets/icon_home.png" active={false} onClick={() => { }} />
         <NavButton label="BATTLE" image="/assets/icon_battle.png" active={activeTab === 'boss'} onClick={() => setActiveTab('boss')} />
         <NavButton label="UNIT" image="/assets/icon_monster.png" active={activeTab === 'monsters'} onClick={() => setActiveTab('monsters')} />
-        <NavButton label="EQUIP" image="/assets/icon_equip.png" active={activeTab === 'fusion'} onClick={() => alert("Fusion Coming!")} />
+        <NavButton label="FUSION" image="/assets/icon_equip.png" active={activeTab === 'fusion'} onClick={() => alert("Fusion Coming!")} />
         <NavButton label="SHOP" image="/assets/icon_shop.png" active={activeTab === 'shop'} onClick={() => setActiveTab('shop')} />
       </div>
     </div>
