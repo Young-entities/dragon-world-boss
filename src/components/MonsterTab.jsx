@@ -51,11 +51,11 @@ const fusionMonsters = [
   },
   {
     name: 'Dark Deity Azaerth', /* Renamed */
-    tier: 'Deity',
+    tier: 'Primordial',
     icon: '/assets/dark_deity_icon.png',
     full: '/assets/dark_deity_unit.png',
     color: '#ff00ff',
-    rankValue: 10,
+    rankValue: 13,
     aura: '#aa00ff',
     stats: { atk: '669,222', def: '255,879' } /* Base Dark * 3^9 */
   }
@@ -596,272 +596,282 @@ const MonsterTab = () => {
         </div>
       )}
 
-      {subTab === 'collections' && (
-        <div className="mon-tab-content active">
-          <div className="mon-grid">
-            {Array.from({ length: 12 }).map((_, idx) => (
-              <div key={`slot-${idx}`} className="mon-grid-item">?</div>
-            ))}
+      {
+        subTab === 'collections' && (
+          <div className="mon-tab-content active">
+            <div className="mon-grid">
+              {Array.from({ length: 12 }).map((_, idx) => (
+                <div key={`slot-${idx}`} className="mon-grid-item">?</div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {fusionModal && (
-        <div className="fusion-modal">
-          <div className="fusion-modal-content">
-            <div className="fusion-modal-header">FUSION CHAMBER</div>
-            <div className="fusion-modal-body">
-              <div className="fusion-modal-info">Units will be fused.</div>
-              <div className="fusion-modal-ingredients">
-                <div className="fusion-modal-slot">
-                  <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot1 ? `<img src='${fusionSlots.slot1.icon}' />` : '' }} />
-                  <div className="fusion-modal-qty">1</div>
+      {
+        fusionModal && (
+          <div className="fusion-modal">
+            <div className="fusion-modal-content">
+              <div className="fusion-modal-header">FUSION CHAMBER</div>
+              <div className="fusion-modal-body">
+                <div className="fusion-modal-info">Units will be fused.</div>
+                <div className="fusion-modal-ingredients">
+                  <div className="fusion-modal-slot">
+                    <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot1 ? `<img src='${fusionSlots.slot1.icon}' />` : '' }} />
+                    <div className="fusion-modal-qty">1</div>
+                  </div>
+                  <div className="fusion-modal-plus">+</div>
+                  <div className="fusion-modal-slot">
+                    <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot2 ? `<img src='${fusionSlots.slot2.icon}' />` : '' }} />
+                    <div className="fusion-modal-qty">1</div>
+                  </div>
                 </div>
-                <div className="fusion-modal-plus">+</div>
-                <div className="fusion-modal-slot">
-                  <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot2 ? `<img src='${fusionSlots.slot2.icon}' />` : '' }} />
-                  <div className="fusion-modal-qty">1</div>
+                <div className="fusion-modal-connectors">
+                  <div className="connector-line left" />
+                  <div className="connector-line right" />
                 </div>
-              </div>
-              <div className="fusion-modal-connectors">
-                <div className="connector-line left" />
-                <div className="connector-line right" />
-              </div>
-              <div className="fusion-modal-result">
-                <div className="fusion-modal-result-ring" />
-                <span>?</span>
-              </div>
-              <div className="fusion-info">
-                <div className="fusion-info-row"><span>Success Rate:</span><span className="fusion-info-value">{fusionModal.chance}</span></div>
-                <div className="fusion-info-row"><span>Fusion Cost:</span><span className="fusion-info-cost" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {fusionModal.cost.toLocaleString()}
-                  <img src={fusionModal.type === 'money' ? '/assets/icon_gold.svg' : '/assets/icon_gem.svg'} alt={fusionModal.type} style={{ width: '14px', height: '14px' }} />
-                </span></div>
-              </div>
-              <div className="fusion-modal-actions">
-                <button className="fusion-cancel" onClick={closeFusionModal}>CANCEL</button>
-                <button className="fusion-confirm" onClick={executeFusion}>COMBINE</button>
+                <div className="fusion-modal-result">
+                  <div className="fusion-modal-result-ring" />
+                  <span>?</span>
+                </div>
+                <div className="fusion-info">
+                  <div className="fusion-info-row"><span>Success Rate:</span><span className="fusion-info-value">{fusionModal.chance}</span></div>
+                  <div className="fusion-info-row"><span>Fusion Cost:</span><span className="fusion-info-cost" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {fusionModal.cost.toLocaleString()}
+                    <img src={fusionModal.type === 'money' ? '/assets/icon_gold.svg' : '/assets/icon_gem.svg'} alt={fusionModal.type} style={{ width: '14px', height: '14px' }} />
+                  </span></div>
+                </div>
+                <div className="fusion-modal-actions">
+                  <button className="fusion-cancel" onClick={closeFusionModal}>CANCEL</button>
+                  <button className="fusion-confirm" onClick={executeFusion}>COMBINE</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {fusionAnim.open && (
-        <div className={`fusion-anim-overlay ${fusionAnim.phase ? `fusion-phase-${fusionAnim.phase}` : ''} ${fusionAnim.phase >= 5 ? 'fusion-phase-5' : ''}`}>
-          <div id="anim-bg" />
-          <div id="energy-particles">
-            <div className="particle p1" />
-            <div className="particle p2" />
-            <div className="particle p3" />
-            <div className="particle p4" />
-            <div className="particle p5" />
-            <div className="particle p6" />
-          </div>
-          <div id="fusion-orb" />
-          <div id="light-rays">
-            <div />
-            <div />
-            <div />
-            <div />
-          </div>
-          <img id="anim-left" className="boss-animation" src={ingredientMonster?.full || ingredientMonster?.icon || ''} alt="" />
-          <img id="anim-right" className="boss-animation" src={ingredientMonster?.full || ingredientMonster?.icon || ''} alt="" />
-          <div id="anim-flash" />
-          <div id="anim-result-container">
-            <div id="success-text">
-              {fusionAnim.success ? (
-                <div className="rainbow-text-wrapper">
-                  {"FUSION SUCCESS!!".split('').map((char, i) => (
-                    <span key={i} className="rainbow-char-clean" style={{ '--delay': `${i * 0.1}s` }}>
-                      {char === ' ' ? '\u00A0' : char}
-                    </span>
-                  ))}
-                </div>
-              ) : '❌ FUSION FAILED ❌'}
+      {
+        fusionAnim.open && (
+          <div className={`fusion-anim-overlay ${fusionAnim.phase ? `fusion-phase-${fusionAnim.phase}` : ''} ${fusionAnim.phase >= 5 ? 'fusion-phase-5' : ''}`}>
+            <div id="anim-bg" />
+            <div id="energy-particles">
+              <div className="particle p1" />
+              <div className="particle p2" />
+              <div className="particle p3" />
+              <div className="particle p4" />
+              <div className="particle p5" />
+              <div className="particle p6" />
             </div>
-            <div id="result-glow">
-              <div className="result-glow-ring" />
-              <img id="anim-result" src={resultMonster?.full || resultMonster?.icon || ''} alt="" />
+            <div id="fusion-orb" />
+            <div id="light-rays">
+              <div />
+              <div />
+              <div />
+              <div />
             </div>
-            {/* Auto Transition - No Continue Button */}
-          </div>
+            <img id="anim-left" className="boss-animation" src={ingredientMonster?.full || ingredientMonster?.icon || ''} alt="" />
+            <img id="anim-right" className="boss-animation" src={ingredientMonster?.full || ingredientMonster?.icon || ''} alt="" />
+            <div id="anim-flash" />
+            <div id="anim-result-container">
+              <div id="success-text">
+                {fusionAnim.success ? (
+                  <div className="rainbow-text-wrapper">
+                    {"FUSION SUCCESS!!".split('').map((char, i) => (
+                      <span key={i} className="rainbow-char-clean" style={{ '--delay': `${i * 0.1}s` }}>
+                        {char === ' ' ? '\u00A0' : char}
+                      </span>
+                    ))}
+                  </div>
+                ) : '❌ FUSION FAILED ❌'}
+              </div>
+              <div id="result-glow">
+                <div className="result-glow-ring" />
+                <img id="anim-result" src={resultMonster?.full || resultMonster?.icon || ''} alt="" />
+              </div>
+              {/* Auto Transition - No Continue Button */}
+            </div>
 
-          {fusionAnim.phase === 6 && phase6Monster && (
-            <div className="monster-detail-overlay" style={{ zIndex: 21000, background: 'rgba(0,0,0,0.4)', position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <style>{`
+            {fusionAnim.phase === 6 && phase6Monster && (
+              <div className="monster-detail-overlay" style={{ zIndex: 21000, background: 'rgba(0,0,0,0.4)', position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <style>{`
                 @keyframes scaleIn {
                   from { transform: scale(0.8); opacity: 0; }
                   to { transform: scale(1); opacity: 1; }
                 }
               `}</style>
-              <div className="monster-detail-card" onClick={(event) => event.stopPropagation()} style={{
-                animation: 'scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                width: '85%',
-                maxWidth: '300px',
-                background: '#1a1a1a',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
-                border: '1px solid #444',
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
-                <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4px 0', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid #333' }}>
-                  <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <img
-                      src={`/assets/element_${getElementIcon(phase6Monster.element)}_circle.png?v=129`}
-                      alt={phase6Monster.element}
-                      style={{ width: getElementIcon(phase6Monster.element) === 'dark' ? '16px' : '14px', height: getElementIcon(phase6Monster.element) === 'dark' ? '16px' : '14px', objectFit: 'contain' }}
-                    />
-                    <span style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#fff' }}>{phase6Monster.name}</span>
+                <div className="monster-detail-card" onClick={(event) => event.stopPropagation()} style={{
+                  animation: 'scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                  width: '85%',
+                  maxWidth: '300px',
+                  background: '#1a1a1a',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
+                  border: '1px solid #444',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
+                  <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '4px 0', background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid #333' }}>
+                    <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <img
+                        src={`/assets/element_${getElementIcon(phase6Monster.element)}_circle.png?v=129`}
+                        alt={phase6Monster.element}
+                        style={{ width: '18px', height: '18px', objectFit: 'contain' }}
+                      />
+                      <span style={{ fontWeight: '900', fontSize: '1.1rem', color: '#fff', fontFamily: "'Inter', sans-serif" }}>{phase6Monster.name}</span>
+                    </div>
+                    <div style={{ color: getTierColor(phase6Monster.rank || phase6Monster.tier), fontWeight: '800', fontSize: '0.75rem', marginTop: '-2px', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'Inter', sans-serif", width: '100%', textAlign: 'left', paddingLeft: '32px' }}>
+                      {phase6Monster.rank || phase6Monster.tier}
+                    </div>
+                    <button className="monster-detail-close" onClick={closeFusionOverlay} style={{ position: 'absolute', right: '8px', top: '8px', background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
                   </div>
-                  <div style={{ color: getTierColor(phase6Monster.rank || phase6Monster.tier), fontWeight: '600', fontSize: '0.7rem', marginTop: '0px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    {phase6Monster.rank || phase6Monster.tier}
-                  </div>
-                  <button className="monster-detail-close" onClick={closeFusionOverlay} style={{ position: 'absolute', right: '8px', top: '8px', background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
-                </div>
 
-                <div className="monster-detail-body" style={{ padding: '0', flex: 1 }}>
-                  <div className="monster-detail-image" style={{
-                    backgroundImage: `url(${(phase6Monster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=119)`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'center',
-                    paddingBottom: '4px',
-                    height: '110px',
-                    position: 'relative'
-                  }}>
-                    <img
-                      src={`${phase6Monster.fullImage || phase6Monster.full || phase6Monster.image}?v=119`}
-                      alt={phase6Monster.name}
-                      style={{ maxHeight: '95%', maxWidth: '95%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
-                    />
-                  </div>
-                  <div className="monster-detail-stats" style={{ padding: '5px 8px', background: '#222' }}>
-                    {phase6Monster.leaderSkill && (
-                      <div className="monster-detail-leader-skill" style={{ textAlign: 'center', marginBottom: '4px', paddingBottom: '4px', borderBottom: '1px solid #333', fontSize: '0.65rem', lineHeight: '1.1' }}>
-                        <span style={{ color: '#ffd700', fontWeight: 'bold', textTransform: 'uppercase' }}>LEADER:</span> <span style={{ color: '#ddd', fontStyle: 'italic' }}>{phase6Monster.leaderSkill}</span>
-                      </div>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '4px 6px', background: 'rgba(0,0,0,0.4)', borderRadius: '6px' }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ color: '#ff5555', fontSize: '0.6rem', fontWeight: 'bold', lineHeight: '1' }}>ATK</div>
-                        <div style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold' }}>{(phase6Monster.stats?.atk || '0').toLocaleString()}</div>
-                      </div>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ color: '#5555ff', fontSize: '0.6rem', fontWeight: 'bold', lineHeight: '1' }}>DEF</div>
-                        <div style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold' }}>{(phase6Monster.stats?.def || '0').toLocaleString()}</div>
-                      </div>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ color: '#55ff55', fontSize: '0.6rem', fontWeight: 'bold', lineHeight: '1' }}>HP</div>
-                        <div style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold' }}>{(phase6Monster.stats?.hp || '0').toLocaleString()}</div>
+                  <div className="monster-detail-body" style={{ padding: '0', flex: 1 }}>
+                    <div className="monster-detail-image" style={{
+                      backgroundImage: `url(${(phase6Monster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=119)`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      paddingBottom: '4px',
+                      height: '110px',
+                      position: 'relative'
+                    }}>
+                      <img
+                        src={`${phase6Monster.fullImage || phase6Monster.full || phase6Monster.image}?v=119`}
+                        alt={phase6Monster.name}
+                        style={{ maxHeight: '95%', maxWidth: '95%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
+                      />
+                    </div>
+                    <div className="monster-detail-stats" style={{ padding: '5px 8px', background: '#222' }}>
+                      {phase6Monster.leaderSkill && (
+                        <div className="monster-detail-leader-skill" style={{ textAlign: 'center', marginBottom: '4px', paddingBottom: '4px', borderBottom: '1px solid #333', fontSize: '0.65rem', lineHeight: '1.1' }}>
+                          <span style={{ color: '#ffd700', fontWeight: 'bold', textTransform: 'uppercase' }}>LEADER:</span> <span style={{ color: '#ddd', fontStyle: 'italic' }}>{phase6Monster.leaderSkill}</span>
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '4px 6px', background: 'rgba(0,0,0,0.4)', borderRadius: '6px' }}>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ color: '#ff5555', fontSize: '0.6rem', fontWeight: 'bold', lineHeight: '1' }}>ATK</div>
+                          <div style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold' }}>{(phase6Monster.stats?.atk || '0').toLocaleString()}</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ color: '#5555ff', fontSize: '0.6rem', fontWeight: 'bold', lineHeight: '1' }}>DEF</div>
+                          <div style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold' }}>{(phase6Monster.stats?.def || '0').toLocaleString()}</div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ color: '#55ff55', fontSize: '0.6rem', fontWeight: 'bold', lineHeight: '1' }}>HP</div>
+                          <div style={{ color: '#fff', fontSize: '0.75rem', fontWeight: 'bold' }}>{(phase6Monster.stats?.hp || '0').toLocaleString()}</div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div style={{ padding: '6px', background: '#222', borderTop: '1px solid #333', textAlign: 'center' }}>
-                  <button onClick={closeFusionOverlay} style={{
-                    padding: '4px 20px',
-                    background: 'linear-gradient(to bottom, #d4af37, #a67c00)',
-                    border: '1px solid #8a6d3b',
-                    borderRadius: '4px',
-                    color: '#222',
-                    fontWeight: 'bold',
-                    fontSize: '1rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.5)'
-                  }}>
-                    CLOSE
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {selectedMonster && (
-        <div className="monster-detail-overlay" onClick={() => setSelectedMonster(null)}>
-          <div className="monster-detail-card" onClick={(event) => event.stopPropagation()}>
-            <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 0 2px 0', background: 'rgba(0,0,0,0.5)', borderBottom: '1px solid #333' }}>
-              <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <img
-                  src={`/assets/element_${getElementIcon(selectedMonster.element)}_circle.png?v=129`}
-                  alt={selectedMonster.element}
-                  style={{ width: getElementIcon(selectedMonster.element) === 'dark' ? '23px' : '20px', height: getElementIcon(selectedMonster.element) === 'dark' ? '23px' : '20px', objectFit: 'contain' }}
-                />
-                <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{selectedMonster.name}</span>
-              </div>
-              <div style={{
-                color: getTierColor(selectedMonster.rank),
-                fontWeight: 'normal',
-                fontSize: '0.95rem',
-                marginTop: '1px'
-              }}>
-                {selectedMonster.rank}
-              </div>
-              <button className="monster-detail-close" onClick={() => setSelectedMonster(null)} style={{ position: 'absolute', right: '15px', top: '15px' }}>✕</button>
-            </div>
-            <div className="monster-detail-body">
-              <div className="monster-detail-image" style={{
-                backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=119)`,
-                backgroundSize: '100% 100%',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                display: 'flex',
-                alignItems: 'flex-end',
-                justifyContent: 'center',
-                paddingBottom: '20px',
-                minHeight: '260px',
-                borderRadius: '8px',
-                border: '1px solid #444',
-                position: 'relative'
-              }}>
-                <img
-                  src={`${selectedMonster.fullImage || selectedMonster.image}?v=119`}
-                  alt={selectedMonster.name}
-                  style={{
-                    maxHeight: '90%',
-                    maxWidth: '90%',
-                    objectFit: 'contain',
-                    objectFit: 'contain'
-                  }}
-                />
-              </div>
-              <div className="monster-detail-stats">
-
-                {selectedMonster.leaderSkill && (
-                  <div className="monster-detail-leader-skill" style={{
-                    textAlign: 'center',
-                    marginBottom: '4px',
-                    padding: '0'
-                  }}>
-                    <span style={{ color: '#ffd700', fontWeight: 'bold', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0' }}>
-                      Leader Skill
-                    </span>
-                    <span style={{ color: '#fff', fontSize: '13px', fontStyle: 'italic' }}>
-                      {selectedMonster.leaderSkill}
-                    </span>
+                  <div style={{ padding: '6px', background: '#222', borderTop: '1px solid #333', textAlign: 'center' }}>
+                    <button onClick={closeFusionOverlay} style={{
+                      padding: '4px 20px',
+                      background: 'linear-gradient(to bottom, #d4af37, #a67c00)',
+                      border: '1px solid #8a6d3b',
+                      borderRadius: '4px',
+                      color: '#222',
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.5)'
+                    }}>
+                      CLOSE
+                    </button>
                   </div>
-                )}
-
-                <div className="monster-detail-stat-line" style={{ margin: '8px -16px' }}>
-                  <span className="stat-attack">ATK {selectedMonster.stats.atk.toLocaleString()}</span>
-                  <span className="stat-divider"> • </span>
-                  <span className="stat-defense">DEF {selectedMonster.stats.def.toLocaleString()}</span>
-                  <span className="stat-divider"> • </span>
-                  <span className="stat-hp">HP {selectedMonster.stats.hp.toLocaleString()}</span>
                 </div>
-                <div className="monster-detail-desc" style={{ marginTop: '4px' }}>{selectedMonster.description}</div>
+              </div>
+            )}
+          </div>
+        )
+      }
+
+      {
+        selectedMonster && (
+          <div className="monster-detail-overlay" onClick={() => setSelectedMonster(null)}>
+            <div className="monster-detail-card" onClick={(event) => event.stopPropagation()}>
+              <div className="monster-detail-header" style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '10px 16px', background: 'rgba(0,0,0,0.5)', borderBottom: '1px solid #333' }}>
+                <div className="monster-detail-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img
+                    src={`/assets/element_${getElementIcon(selectedMonster.element)}_circle.png?v=129`}
+                    alt={selectedMonster.element}
+                    style={{ width: '22px', height: '22px', objectFit: 'contain' }}
+                  />
+                  <span style={{ fontWeight: '900', fontSize: '1.4rem', color: '#fff', fontFamily: "'Inter', sans-serif" }}>{selectedMonster.name}</span>
+                </div>
+                <div style={{
+                  color: getTierColor(selectedMonster.rank),
+                  fontWeight: '850',
+                  fontSize: '0.85rem',
+                  marginTop: '-4px',
+                  paddingLeft: '30px',
+                  textTransform: 'uppercase',
+                  fontFamily: "'Inter', sans-serif"
+                }}>
+                  {selectedMonster.rank}
+                </div>
+                <button className="monster-detail-close" onClick={() => setSelectedMonster(null)} style={{ position: 'absolute', right: '15px', top: '15px' }}>✕</button>
+              </div>
+              <div className="monster-detail-body">
+                <div className="monster-detail-image" style={{
+                  backgroundImage: `url(${(selectedMonster.cardBackground || '/assets/bg_final_no_mercy.png')}?v=119)`,
+                  backgroundSize: '100% 100%',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center',
+                  paddingBottom: '20px',
+                  minHeight: '260px',
+                  borderRadius: '8px',
+                  border: '1px solid #444',
+                  position: 'relative'
+                }}>
+                  <img
+                    src={`${selectedMonster.fullImage || selectedMonster.image}?v=119`}
+                    alt={selectedMonster.name}
+                    style={{
+                      maxHeight: '90%',
+                      maxWidth: '90%',
+                      objectFit: 'contain',
+                      objectFit: 'contain'
+                    }}
+                  />
+                </div>
+                <div className="monster-detail-stats">
+
+                  {selectedMonster.leaderSkill && (
+                    <div className="monster-detail-leader-skill" style={{
+                      textAlign: 'center',
+                      marginBottom: '4px',
+                      padding: '0'
+                    }}>
+                      <span style={{ color: '#ffda00', fontWeight: 'bold', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0' }}>
+                        Leader Skill
+                      </span>
+                      <span style={{ color: '#fff', fontSize: '13px', fontStyle: 'italic' }}>
+                        {selectedMonster.leaderSkill}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="monster-detail-stat-line" style={{ margin: '8px -16px' }}>
+                    <span className="stat-attack">ATK {selectedMonster.stats.atk.toLocaleString()}</span>
+                    <span className="stat-divider"> • </span>
+                    <span className="stat-defense">DEF {selectedMonster.stats.def.toLocaleString()}</span>
+                    <span className="stat-divider"> • </span>
+                    <span className="stat-hp">HP {selectedMonster.stats.hp.toLocaleString()}</span>
+                  </div>
+                  <div className="monster-detail-desc" style={{ marginTop: '4px' }}>{selectedMonster.description}</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )
+        )
       }
     </div >
   );

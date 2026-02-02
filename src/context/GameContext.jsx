@@ -92,7 +92,8 @@ export const GameProvider = ({ children }) => {
                     showLevelUp: false,
                     bossState: 'active',
                     bossEndTime: Date.now() + 12 * 60 * 60 * 1000,
-                    bossRespawnTime: null
+                    bossRespawnTime: null,
+                    questProgress: { '1-1-1': 0 }
                 };
 
                 return {
@@ -152,7 +153,8 @@ export const GameProvider = ({ children }) => {
             showLevelUp: false,
             bossState: 'active',
             bossEndTime: Date.now() + 12 * 60 * 60 * 1000,
-            bossRespawnTime: null
+            bossRespawnTime: null,
+            questProgress: { '1-1-1': 0 }
         };
     });
 
@@ -179,6 +181,11 @@ export const GameProvider = ({ children }) => {
                 const realMaxStamina = 50 + bonusStamina;
                 const realMaxHp = 100 + bonusHp;
                 const realMaxEnergy = 50 + bonusEnergy;
+
+                // FORCE SYNC MAX STATS
+                if (prev.maxHp !== realMaxHp) { updates.maxHp = realMaxHp; changed = true; }
+                if (prev.maxEnergy !== realMaxEnergy) { updates.maxEnergy = realMaxEnergy; changed = true; }
+                if (prev.maxStamina !== realMaxStamina) { updates.maxStamina = realMaxStamina; changed = true; }
 
                 const leaderEffect = getLeaderSkillEffect(prev.leader);
                 const baseWait = 120;
@@ -265,14 +272,17 @@ export const GameProvider = ({ children }) => {
     };
 
     const bulkUpdateStats = (newStats, pointsSpent) => {
-        setState(prev => ({
-            ...prev,
-            skillPoints: prev.skillPoints - pointsSpent,
-            stats: {
-                ...prev.stats,
-                ...newStats
-            }
-        }));
+        setState(prev => {
+            const nextStats = { ...prev.stats, ...newStats };
+            return {
+                ...prev,
+                skillPoints: prev.skillPoints - pointsSpent,
+                stats: nextStats,
+                maxHp: 100 + (nextStats.health * 10),
+                maxEnergy: 50 + nextStats.energy,
+                maxStamina: 50 + nextStats.stamina
+            };
+        });
     };
 
     const applyResourceDelta = ({ money = 0, gems = 0 }) => {
@@ -294,7 +304,10 @@ export const GameProvider = ({ children }) => {
                 skillPoints: prev.skillPoints + totalSpent,
                 stats: {
                     health: 0, energy: 0, stamina: 0, attack: 0, defense: 0, od: 0
-                }
+                },
+                maxHp: 100,
+                maxEnergy: 50,
+                maxStamina: 50
             };
         });
     };
@@ -461,8 +474,63 @@ export const GameProvider = ({ children }) => {
         }
     };
 
+    const doQuest = (quest) => {
+        const energyCost = quest.energy;
+        const xpReward = quest.xp;
+        const moneyReward = quest.money;
+
+        if (state.energy < energyCost) return false;
+
+        setState(prev => {
+            const progressId = quest.id;
+            const currentProgress = prev.questProgress?.[progressId] || 0;
+            if (currentProgress >= 100) return prev;
+
+            const nextProgress = Math.min(100, currentProgress + 10);
+            const newQuestProgress = { ...prev.questProgress, [progressId]: nextProgress };
+
+            let newXp = prev.xp + xpReward;
+            let newLevel = prev.level;
+            let newXpToLevel = prev.xpToLevel;
+            let tempPoints = prev.skillPoints || 0;
+            let tempShowLevelUp = false;
+            let tempHp = prev.hp;
+            let tempStamina = prev.stamina;
+            let tempEnergy = prev.energy - energyCost;
+
+            if (newXp >= newXpToLevel) {
+                newXp -= newXpToLevel;
+                newLevel++;
+                newXpToLevel = Math.floor(newXpToLevel * 1.1);
+                tempPoints += 5;
+                tempShowLevelUp = true;
+                tempHp = 100 + (prev.stats.health * 10);
+                tempStamina = 50 + prev.stats.stamina;
+                tempEnergy = 50 + prev.stats.energy;
+            }
+
+            triggerResourcePopup('xp', xpReward);
+            triggerResourcePopup('money', moneyReward);
+
+            return {
+                ...prev,
+                energy: tempEnergy,
+                money: prev.money + moneyReward,
+                xp: newXp,
+                level: newLevel,
+                xpToLevel: newXpToLevel,
+                hp: tempHp,
+                stamina: tempStamina,
+                skillPoints: tempPoints,
+                showLevelUp: tempShowLevelUp,
+                questProgress: newQuestProgress
+            };
+        });
+        return true;
+    };
+
     return (
-        <GameContext.Provider value={{ state, attackBoss, damagePopup, bossShake, resourcePopups, bulkUpdateStats, resetStats, dismissLevelUp, skillModalOpen, setSkillModalOpen, applyResourceDelta, updateMonsterCollection, appointLeader, isAttacking }}>
+        <GameContext.Provider value={{ state, attackBoss, damagePopup, bossShake, resourcePopups, bulkUpdateStats, resetStats, dismissLevelUp, skillModalOpen, setSkillModalOpen, applyResourceDelta, updateMonsterCollection, appointLeader, isAttacking, doQuest }}>
             {children}
         </GameContext.Provider>
     );

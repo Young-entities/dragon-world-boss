@@ -64,7 +64,6 @@ const TopUI = ({ variant = 'boss' }) => {
                         <div className="money-amount-pill">{fmt(state.money)}</div>
                     </div>
                     <div className="money-sub">Next Check: 15:00</div>
-
                     {/* MONEY FLOATERS */}
                     {resourcePopups.filter(p => p.type === 'money').map(p => (
                         <div key={p.id} className={`res-floater ${p.isCrit ? 'crit' : ''}`} style={{ top: '30px', right: '10px' }}>+{fmt(p.val)}</div>

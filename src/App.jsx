@@ -4,6 +4,7 @@ import { useGameState } from './context/useGameState';
 import { monsters } from './data/monsters';
 import MonsterCard from './components/MonsterCard';
 import MonsterTab from './components/MonsterTab';
+import QuestScreen from './components/QuestScreen';
 import TopUI from './components/TopUI';
 import SkillModal from './components/SkillModal';
 import BattleMenu from './components/BattleMenu';
@@ -206,6 +207,7 @@ const GameLayout = () => {
 
   const handleBattleSelect = (id) => {
     if (id === 'world-boss') setBattleMode('world-boss');
+    if (id === 'quest') setBattleMode('quest');
   };
 
   return (
@@ -227,9 +229,11 @@ const GameLayout = () => {
         {activeTab === 'boss' && (
           battleMode === 'menu' ? (
             <BattleMenu onSelect={handleBattleSelect} />
-          ) : (
+          ) : battleMode === 'world-boss' ? (
             <BossScreen onBack={() => setBattleMode('menu')} />
-          )
+          ) : battleMode === 'quest' ? (
+            <QuestScreen onBack={() => setBattleMode('menu')} />
+          ) : null
         )}
         {activeTab === 'monsters' && <MonsterTab />}
         {activeTab === 'shop' && (
@@ -248,7 +252,7 @@ const GameLayout = () => {
         position: 'relative', zIndex: 50
       }}>
         <NavButton label="HOME" image="/assets/icon_home.png" active={false} onClick={() => { }} />
-        <NavButton label="BATTLE" image="/assets/icon_battle.png" active={activeTab === 'boss'} onClick={() => setActiveTab('boss')} />
+        <NavButton label="BATTLE" image="/assets/icon_battle.png" active={activeTab === 'boss'} onClick={() => { setActiveTab('boss'); setBattleMode('menu'); }} />
         <NavButton label="UNIT" image="/assets/icon_monster.png" active={activeTab === 'monsters'} onClick={() => setActiveTab('monsters')} />
         <NavButton label="FUSION" image="/assets/icon_equip.png" active={activeTab === 'fusion'} onClick={() => alert("Fusion Coming!")} />
         <NavButton label="SHOP" image="/assets/icon_shop.png" active={activeTab === 'shop'} onClick={() => setActiveTab('shop')} />

@@ -33,12 +33,13 @@ const SkillModal = ({ isOpen, onClose }) => {
     })();
 
     const statConfigs = {
-        health: { label: 'Health', icon: '/assets/icon_hp.svg', getBonus: (v) => `+${v * 10} Max HP` },
-        energy: { label: 'Energy', icon: '/assets/icon_energy.svg', getBonus: (v) => `+${v} Max Energy` },
-        stamina: { label: 'Stamina', icon: '/assets/icon_battle.png', getBonus: (v) => `+${v} Max Stamina` },
+        health: { label: 'Health', icon: '/assets/icon_hp.svg', short: 'HP', color: '#ff4d4d', getBonus: (v) => `+${v * 10} Max HP` },
+        energy: { label: 'Energy', icon: '/assets/icon_energy.svg', short: 'EN', color: '#ffd700', getBonus: (v) => `+${v} Max Energy` },
+        stamina: { label: 'Stamina', icon: '/assets/icon_battle.png', short: 'ST', color: '#39b6ff', getBonus: (v) => `+${v} Max Stamina` },
         attack: {
             label: 'Attack',
             icon: '/assets/stat_attack_retro.png',
+            isRetro: true,
             getBonus: (v) => {
                 const perc = (v * 0.1).toFixed(1);
                 const leaderBonus = (leaderSkillEffect.attack || 0) * 100;
@@ -48,6 +49,7 @@ const SkillModal = ({ isOpen, onClose }) => {
         defense: {
             label: 'Defense',
             icon: '/assets/stat_defense_retro.png',
+            isRetro: true,
             getBonus: (v) => {
                 const statBonus = v;
                 const leaderBonus = (leaderSkillEffect.defense || 0) * 100;
@@ -57,6 +59,7 @@ const SkillModal = ({ isOpen, onClose }) => {
         od: {
             label: 'Overdrive DMG',
             icon: '/assets/stat_overdrive_retro.png',
+            isRetro: true,
             getBonus: (v) => {
                 const perc = (v * 0.1).toFixed(1);
                 return `+${perc}% OD DMG`;
@@ -113,7 +116,16 @@ const SkillModal = ({ isOpen, onClose }) => {
                     {Object.entries(statConfigs).map(([key, config]) => (
                         <div key={key} className="skill-item compact">
                             <div className="skill-info">
-                                <img src={config.icon} alt={config.label} className="skill-icon-mini" />
+                                {config.isRetro ? (
+                                    <img src={config.icon} alt={config.label} className="stat-boxed-icon-retro" />
+                                ) : (
+                                    <div className="stat-boxed-icon-virtual" style={{ '--stat-accent': config.color }}>
+                                        <div className="boxed-glow"></div>
+                                        <div className="boxed-arrow">▲</div>
+                                        <img src={config.icon} alt={config.label} className="boxed-icon-img" />
+                                        <div className="boxed-label">{config.short}</div>
+                                    </div>
+                                )}
                                 <div className="skill-details">
                                     <div className="skill-name-row">
                                         <span className="skill-name">{config.label}</span>
