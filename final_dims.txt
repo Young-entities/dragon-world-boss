@@ -1,0 +1,6 @@
+public/assets/earth_icon.png: 992x992 (Aspect: 1.00)
+public/assets/earth_minion_final.png: 1200x896 (Aspect: 1.34)
+public/assets/earth_tree_bg_final.png: 1248x832 (Aspect: 1.50)
+public/assets/overlord_face_crop.png: 992x992 (Aspect: 1.00)
+public/assets/overlord_absolute_final.png: 1200x896 (Aspect: 1.34)
+public/assets/electric_bg_final.png: 1248x832 (Aspect: 1.50)

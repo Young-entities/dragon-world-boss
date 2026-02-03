@@ -262,24 +262,11 @@
     z-index: 2;
 }
 
-/* Glassy Icon Container to match premium buttons */
-.resource-item.pill::before {
-    content: '';
-    position: absolute;
-    left: 4px;
-    width: 28px;
-    height: 28px;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.5);
-    z-index: 1;
-}
-
+/* Glassy Icon Container removed as per user request */
 .resource-item.pill {
     position: relative;
-    padding-left: 36px !important;
-    gap: 10px !important;
+    /* padding-left removed to fix alignment and width */
+    gap: 6px !important;
 }
 
 .resource-bar {
@@ -432,3 +419,5 @@
     font-size: 16px !important;
     text-shadow: 0 0 5px #ffaa00, 0 1px 2px #000 !important;
 }
+.res-icon.stamina-icon { width: 24px !important; height: 24px !important; margin-left: -2px; }
+

@@ -1,0 +1,55 @@
+/* PREMIUM RARITY BORDERS */
+
+/* Gold / Primordial Tier */
+.rarity-border-primordial {
+    position: relative;
+    padding: 5px;
+    /* Border Thickness */
+    /* Sharp Metallic Gold */
+    background: linear-gradient(135deg,
+            #a67c00 0%,
+            #ffea80 20%,
+            #ffea80 24%,
+            #b88a00 50%,
+            #d4a017 51%,
+            #fff0a0 85%,
+            #a67c00 100%);
+    border-radius: 6px;
+    /* Crisp Edges + Glow */
+    box-shadow:
+        0 0 0 1px #8a6e2f,
+        /* Outer definition line */
+        0 4px 6px rgba(0, 0, 0, 0.6),
+        /* Drop Shadow */
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        /* Top Bevel */
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+    /* Bottom Bevel */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    /* Force Square */
+    box-sizing: border-box;
+    /* Include padding in size */
+    overflow: hidden;
+}
+
+/* Inner Bevel (Optional) */
+.rarity-border-primordial::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    /* Just fitting inside the outer gradient */
+    border: 1px solid rgba(133, 94, 16, 0.5);
+    border-radius: 5px;
+    pointer-events: none;
+}
+
+.rarity-border-primordial img {
+    display: block;
+    border-radius: 2px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    /* Inner shadow on the image itself */
+    border: 1px solid #4a340a;
+}

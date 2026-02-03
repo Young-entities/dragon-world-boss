@@ -84,7 +84,7 @@ export const monsters = [
     name: "Inferno Empress Pyra",
     rank: "Primordial",
     element: "Fire",
-    image: "/assets/fire_empress_icon.png?v=normalized",
+    image: "/assets/primordial_fire_clean.png?v=fixed",
     fullImage: "/assets/fire_empress_unit.png?v=upscaled",
     cardBackground: "/assets/fire_empress_bg.png?v=normalized",
     leaderSkill: "Lower Energy Recharge Time: 25 Seconds",

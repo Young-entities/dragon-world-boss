@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useGameState } from '../context/useGameState';
 import { monsters as baseMonsters } from '../data/monsters';
 import './MonsterTab.css';
+import './RarityBorders.css';
 
 const tierOrder = [
   { key: 'Primordial', tierClass: 'tier-13', color: '#ffd700', rankValue: 13 },
@@ -185,6 +186,8 @@ const MonsterTab = () => {
     });
   };
 
+
+
   const openFusionModal = (type) => {
     if (!fusionSlots.slot1 || !fusionSlots.slot2) {
       window.alert('You need 2 units to fuse!');
@@ -197,10 +200,10 @@ const MonsterTab = () => {
     }
 
     const rank = fusionSlots.slot1.rankValue || 1;
-    const cost = getFusionCost(rank, type);
+    const baseCost = getFusionCost(rank, type);
     const chance = type === 'gem' ? '100%' : '40%';
 
-    setFusionModal({ type, cost, chance });
+    setFusionModal({ type, baseCost, cost: baseCost, chance, amount: 1 });
   };
 
   const closeFusionModal = () => setFusionModal(null);
@@ -208,7 +211,7 @@ const MonsterTab = () => {
   const executeFusion = () => {
     if (!fusionModal) return;
 
-    const { type, cost } = fusionModal;
+    const { type, cost, amount = 1 } = fusionModal;
     closeFusionModal();
 
     if (!fusionSlots.slot1 || !fusionSlots.slot2) return;
@@ -222,8 +225,8 @@ const MonsterTab = () => {
     }
 
     const qty = monsterInventory[name1] || 0;
-    if (qty < 2) {
-      window.alert(`You don't have enough ${name1}s! (Need 2, Have ${qty})`);
+    if (qty < amount * 2) {
+      window.alert(`You don't have enough ${name1}s! (Need ${amount * 2}, Have ${qty})`);
       return;
     }
 
@@ -242,44 +245,44 @@ const MonsterTab = () => {
     applyResourceDelta(type === 'money' ? { money: -cost } : { gems: -cost });
 
     const chance = type === 'gem' ? 1.0 : 0.4;
-    if (!rollFusionSuccess(chance)) {
-      const fallbackTier = fusionSlots.slot1.tier;
-      const sameTierMonsters = fusionMonsters.filter((monster) => monster.tier === fallbackTier);
-      const fallbackMonster = pickFallbackMonster(sameTierMonsters, name1);
+    let successCount = 0;
+    let failCount = 0;
 
-      if (!fallbackMonster) {
-        window.alert('No fallback unit found for this tier.');
-        return;
-      }
-
-      const currentQty = monsterInventory[name1] || 0;
-      const nextName1 = Math.max(0, currentQty - 2);
-
-      if (fallbackMonster.name === name1) {
-        updateMonsterCollection({
-          [name1]: Math.max(0, nextName1 + 1)
-        });
-      } else {
-        updateMonsterCollection({
-          [name1]: nextName1,
-          [fallbackMonster.name]: (monsterInventory[fallbackMonster.name] || 0) + 1
-        });
-      }
-
-      startFusionAnimation(name1, fallbackMonster.name, false);
-      return;
+    for (let i = 0; i < amount; i++) {
+      if (rollFusionSuccess(chance)) successCount++;
+      else failCount++;
     }
 
-    const currentQty = monsterInventory[name1] || 0;
-    const nextName1 = Math.max(0, currentQty - 2);
-    const nextResult = (monsterInventory[resultName] || 0) + 1;
+    // Calculate Inventory Updates
+    const updates = {};
+    const fallbackTier = fusionSlots.slot1.tier;
+    const sameTierMonsters = fusionMonsters.filter((monster) => monster.tier === fallbackTier);
 
-    updateMonsterCollection({
-      [name1]: nextName1,
-      [resultName]: nextResult
-    });
+    // Deduct Ingredients
+    updates[name1] = (monsterInventory[name1] || 0) - (amount * 2);
 
-    startFusionAnimation(name1, resultName, true);
+    // Add Successes
+    if (successCount > 0) {
+      updates[resultName] = (monsterInventory[resultName] || 0) + successCount;
+    }
+
+    // Add Failures (Fallbacks)
+    for (let i = 0; i < failCount; i++) {
+      const fallbackMonster = pickFallbackMonster(sameTierMonsters, name1);
+      if (fallbackMonster) {
+        // Handle case where fallback is same as ingredient or previously updated
+        const currentVal = (updates[fallbackMonster.name] !== undefined)
+          ? updates[fallbackMonster.name]
+          : (monsterInventory[fallbackMonster.name] || 0);
+        updates[fallbackMonster.name] = currentVal + 1;
+      }
+    }
+
+    updateMonsterCollection(updates);
+
+    // Trigger Animation (Visuals show result logic)
+    // If mixed batch, show success if majority or at least one? logic: Show Success if > 0.
+    startFusionAnimation(name1, resultName, successCount > 0);
   };
 
   const startFusionAnimation = (ingredientName, resultName, success) => {
@@ -362,9 +365,16 @@ const MonsterTab = () => {
 
               return (
                 <div key={monster.id} className="mon-row" onClick={() => setSelectedMonster(monster)}>
-                  <div className="mon-icon-box">
-                    <img src={monster.icon || monster.image} alt={monster.name} style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
-                  </div>
+                  {monster.rank === 'Primordial' ? (
+                    // CSS BORDER FOR PRIMORDIAL
+                    <div className="mon-icon-box rarity-border-primordial" style={{ padding: '4px', overflow: 'visible', border: 'none' }}>
+                      <img src={monster.icon || monster.image} alt={monster.name} style={{ width: '100%', height: '100%', borderRadius: '2px', objectFit: 'cover' }} />
+                    </div>
+                  ) : (
+                    <div className="mon-icon-box">
+                      <img src={monster.icon || monster.image} alt={monster.name} style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
+                    </div>
+                  )}
 
                   <div className="mon-info">
                     <div className="mon-name">
@@ -493,56 +503,75 @@ const MonsterTab = () => {
 
       {subTab === 'fusions' && (
         <div className="mon-tab-content active fusion-tab">
-          <div className="fusion-deck unique-style">
-            <div className="fusion-deck-left">
-              <div className="fusion-chamber">
-                <div className="fusion-slot-wrapper">
-                  <div
-                    className={`fusion-slot ${fusionSlots.slot1 ? 'filled' : ''}`}
-                    style={getSlotStyle(fusionSlots.slot1)}
-                    onClick={() => clearFusionSlot('slot1')}
-                  >
-                    {fusionSlots.slot1 ? (
-                      <img src={fusionSlots.slot1.icon} alt={fusionSlots.slot1.name} />
-                    ) : (
-                      <img src="/assets/fusion_vortex.png" className="vortex-bg" />
-                    )}
-                  </div>
+          <div className="fusion-chamber-container">
+            <div className="chamber-visual">
+              {/* LEFT FUSION SLOT */}
+              <div className="chamber-slot-frame">
+                <div
+                  className={`fusion-slot ${fusionSlots.slot1 ? 'filled' : ''}`}
+                  style={getSlotStyle(fusionSlots.slot1)}
+                  onClick={() => clearFusionSlot('slot1')}
+                >
+                  {fusionSlots.slot1 ? (
+                    <img src={fusionSlots.slot1.icon} alt={fusionSlots.slot1.name} />
+                  ) : (
+                    <div className="slot-placeholder">+</div>
+                  )}
                 </div>
+              </div>
 
-                <div className="fusion-plus">
-                  <div className="atom-container">
-                    <div className="atom-nucleus">
-                      <div className="proton p1" />
-                      <div className="proton p2" />
-                      <div className="proton p3" />
-                      <div className="proton p4" />
-                    </div>
-                    <div className="atom-ring ring-1" />
-                    <div className="atom-ring ring-2" />
-                    <div className="atom-ring ring-3" />
-                  </div>
-                </div>
+              {/* CENTER FUSION CORE */}
+              <div className="chamber-core">
+                <div className="core-line"></div>
+                <div className="core-arrow">+</div>
+              </div>
 
-                <div className="fusion-slot-wrapper">
-                  <div
-                    className={`fusion-slot ${fusionSlots.slot2 ? 'filled' : ''}`}
-                    style={getSlotStyle(fusionSlots.slot2)}
-                    onClick={() => clearFusionSlot('slot2')}
-                  >
-                    {fusionSlots.slot2 ? (
-                      <img src={fusionSlots.slot2.icon} alt={fusionSlots.slot2.name} />
-                    ) : (
-                      <img src="/assets/fusion_vortex.png" className="vortex-bg" />
-                    )}
-                  </div>
+              {/* RIGHT FUSION SLOT */}
+              <div className="chamber-slot-frame">
+                <div
+                  className={`fusion-slot ${fusionSlots.slot2 ? 'filled' : ''}`}
+                  style={getSlotStyle(fusionSlots.slot2)}
+                  onClick={() => clearFusionSlot('slot2')}
+                >
+                  {fusionSlots.slot2 ? (
+                    <img src={fusionSlots.slot2.icon} alt={fusionSlots.slot2.name} />
+                  ) : (
+                    <div className="slot-placeholder">+</div>
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="fusion-actions">
-              <button className="btn-fuse" onClick={() => openFusionModal('money')}>FUSE</button>
-              <button className="btn-fuse mass" onClick={() => openFusionModal('gem')}>INSTANT<br />FUSE</button>
+            {/* FUSION CONTROLS */}
+            <div className="fusion-control-panel">
+              <button
+                className={`btn-chamber-action fuse ${(!fusionSlots.slot1 || !fusionSlots.slot2) ? 'disabled' : ''}`}
+                onClick={() => (fusionSlots.slot1 && fusionSlots.slot2) && openFusionModal('money')}
+              >
+                <span className="btn-label">FUSE</span>
+                <span className="btn-cost" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                  {(fusionSlots.slot1 && fusionSlots.slot2) ? (
+                    <>
+                      {getFusionCost(fusionSlots.slot1.rankValue || tierOrder.find(t => t.key === fusionSlots.slot1.tier)?.rankValue || 1, 'money').toLocaleString()}
+                      <img src="/assets/icon_gold.svg" alt="Gold" style={{ width: '12px', height: '12px' }} />
+                    </>
+                  ) : 'SELECT UNITS'}
+                </span>
+              </button>
+              <button
+                className={`btn-chamber-action instant ${(!fusionSlots.slot1 || !fusionSlots.slot2) ? 'disabled' : ''}`}
+                onClick={() => (fusionSlots.slot1 && fusionSlots.slot2) && openFusionModal('gem')}
+              >
+                <span className="btn-label">INSTANT</span>
+                <span className="btn-cost-gem" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                  {(fusionSlots.slot1 && fusionSlots.slot2) ? (
+                    <>
+                      {getFusionCost(fusionSlots.slot1.rankValue || tierOrder.find(t => t.key === fusionSlots.slot1.tier)?.rankValue || 1, 'gem').toLocaleString()}
+                      <img src="/assets/icon_gem.svg" alt="Gems" style={{ width: '12px', height: '12px' }} />
+                    </>
+                  ) : 'SELECT UNITS'}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -618,12 +647,12 @@ const MonsterTab = () => {
                 <div className="fusion-modal-ingredients">
                   <div className="fusion-modal-slot">
                     <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot1 ? `<img src='${fusionSlots.slot1.icon}' />` : '' }} />
-                    <div className="fusion-modal-qty">1</div>
+                    <div className="fusion-modal-qty">{fusionModal.amount}</div>
                   </div>
                   <div className="fusion-modal-plus">+</div>
                   <div className="fusion-modal-slot">
                     <div className="fusion-modal-slot-img" dangerouslySetInnerHTML={{ __html: fusionSlots.slot2 ? `<img src='${fusionSlots.slot2.icon}' />` : '' }} />
-                    <div className="fusion-modal-qty">1</div>
+                    <div className="fusion-modal-qty">{fusionModal.amount}</div>
                   </div>
                 </div>
                 <div className="fusion-modal-connectors">
@@ -633,6 +662,35 @@ const MonsterTab = () => {
                 <div className="fusion-modal-result">
                   <div className="fusion-modal-result-ring" />
                   <span>?</span>
+                </div>
+
+                {/* BATCH SELECTOR - Moved Below per Request */}
+                <div className="fusion-batch-container" style={{ textAlign: 'center', margin: '15px 0 5px' }}>
+                  <div className="fusion-selector-wrapper" style={{ display: 'inline-flex', alignItems: 'center', background: '#000', border: '1px solid #444', borderRadius: '4px', overflow: 'hidden' }}>
+                    <button
+                      className="selector-btn"
+                      onClick={() => {
+                        const newAmount = Math.max(1, fusionModal.amount - 1);
+                        setFusionModal(prev => ({ ...prev, amount: newAmount, cost: prev.baseCost * newAmount }));
+                      }}
+                      style={{ background: '#222', border: 'none', borderRight: '1px solid #444', color: '#888', width: '30px', height: '30px', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >◄</button>
+                    <div className="selector-val" style={{ width: '60px', color: '#fff', fontSize: '16px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {(fusionModal.amount === Math.floor((monsterInventory[fusionSlots.slot1.name] || 0) / 2)) ? 'MAX' : fusionModal.amount}
+                    </div>
+                    <button
+                      className="selector-btn"
+                      onClick={() => {
+                        const maxFusions = Math.floor((monsterInventory[fusionSlots.slot1.name] || 0) / 2);
+                        const newAmount = Math.min(maxFusions, fusionModal.amount + 1);
+                        setFusionModal(prev => ({ ...prev, amount: newAmount, cost: prev.baseCost * newAmount }));
+                      }}
+                      style={{ background: '#222', border: 'none', borderLeft: '1px solid #444', color: '#888', width: '30px', height: '30px', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >►</button>
+                  </div>
+                </div>
+                <div style={{ color: '#ff4444', fontSize: '11px', textAlign: 'center', marginBottom: '15px', fontWeight: 'bold' }}>
+                  ※ Note: Units used in Bulk Combination cannot be recovered.
                 </div>
                 <div className="fusion-info">
                   <div className="fusion-info-row"><span>Success Rate:</span><span className="fusion-info-value">{fusionModal.chance}</span></div>

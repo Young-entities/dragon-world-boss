@@ -33,12 +33,12 @@ const SkillModal = ({ isOpen, onClose }) => {
     })();
 
     const statConfigs = {
-        health: { label: 'Health', icon: '/assets/icon_hp.svg', short: 'HP', color: '#ff4d4d', getBonus: (v) => `+${v * 10} Max HP` },
-        energy: { label: 'Energy', icon: '/assets/icon_energy.svg', short: 'EN', color: '#ffd700', getBonus: (v) => `+${v} Max Energy` },
-        stamina: { label: 'Stamina', icon: '/assets/icon_battle.png', short: 'ST', color: '#39b6ff', getBonus: (v) => `+${v} Max Stamina` },
+        health: { label: 'Health', icon: '/assets/stat_hp_retro.png', isRetro: true, color: '#ff4d4d', getBonus: (v) => `+${v * 10} Max HP` },
+        energy: { label: 'Energy', icon: '/assets/stat_energy_retro.png', isRetro: true, color: '#ffd700', getBonus: (v) => `+${v} Max Energy` },
+        stamina: { label: 'Stamina', icon: '/assets/stat_stamina_retro.png', isRetro: true, color: '#39b6ff', getBonus: (v) => `+${v} Max Stamina` },
         attack: {
             label: 'Attack',
-            icon: '/assets/stat_attack_retro.png',
+            icon: '/assets/stat_attack_modern.png',
             isRetro: true,
             getBonus: (v) => {
                 const perc = (v * 0.1).toFixed(1);
@@ -48,7 +48,7 @@ const SkillModal = ({ isOpen, onClose }) => {
         },
         defense: {
             label: 'Defense',
-            icon: '/assets/stat_defense_retro.png',
+            icon: '/assets/stat_defense_modern.png',
             isRetro: true,
             getBonus: (v) => {
                 const statBonus = v;
@@ -58,7 +58,7 @@ const SkillModal = ({ isOpen, onClose }) => {
         },
         od: {
             label: 'Overdrive DMG',
-            icon: '/assets/stat_overdrive_retro.png',
+            icon: '/assets/stat_overdrive_modern.png',
             isRetro: true,
             getBonus: (v) => {
                 const perc = (v * 0.1).toFixed(1);

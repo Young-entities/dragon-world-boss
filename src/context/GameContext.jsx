@@ -154,6 +154,32 @@ export const GameProvider = ({ children }) => {
             bossState: 'active',
             bossEndTime: Date.now() + 12 * 60 * 60 * 1000,
             bossRespawnTime: null,
+            bosses: {
+                world: {
+                    name: "World Titan",
+                    hp: 500000000000,
+                    maxHp: 500000000000,
+                    state: 'active',
+                    respawnTime: null,
+                    endTime: Date.now() + 12 * 60 * 60 * 1000
+                },
+                elemental: {
+                    name: "Elemental Invader",
+                    hp: 200000000000,
+                    maxHp: 200000000000,
+                    state: 'active',
+                    respawnTime: null,
+                    endTime: Date.now() + 6 * 60 * 60 * 1000
+                },
+                eternal: {
+                    name: "Eternal Void",
+                    hp: 1000000000000,
+                    maxHp: 1000000000000,
+                    state: 'locked', // Logic will unlock if Friday
+                    respawnTime: null,
+                    endTime: null
+                }
+            },
             questProgress: { '1-1-1': 0 }
         };
     });
@@ -225,36 +251,161 @@ export const GameProvider = ({ children }) => {
                     }
                 }
 
-                if (prev.bossState === 'active' && prev.bossHp > 0) {
-                    const simulatedDmg = Math.floor(Math.random() * 500000) + 100000;
-                    updates.bossHp = Math.max(0, prev.bossHp - simulatedDmg);
-                    updates.worldBossPlayers = prev.worldBossPlayers.map(p => ({
-                        ...p,
-                        damage: p.damage + Math.floor(simulatedDmg * (0.8 + Math.random() * 0.4))
-                    }));
+                // BOSS LOGIC (World, Elemental, Eternal)
+                const now = Date.now();
+                if (!prev.bosses) {
+                    updates.bosses = {
+                        world: {
+                            name: "World Titan",
+                            hp: 500000000000,
+                            maxHp: 500000000000,
+                            state: 'active',
+                            respawnTime: null,
+                            endTime: Date.now() + 12 * 60 * 60 * 1000,
+                            rotationIndex: 0
+                        },
+                        elemental: {
+                            name: "Elemental Invader",
+                            hp: 200000000000,
+                            maxHp: 200000000000,
+                            state: 'active',
+                            respawnTime: null,
+                            endTime: Date.now() + 6 * 60 * 60 * 1000
+                        },
+                        eternal: {
+                            name: "Eternal Void",
+                            hp: 1000000000000,
+                            maxHp: 1000000000000,
+                            state: 'locked',
+                            respawnTime: null,
+                            endTime: null
+                        }
+                    };
                     changed = true;
+                } else {
+                    const dayOfWeek = new Date().getDay(); // 0=Sun, 5=Fri
+                    const bossTypes = ['world', 'elemental', 'eternal'];
+
+                    bossTypes.forEach(type => {
+                        const boss = prev.bosses[type];
+                        let nextState = boss.state;
+                        let nextHp = boss.hp;
+                        let nextEndTime = boss.endTime;
+                        let nextRespawn = boss.respawnTime;
+                        let bossChanged = false;
+
+                        // 1. ETERNAL BOSS (Friday Only)
+                        if (type === 'eternal') {
+                            if (dayOfWeek === 5) { // Friday
+                                // If locked and not in cooldown (killed), activate
+                                if (boss.state === 'locked' && (!boss.respawnTime || now >= boss.respawnTime)) {
+                                    nextState = 'active';
+                                    nextHp = boss.maxHp;
+                                    bossChanged = true;
+                                }
+                            } else {
+                                // Not Friday
+                                if (boss.state !== 'locked') {
+                                    nextState = 'locked';
+                                    bossChanged = true;
+                                }
+                            }
+                        }
+
+                        // 2. ACTIVE BOSS LOGIC
+                        if (nextState === 'active') {
+                            // Check End Time (Forced Despawn) OR Death
+                            if (nextHp <= 0 || (nextEndTime && now >= nextEndTime)) {
+                                nextState = 'cooldown';
+                                // Respawn Times: World=23h, Elemental=11h, Eternal=Next Friday
+                                if (type === 'world') nextRespawn = now + 23 * 60 * 60 * 1000;
+                                else if (type === 'elemental') nextRespawn = now + 11 * 60 * 60 * 1000;
+                                else if (type === 'eternal') nextRespawn = now + 24 * 60 * 60 * 1000; // Just push it forward, day check handles lock
+
+                                bossChanged = true;
+                            } else {
+                                // Simulate Damage (World Boss Only)
+                                if (type === 'world') {
+                                    const simulatedDmg = Math.floor(Math.random() * 500000) + 100000;
+                                    nextHp = Math.max(0, nextHp - simulatedDmg);
+                                    bossChanged = true;
+                                    if (Math.random() > 0.9) { // Occasionally update leaderboard
+                                        updates.worldBossPlayers = prev.worldBossPlayers.map(p => ({
+                                            ...p,
+                                            damage: p.damage + Math.floor(simulatedDmg * (0.8 + Math.random() * 0.4))
+                                        }));
+                                        changed = true;
+                                    }
+                                }
+                            }
+                        }
+                        // 3. COOLDOWN LOGIC
+                        let rotationUpdate = {};
+
+                        if (nextState === 'cooldown') {
+                            if (now >= nextRespawn) {
+                                // Respawn
+                                nextState = 'active';
+                                nextHp = boss.maxHp;
+
+                                if (type === 'world') {
+                                    nextEndTime = now + 23 * 60 * 60 * 1000;
+                                    // Rotation Logic
+                                    const rotation = [
+                                        { name: "Primordial Ignis", element: 'fire', img: '/assets/primordial_fire_combined.png' },
+                                        { name: "Primordial Tide", element: 'water' },
+                                        { name: "Primordial Spark", element: 'electric' },
+                                        { name: "Primordial Terra", element: 'earth' },
+                                        { name: "Primordial Void", element: 'dark' },
+                                        { name: "Primordial Light", element: 'holy' }
+                                    ];
+                                    const nextIndex = ((boss.rotationIndex || 0) + 1) % rotation.length;
+                                    rotationUpdate = {
+                                        rotationIndex: nextIndex,
+                                        name: rotation[nextIndex].name,
+                                        img: rotation[nextIndex].img
+                                    };
+                                }
+                                else if (type === 'elemental') nextEndTime = now + 11 * 60 * 60 * 1000;
+
+                                bossChanged = true;
+
+                                // Reset Leaderboard for World
+                                if (type === 'world') {
+                                    updates.worldBossDamage = 0;
+                                    updates.worldBossPlayers = [
+                                        { name: "Top-G", damage: 150000000000 },
+                                        { name: "Slayer", damage: 120000000000 },
+                                        { name: "Shadow", damage: 90000000000 }
+                                    ];
+                                    changed = true;
+                                }
+                            }
+                        }
+
+                        if (bossChanged) {
+                            updates.bosses = {
+                                ...(updates.bosses || prev.bosses),
+                                [type]: {
+                                    ...boss,
+                                    state: nextState,
+                                    hp: nextHp,
+                                    respawnTime: nextRespawn,
+                                    endTime: nextEndTime,
+                                    ...rotationUpdate
+                                }
+                            };
+                            changed = true;
+                        }
+                    });
                 }
 
-                const now = Date.now();
-                if (prev.bossState === 'active') {
-                    if (prev.bossHp <= 0 || now >= prev.bossEndTime) {
-                        updates.bossState = 'cooldown';
-                        updates.bossRespawnTime = now + 12 * 60 * 60 * 1000;
-                        changed = true;
-                    }
-                } else if (prev.bossState === 'cooldown') {
-                    if (now >= prev.bossRespawnTime) {
-                        updates.bossState = 'active';
-                        updates.bossHp = prev.maxBossHp;
-                        updates.bossEndTime = now + 12 * 60 * 60 * 1000;
-                        updates.worldBossDamage = 0;
-                        updates.worldBossPlayers = [
-                            { name: "Top-G", damage: 150000000000 },
-                            { name: "Slayer", damage: 120000000000 },
-                            { name: "Shadow", damage: 90000000000 }
-                        ];
-                        changed = true;
-                    }
+                // SYNC LEGACY STATE for Compatibility
+                if (updates.bosses && updates.bosses.world) {
+                    updates.bossHp = updates.bosses.world.hp;
+                    updates.bossState = updates.bosses.world.state;
+                    updates.bossRespawnTime = updates.bosses.world.respawnTime;
+                    changed = true;
                 }
 
                 return changed ? { ...prev, ...updates } : prev;
@@ -274,13 +425,21 @@ export const GameProvider = ({ children }) => {
     const bulkUpdateStats = (newStats, pointsSpent) => {
         setState(prev => {
             const nextStats = { ...prev.stats, ...newStats };
+            const newMaxHp = 100 + (nextStats.health * 10);
+            const newMaxEnergy = 50 + nextStats.energy;
+            const newMaxStamina = 50 + nextStats.stamina;
+
             return {
                 ...prev,
                 skillPoints: prev.skillPoints - pointsSpent,
                 stats: nextStats,
-                maxHp: 100 + (nextStats.health * 10),
-                maxEnergy: 50 + nextStats.energy,
-                maxStamina: 50 + nextStats.stamina
+                maxHp: newMaxHp,
+                maxEnergy: newMaxEnergy,
+                maxStamina: newMaxStamina,
+                // Add the delta to current values so user doesn't feel they "lost" the fill
+                hp: prev.hp + (newMaxHp - prev.maxHp),
+                energy: prev.energy + (newMaxEnergy - prev.maxEnergy),
+                stamina: prev.stamina + (newMaxStamina - prev.maxStamina)
             };
         });
     };
@@ -332,8 +491,12 @@ export const GameProvider = ({ children }) => {
         setState(prev => ({ ...prev, leader: monsterName }));
     };
 
-    const attackBoss = (dmgType) => {
-        if (state.bossState !== 'active') return;
+    const attackBoss = (dmgType, targetBoss = 'world') => {
+        // Guard against missing boss data
+        if (!state.bosses || !state.bosses[targetBoss]) return;
+        const target = state.bosses[targetBoss];
+
+        if (target.state !== 'active') return;
         if (isAttacking) return;
 
         let costSt = 1, costGm = 0, baseDmg = 15000, attacks = 1, odGain = 0.8;
@@ -424,21 +587,42 @@ export const GameProvider = ({ children }) => {
                 tempEnergy = 50 + prev.stats.energy;
             }
 
-            let nextState = prev.bossState;
-            let nextRespawn = prev.bossRespawnTime;
-            let nextWorldDamage = (prev.worldBossDamage || 0) + finalDmg;
-            let newBossHp = Math.max(0, prev.bossHp - finalDmg);
+            // TARGET SPECIFIC BOSS
+            const currentBoss = prev.bosses[targetBoss];
+            let nextState = currentBoss.state;
+            let nextRespawn = currentBoss.respawnTime;
+            let newBossHp = Math.max(0, currentBoss.hp - finalDmg);
 
-            if (prev.bossState === 'active' && newBossHp <= 0) {
+            // WORLD BOSS LEADERBOARD logic
+            let nextWorldDamage = prev.worldBossDamage;
+            let nextWorldPlayers = prev.worldBossPlayers;
+
+            if (targetBoss === 'world') {
+                nextWorldDamage = (prev.worldBossDamage || 0) + finalDmg;
+            }
+
+            if (currentBoss.state === 'active' && newBossHp <= 0) {
                 nextState = 'cooldown';
-                nextRespawn = Date.now() + 12 * 60 * 60 * 1000;
-                const players = [...prev.worldBossPlayers, { name: "YOU", damage: nextWorldDamage }];
-                players.sort((a, b) => b.damage - a.damage);
-                const rank = players.findIndex(p => p.name === "YOU") + 1;
-                let bonusMoney = 1000000 / rank;
-                let bonusGems = Math.max(1, Math.floor(50 / rank));
-                moneyGain += bonusMoney;
-                tempGems += bonusGems;
+                const now = Date.now();
+                if (targetBoss === 'world') nextRespawn = now + 23 * 60 * 60 * 1000;
+                else if (targetBoss === 'elemental') nextRespawn = now + 11 * 60 * 60 * 1000;
+                else if (targetBoss === 'eternal') nextRespawn = now + 24 * 60 * 60 * 1000;
+
+                // Rewards for kill
+                if (targetBoss === 'world') {
+                    const players = [...prev.worldBossPlayers, { name: "YOU", damage: nextWorldDamage }];
+                    players.sort((a, b) => b.damage - a.damage);
+                    const rank = players.findIndex(p => p.name === "YOU") + 1;
+                    let bonusMoney = 1000000 / rank;
+                    let bonusGems = Math.max(1, Math.floor(50 / rank));
+                    moneyGain += bonusMoney;
+                    tempGems += bonusGems;
+                    nextWorldPlayers = players;
+                } else {
+                    // Solo Kill Rewards
+                    moneyGain += 500000;
+                    tempGems += 50;
+                }
             }
 
             return {
@@ -446,11 +630,9 @@ export const GameProvider = ({ children }) => {
                 stamina: tempStamina,
                 energy: tempEnergy,
                 gems: tempGems,
-                bossHp: newBossHp,
-                bossState: nextState,
-                bossRespawnTime: nextRespawn,
                 totalDamage: prev.totalDamage + finalDmg,
-                worldBossDamage: nextWorldDamage,
+                worldBossDamage: targetBoss === 'world' ? nextWorldDamage : prev.worldBossDamage,
+                worldBossPlayers: targetBoss === 'world' ? nextWorldPlayers : prev.worldBossPlayers,
                 totalAttacks: prev.totalAttacks + attacks,
                 money: prev.money + moneyGain,
                 xp: newXp,
@@ -459,7 +641,20 @@ export const GameProvider = ({ children }) => {
                 hp: tempHp,
                 skillPoints: tempPoints,
                 showLevelUp: tempShowLevelUp,
-                overdrive: currentOD
+                overdrive: currentOD,
+                bosses: {
+                    ...prev.bosses,
+                    [targetBoss]: {
+                        ...currentBoss,
+                        hp: newBossHp,
+                        state: nextState,
+                        respawnTime: nextRespawn
+                    }
+                },
+                // Legacy Sync
+                bossHp: targetBoss === 'world' ? newBossHp : prev.bossHp,
+                bossState: targetBoss === 'world' ? nextState : prev.bossState,
+                bossRespawnTime: targetBoss === 'world' ? nextRespawn : prev.bossRespawnTime
             };
         });
 
@@ -484,12 +679,58 @@ export const GameProvider = ({ children }) => {
         setState(prev => {
             const progressId = quest.id;
             const currentProgress = prev.questProgress?.[progressId] || 0;
-            if (currentProgress >= 100) return prev;
+            if (currentProgress >= 300) return prev;
 
-            const nextProgress = Math.min(100, currentProgress + 10);
+            const [c, s, q] = progressId.split('-').map(Number);
+            // Dynamic Difficulty: Earlier quests are faster (22%), later quests are slower (7%).
+            const gain = Math.max(5, 25 - (q * 3));
+            let nextProgress = Math.min(300, currentProgress + gain);
+
+            // CLAMP TO TIER START logic:
+            // If we cross into a new tier (e.g. 100 or 200), stop exactly there so the next round starts at 0%.
+            const currentTier = Math.floor(currentProgress / 100);
+            const calculatedTier = Math.floor(nextProgress / 100);
+
+            if (calculatedTier > currentTier && calculatedTier < 3) {
+                nextProgress = calculatedTier * 100;
+            }
+
             const newQuestProgress = { ...prev.questProgress, [progressId]: nextProgress };
 
             let newXp = prev.xp + xpReward;
+
+            // CHECK FOR COMPLETION BURSTS
+            const oldTier = Math.floor(currentProgress / 100);
+            const newTier = Math.floor(nextProgress / 100);
+
+            if (newTier > oldTier) {
+                // 1. QUEST COMPLETION BURST
+                const tierMultiplier = newTier; // 1, 2, or 3
+                const questBurst = xpReward * 10 * tierMultiplier;
+                newXp += questBurst;
+                triggerResourcePopup('xp', questBurst, true); // true = Crit (Gold/Big text)
+
+                // 2. STAGE COMPLETION BURST
+                // Check if all peers in this stage are also at least newTier * 100
+                let allPeersDone = true;
+                for (let k = 1; k <= 6; k++) {
+                    if (k === q) continue; // Skip self (already checked via nextProgress/newTier)
+                    const peerId = `${c}-${s}-${k}`;
+                    const peerProgress = prev.questProgress?.[peerId] || 0;
+                    if (peerProgress < newTier * 100) {
+                        allPeersDone = false;
+                        break;
+                    }
+                }
+
+                if (allPeersDone) {
+                    const stageBurst = xpReward * 30 * tierMultiplier;
+                    newXp += stageBurst;
+                    // Trigger a second popup slightly delayed or just one big one?
+                    // Let's rely on the separate trigger
+                    setTimeout(() => triggerResourcePopup('xp', stageBurst, true), 300);
+                }
+            }
             let newLevel = prev.level;
             let newXpToLevel = prev.xpToLevel;
             let tempPoints = prev.skillPoints || 0;
